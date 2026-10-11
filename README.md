@@ -41,7 +41,7 @@ Antes de enviar telas reais da empresa, valide as políticas internas de dados e
 
 ## Novidades da v0.7
 
-- **💚 Elogie um Colega** (menu lateral): nome do colega + elogio. Ao chegar a 10 elogios
+- **💚 Elogie um Colega** (menu lateral): nome do colega + elogio. Ao chegar a 15 elogios
   (`ELOGIOS_META`), as palavras mais usadas formam uma **nuvem de palavras** que se atualiza sozinha.
   - **QR Code → `/elogiar.html`**: o público abre só a tela de envio (sem menu, nuvem ou moderação).
   - **Área do moderador** (link no fim da página `Elogie um Colega`): entre com `ELOGIOS_ADMIN_KEY`.
