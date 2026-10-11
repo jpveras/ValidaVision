@@ -1,4 +1,4 @@
-# Valida Vision — v0.7
+# Valida Vision — v0.8
 
 ## Rodar
 
@@ -38,6 +38,17 @@ Os elogios ficam visíveis para quem abrir a página (é a ideia da dinâmica). 
 
 A chave fica só no `.env` e nunca vai para o browser. Não compartilhe o `.env`.
 Antes de enviar telas reais da empresa, valide as políticas internas de dados e PII.
+
+## Novidades da v0.8
+
+- **🙂 Sentimento da Semana** (menu lateral): toda sexta, cada pessoa da equipe informa **uma palavra**
+  que define a sua semana. As respostas são **anônimas** (não guardamos nome, IP nem identificador).
+  - Depois de responder, a pessoa vê a nuvem da equipe naquela semana e quantos já responderam.
+  - O mesmo navegador responde uma vez por semana (semana de segunda a domingo, horário de Brasília).
+- **Painel da gestora** (`/sentimento-gestora.html`, link no rodapé da página): senha própria
+  `SENTIMENTO_GESTORA_KEY`. Mostra palavra da semana, participação, ranking, comparação com a semana
+  anterior, histórico de todas as semanas, **Baixar PDF**, **Copiar resumo** e remoção de palavras impróprias.
+- Variáveis: `SENTIMENTO_GESTORA_KEY` (obrigatória para o painel) e `SENTIMENTO_EQUIPE` (padrão 15).
 
 ## Novidades da v0.7
 
