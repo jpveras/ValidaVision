@@ -1,0 +1,393 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Elogie um Colega · Valida Vision</title>
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --top:#033a45;--teal:#109c8a;--teal2:#0b7f70;--teal-soft:#e6f5f2;--ink:#0b3b47;--text:#25343a;--muted:#6b7a80;
+  --line:#dfe5e3;--page:#eef1f0;--panel:#f5f7f6;--card:#fff;--red:#d64545;--amber:#c98a12;
+  --warn-bg:#fffbea;--warn-line:#f3d77c;--warn-ink:#7a4f00;--info-bg:#eaf6f4;--info-line:#a9dcd3;--info-ink:#0b5e54;
+  --side:104px;--topH:50px
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--page);font-family:Roboto,"Segoe UI",Arial,sans-serif;color:var(--text);font-size:14px}
+[hidden]{display:none!important}
+
+/* Barra superior e menu (iguais à Análise de Tela) */
+.topbar{position:fixed;inset:0 0 auto 0;height:var(--topH);background:var(--top);display:flex;align-items:center;padding:0 18px 0 14px;gap:10px;z-index:10;color:#fff}
+.logo{display:flex;align-items:center;gap:9px;text-decoration:none;color:#fff}
+.logo img{height:40px;width:40px;display:block;border-radius:50%}
+.logo b{font-size:20px;font-weight:700;letter-spacing:.2px}
+.logo b span{font-weight:400;opacity:.85}
+.ver{font-size:10px;opacity:.7;margin-top:6px}
+.topbar .spacer{flex:1}
+.env{font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;padding:6px 10px;border-radius:99px;background:rgba(255,255,255,.12)}
+.side{position:fixed;top:var(--topH);bottom:0;left:0;width:var(--side);background:#fff;border-right:1px solid var(--line);padding-top:18px;overflow-y:auto}
+.nav{display:flex;flex-direction:column;align-items:center;gap:6px;padding:16px 6px;color:var(--text);text-decoration:none;font-size:12px;text-align:center;line-height:1.3;border-left:3px solid transparent}
+.nav svg{width:24px;height:24px;stroke:var(--teal);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.nav:hover{background:var(--panel)}
+.nav.active{background:var(--teal-soft);border-left-color:var(--teal);color:var(--teal2);font-weight:500}
+.content{margin:var(--topH) 0 0 var(--side);padding:24px 28px 40px;min-height:calc(100vh - var(--topH))}
+.panel{background:var(--panel);min-height:100%;padding:24px 20px 48px}
+.wrap{max-width:960px;margin:0 auto}
+
+.alert{display:flex;gap:12px;align-items:flex-start;border:1px solid var(--warn-line);background:var(--warn-bg);color:var(--warn-ink);border-radius:6px;padding:16px 18px;margin-bottom:24px}
+.alert svg{flex:none;width:20px;height:20px;stroke:#e0a100;fill:none;stroke-width:2;margin-top:2px}
+.alert b{display:block;margin-bottom:4px}
+
+.page-head{display:flex;align-items:center;gap:14px}
+.page-head .grow{flex:1}
+.page-icon{width:48px;height:48px;border-radius:10px;background:var(--teal-soft);display:grid;place-items:center;flex:none}
+.page-icon svg{width:24px;height:24px;stroke:var(--teal);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.page-head h1{margin:0;font-size:32px;font-weight:500;color:var(--ink);letter-spacing:-.3px}
+.page-sub{margin:16px 0 0;font-size:16px;color:var(--text)}
+.divider{height:1px;background:var(--line);margin:22px 0 24px}
+
+.card{background:var(--card);border:1px solid var(--line);border-radius:6px;margin-bottom:24px}
+.card-head{padding:20px 24px;border-bottom:1px solid var(--line);font-size:18px;font-weight:500;color:var(--text);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.card-body{padding:28px 24px}
+.field{margin-bottom:22px}
+.label{display:flex;justify-content:space-between;font-size:13px;font-weight:500;letter-spacing:1px;text-transform:uppercase;color:var(--text);margin-bottom:10px}
+.label .req{color:var(--red)}
+.counter{font-size:12px;letter-spacing:0;text-transform:none;color:var(--muted);font-weight:400}
+.input{width:100%;border:1px solid #cfd8d6;border-radius:4px;padding:13px 14px;font:inherit;font-size:15px;color:var(--text);background:#fff}
+textarea.input{min-height:110px;resize:vertical;line-height:1.5}
+.input:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px var(--teal-soft)}
+
+.actions{display:flex;justify-content:space-between;align-items:center;gap:12px}
+button{font:inherit;font-size:13px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;border-radius:4px;padding:0 24px;height:48px;cursor:pointer;display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
+button svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.btn-outline{background:#fff;border:1px solid #9aa6a9;color:var(--text)}
+.btn-outline:hover{border-color:var(--text)}
+.btn-primary{background:var(--teal);border:1px solid var(--teal);color:#fff;box-shadow:0 2px 4px rgba(16,156,138,.25)}
+.btn-primary:hover{background:var(--teal2);border-color:var(--teal2)}
+.btn-sm{height:36px;padding:0 14px;font-size:12px;letter-spacing:.8px}
+.btn-danger{background:#fff;border:1px solid #e3a5a5;color:#b42318}
+.btn-danger.armed{background:#b42318;color:#fff;border-color:#b42318}
+button:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
+.status{min-height:20px;margin-top:14px;font-size:13px;color:var(--teal2)}
+.status.error{color:var(--red)}
+
+/* Progresso */
+.progress{display:flex;align-items:center;gap:12px;font-size:14px}
+.bar{flex:1;height:10px;border-radius:99px;background:#e3e9e7;overflow:hidden;min-width:120px}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--teal),#2fc28f);border-radius:99px;transition:width .5s}
+.progress b{color:var(--ink);font-size:15px;white-space:nowrap}
+
+/* Nuvem */
+.cloud-box{position:relative;height:420px;border-radius:6px;background:linear-gradient(180deg,#fbfdfc,#f3f8f6);overflow:hidden}
+.cloud-box canvas{display:block;width:100%;height:100%}
+.cloud-wait{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;padding:24px;color:var(--muted)}
+.cloud-wait strong{font-size:22px;color:var(--ink);font-weight:500}
+.cloud-wait .big{font-size:56px;font-weight:900;color:var(--teal);line-height:1}
+.fallback-cloud{position:absolute;inset:0;display:flex;flex-wrap:wrap;align-content:center;justify-content:center;gap:6px 16px;padding:24px;line-height:1.05}
+.fallback-cloud span{font-weight:700}
+
+/* Lista de elogios */
+.list{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(260px,100%),1fr));gap:12px}
+.elogio{border:1px solid var(--line);border-left:4px solid var(--teal);border-radius:6px;padding:14px 16px;background:#fff;position:relative}
+.elogio b{display:block;color:var(--ink);font-size:15px;margin-bottom:4px}
+.elogio p{margin:0;color:var(--text);line-height:1.5;word-wrap:break-word}
+.elogio small{display:block;margin-top:8px;color:var(--muted);font-size:11px}
+.elogio .rm{position:absolute;top:8px;right:8px;height:26px;padding:0 8px;font-size:10px}
+.empty{text-align:center;padding:24px;color:var(--muted)}
+.new{animation:pop .6s ease}
+@keyframes pop{from{transform:scale(.96);background:var(--teal-soft)}to{transform:none}}
+
+/* Moderação */
+.admin{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.admin .input{width:200px;padding:8px 10px;font-size:13px}
+
+/* Modo apresentação */
+.qr-card{display:none}
+body.present{--side:0px}
+body.present .side,body.present #formCard,body.present .page-sub,body.present .divider,body.present .hide-present{display:none!important}
+body.present .content{padding:16px}
+body.present .panel{padding:16px}
+body.present .wrap{max-width:1500px}
+body.present .stage{display:grid;grid-template-columns:1fr 320px;gap:20px;align-items:start}
+body.present .qr-card{display:block}
+body.present .cloud-box{height:calc(100vh - 290px);min-height:420px}
+body.present .list{grid-template-columns:repeat(auto-fill,minmax(300px,1fr))}
+.qr{padding:18px;text-align:center}
+.qr svg{width:100%;height:auto;display:block;background:#fff}
+.qr .url{font-size:13px;color:var(--ink);word-break:break-all;margin-top:10px;font-weight:500}
+.qr .cta{font-size:18px;color:var(--ink);margin:0 0 12px;font-weight:500}
+.qr .count{font-size:64px;font-weight:900;color:var(--teal);line-height:1;margin-top:16px}
+.qr .count-label{color:var(--muted)}
+.qr .warn{margin-top:12px;font-size:12px;color:var(--warn-ink);background:var(--warn-bg);border:1px solid var(--warn-line);border-radius:4px;padding:8px}
+
+@media(max-width:760px){
+  :root{--side:64px}
+  .nav span{display:none}
+  .content{padding:12px}
+  .panel{padding:16px 12px 32px}
+  .page-head h1{font-size:24px}
+  .card-body{padding:20px 16px}
+  .actions button{padding:0 16px;letter-spacing:.6px}
+  .env{display:none}
+  .cloud-box{height:320px}
+  #presentBtn{display:none}
+  .progress{flex-wrap:wrap;max-width:none!important}
+  .progress b{white-space:normal;font-size:13px}
+  .actions button{height:44px;padding:0 12px;letter-spacing:.4px;font-size:12px}
+  .actions button svg{display:none}
+}
+@media(max-width:1000px){body.present .stage{grid-template-columns:1fr}}
+</style></head>
+<body>
+
+<header class="topbar">
+  <a class="logo" href="/">
+    <img id="brandLogo" src="/logo.png" alt="" hidden onload="this.hidden=false;this.nextElementSibling.setAttribute('hidden','')">
+    <svg width="28" height="24" viewBox="0 0 28 24" aria-hidden="true"><path d="M1 2h9l4 9 4-9h9L14 23z" fill="#2fc28f"/><path d="M10 2h8l-4 9z" fill="#1a8f6a"/></svg>
+    <b>Valida <span>Vision</span></b><span class="ver">v0.7</span>
+  </a>
+  <div class="spacer"></div>
+  <span class="env" id="envBadge">Protótipo local</span>
+</header>
+
+<nav class="side" aria-label="Menu">
+  <a class="nav" href="/">
+    <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4"/><circle cx="12" cy="10.5" r="2.5"/></svg>
+    <span>Análise de Tela</span>
+  </a>
+  <a class="nav active" href="/elogios.html" aria-current="page">
+    <svg viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.5 1-1.1a5.5 5.5 0 0 0 0-7.8z"/></svg>
+    <span>Elogie um Colega</span>
+  </a>
+  <a class="nav" href="/api/health" target="_blank" rel="noopener">
+    <svg viewBox="0 0 24 24"><path d="M3 12h4l3-7 4 14 3-7h4"/></svg>
+    <span>Status da IA</span>
+  </a>
+</nav>
+
+<main class="content"><div class="panel"><div class="wrap">
+
+  <div id="storageWarn" class="alert" hidden>
+    <svg viewBox="0 0 24 24"><path d="M12 3 2 20h20L12 3z"/><path d="M12 10v4M12 17v.5"/></svg>
+    <div><b>Armazenamento temporário</b>O Vercel Blob não está conectado a este projeto. Os elogios podem se perder; conecte um Blob store em Storage na Vercel.</div>
+  </div>
+
+  <div class="page-head">
+    <div class="page-icon"><svg viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.5 1-1.1a5.5 5.5 0 0 0 0-7.8z"/></svg></div>
+    <h1 class="grow">Elogie um Colega</h1>
+    <button id="presentBtn" class="btn-outline btn-sm" type="button"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg><span>Modo apresentação</span></button>
+  </div>
+  <p class="page-sub">Reconheça alguém do time. Quando chegarmos a <b id="metaTxt">10</b> elogios, as palavras mais usadas formam uma nuvem.</p>
+  <div class="divider"></div>
+
+  <section class="card" id="formCard">
+    <div class="card-head">Enviar elogio</div>
+    <form class="card-body" id="form" novalidate>
+      <div class="field">
+        <label class="label" for="nome"><span>Nome do colega <span class="req">(obrigatório)</span></span></label>
+        <input class="input" id="nome" name="nome" maxlength="60" autocomplete="off" placeholder="Ex.: Maria Souza">
+      </div>
+      <div class="field">
+        <label class="label" for="texto"><span>Elogio <span class="req">(obrigatório)</span></span><span class="counter" id="cnt">0/280</span></label>
+        <textarea class="input" id="texto" name="texto" maxlength="280" placeholder="Ex.: Sempre parceira, organizada e com uma atenção incrível aos detalhes nos testes."></textarea>
+      </div>
+      <div class="actions">
+        <button class="btn-outline" type="reset" id="limpar">Limpar</button>
+        <button class="btn-primary" type="submit" id="enviar"><svg viewBox="0 0 24 24"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>Enviar elogio</button>
+      </div>
+      <div class="status" id="status" role="status"></div>
+    </form>
+  </section>
+
+  <div class="stage">
+    <div>
+      <section class="card">
+        <div class="card-head">
+          <span>Nuvem de palavras</span>
+          <div class="progress" style="flex:1;max-width:420px"><div class="bar"><i id="bar"></i></div><b id="progTxt">0 de 10 elogios</b></div>
+        </div>
+        <div class="card-body" style="padding:16px">
+          <div class="cloud-box" id="cloudBox">
+            <canvas id="cloud" hidden></canvas>
+            <div id="fallback" class="fallback-cloud" hidden></div>
+            <div class="cloud-wait" id="cloudWait">
+              <span class="big" id="faltam">10</span>
+              <strong id="faltamTxt">elogios para a nuvem aparecer</strong>
+              <span>Cada elogio enviado aproxima a revelação. Vale elogiar mais de um colega!</span>
+              <button class="btn-outline btn-sm" id="previa" type="button" hidden>Mostrar prévia agora</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card-head">
+          <span>Últimos elogios <small class="counter" id="listCount"></small></span>
+          <div class="admin" id="adminBox" hidden>
+            <span id="adminLogin"><input class="input" id="adminKey" type="password" placeholder="Chave de moderação" autocomplete="off"> <button class="btn-outline btn-sm" id="adminOk" type="button">Moderar</button></span>
+            <span id="adminOn" hidden><button class="btn-danger btn-sm" id="zerar" type="button">Zerar tudo</button> <button class="btn-outline btn-sm" id="adminSair" type="button">Sair</button></span>
+            <span class="counter" id="adminMsg"></span>
+          </div>
+        </div>
+        <div class="card-body" style="padding:16px"><div id="list" class="list"><div class="empty">Nenhum elogio ainda. Seja o primeiro!</div></div></div>
+      </section>
+    </div>
+
+    <aside class="card qr-card">
+      <div class="qr">
+        <p class="cta">Aponte a câmera e deixe seu elogio</p>
+        <div id="qr"></div>
+        <div class="url" id="qrUrl"></div>
+        <div class="count" id="bigCount">0</div>
+        <div class="count-label">elogios recebidos</div>
+        <div class="warn" id="qrWarn" hidden>Este endereço só abre no seu computador. Use o link publicado na Vercel para o público acessar.</div>
+        <div style="margin-top:18px;display:flex;flex-direction:column;gap:8px;align-items:stretch">
+          <button class="btn-outline btn-sm" id="modBtn" type="button" style="justify-content:center">Moderação</button>
+          <button class="btn-primary btn-sm" id="exitBtn" type="button" style="justify-content:center">Sair da apresentação</button>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+</div></div></main>
+
+<script src="/vendor/wordcloud2.js"></script>
+<script src="/vendor/qrcode.js"></script>
+<script>
+const $=id=>document.getElementById(id);
+const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+const local=/^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
+$('envBadge').textContent=local?'Protótipo local':'Demonstração';
+
+const ss={get(k){try{return sessionStorage.getItem(k)}catch{return null}},set(k,v){try{v==null?sessionStorage.removeItem(k):sessionStorage.setItem(k,v)}catch{}}};
+let state={meta:10,total:0,palavras:[],elogios:[]},previa=false,adminKey=ss.get('vv-admin'),lastCloudSig='',seen=new Set(),firstLoad=true;
+
+// ---------- Formulário ----------
+const form=$('form'),nome=$('nome'),texto=$('texto'),statusEl=$('status'),enviar=$('enviar');
+const status=(t,e=false)=>{statusEl.textContent=t;statusEl.className='status'+(e?' error':'')};
+texto.addEventListener('input',()=>$('cnt').textContent=`${texto.value.length}/280`);
+form.addEventListener('reset',()=>setTimeout(()=>$('cnt').textContent='0/280'));
+$('limpar').addEventListener('click',()=>status(''));
+form.addEventListener('submit',async e=>{
+  e.preventDefault();
+  const n=nome.value.trim(),t=texto.value.trim();
+  if(n.length<2){status('Informe o nome do colega.',true);return nome.focus()}
+  if(t.length<3){status('Escreva o elogio.',true);return texto.focus()}
+  enviar.disabled=true;status('Enviando…');
+  try{
+    const r=await fetch('/api/elogios',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nome:n,texto:t})});
+    const d=await r.json().catch(()=>({}));
+    if(!r.ok)throw new Error(d.error||'Não consegui enviar. Tente de novo.');
+    form.reset();status(`Elogio para ${n} enviado! 💚 Quer elogiar mais alguém?`);
+    await carregar(true);
+  }catch(err){status(err.message,true)}finally{enviar.disabled=false}
+});
+
+// ---------- Dados ----------
+async function carregar(force){
+  try{
+    const r=await fetch('/api/elogios',{cache:'no-store'});const d=await r.json();
+    if(!r.ok)throw new Error(d.error);
+    state=d;render();
+  }catch(e){if(force)status(e.message||'Falha ao atualizar.',true)}
+}
+
+function render(){
+  const {meta,total}=state;
+  $('metaTxt').textContent=meta;
+  $('bar').style.width=Math.min(100,total/meta*100)+'%';
+  $('progTxt').textContent=total>=meta?`${total} elogios · nuvem liberada 🎉`:`${total} de ${meta} elogios`;
+  $('bigCount').textContent=total;
+  const faltam=Math.max(0,meta-total);
+  $('faltam').textContent=faltam;$('faltamTxt').textContent=faltam===1?'elogio para a nuvem aparecer':'elogios para a nuvem aparecer';
+  $('storageWarn').hidden=state.armazenamento!=='temporario';
+  renderList();renderCloud();
+}
+
+function quando(iso){const d=new Date(iso),s=(Date.now()-d)/1000;if(s<60)return'agora';if(s<3600)return`há ${Math.floor(s/60)} min`;return d.toLocaleString('pt-BR',{hour:'2-digit',minute:'2-digit',day:'2-digit',month:'2-digit'})}
+function renderList(){
+  const l=state.elogios||[];$('listCount').textContent=l.length?`(${state.total})`:'';
+  if(!l.length){$('list').innerHTML='<div class="empty">Nenhum elogio ainda. Seja o primeiro!</div>';return}
+  const mostrar=document.body.classList.contains('present')?l.slice(0,6):l;
+  $('list').innerHTML=mostrar.map(e=>`<div class="elogio${!firstLoad&&!seen.has(e.id)?' new':''}"><b>${esc(e.nome)}</b><p>${esc(e.texto)}</p><small>${quando(e.criadoEm)}</small>${adminKey?`<button class="btn-danger rm" data-id="${esc(e.id)}" type="button">Remover</button>`:''}</div>`).join('');
+  l.forEach(e=>seen.add(e.id));firstLoad=false;
+}
+
+// ---------- Nuvem ----------
+const CORES=['#0b7f70','#109c8a','#033a45','#2fc28f','#c98a12','#0b3b47','#1a8f6a','#d0811b'];
+function renderCloud(force){
+  const mostrar=state.total>=state.meta||previa;
+  $('cloudWait').hidden=mostrar&&state.palavras.length>0;
+  $('previa').hidden=!document.body.classList.contains('present')||state.total>=state.meta||!state.palavras.length;
+  if(!mostrar||!state.palavras.length){$('cloud').hidden=true;$('fallback').hidden=true;lastCloudSig='';return}
+  const box=$('cloudBox'),W=box.clientWidth,H=box.clientHeight;
+  const sig=JSON.stringify(state.palavras)+W+'x'+H;
+  if(sig===lastCloudSig&&!force)return;lastCloudSig=sig;
+  const lista=state.palavras,max=lista[0][1],min=lista[lista.length-1][1];
+  const maxPx=Math.max(34,Math.min(W,H)/(lista.length<6?3.2:4.6)),minPx=Math.max(13,maxPx/5.5);
+  const tam=c=>max===min?maxPx*.8:minPx+(c-min)/(max-min)*(maxPx-minPx);
+  if(window.WordCloud&&WordCloud.isSupported){
+    const cv=$('cloud'),dpr=Math.min(2,window.devicePixelRatio||1);
+    cv.width=W*dpr;cv.height=H*dpr;cv.hidden=false;$('fallback').hidden=true;
+    WordCloud(cv,{list:lista,weightFactor:c=>tam(c)*dpr,fontFamily:'Roboto, "Segoe UI", Arial, sans-serif',fontWeight:'700',
+      color:(w,c)=>CORES[(w.length+c)%CORES.length],rotateRatio:.2,rotationSteps:2,gridSize:Math.round(8*dpr),
+      backgroundColor:'rgba(0,0,0,0)',shrinkToFit:true,drawOutOfBound:false,shuffle:false});
+  }else{
+    $('cloud').hidden=true;const fb=$('fallback');fb.hidden=false;
+    fb.innerHTML=lista.map(([w,c])=>`<span style="font-size:${tam(c).toFixed(0)}px;color:${CORES[(w.length+c)%CORES.length]}">${esc(w)}</span>`).join('');
+  }
+}
+let rz;addEventListener('resize',()=>{clearTimeout(rz);rz=setTimeout(()=>renderCloud(true),250)});
+$('previa').onclick=()=>{previa=true;renderCloud(true)};
+
+// ---------- Modo apresentação ----------
+const pageUrl=location.origin+'/elogios.html';
+function desenharQR(){
+  try{const q=qrcode(0,'M');q.addData(pageUrl);q.make();$('qr').innerHTML=q.createSvgTag({scalable:true,margin:2})}catch{$('qr').textContent=''}
+  $('qrUrl').textContent=pageUrl.replace(/^https?:\/\//,'');$('qrWarn').hidden=!local;
+}
+function setPresent(on){
+  document.body.classList.toggle('present',on);
+  try{const u=new URL(location.href);on?u.searchParams.set('apresentar','1'):u.searchParams.delete('apresentar');history.replaceState(null,'',u)}catch{}
+  if(on)desenharQR();else $('adminBox').hidden=true;
+  agendar();renderList();setTimeout(()=>renderCloud(true),50);
+}
+$('presentBtn').onclick=()=>setPresent(true);
+$('exitBtn').onclick=()=>setPresent(false);
+addEventListener('keydown',e=>{if(e.key==='Escape'&&document.body.classList.contains('present'))setPresent(false)});
+
+// ---------- Moderação ----------
+function atualizaAdmin(){$('adminLogin').hidden=!!adminKey;$('adminOn').hidden=!adminKey;renderList()}
+$('modBtn').onclick=()=>{const b=$('adminBox');b.hidden=!b.hidden;atualizaAdmin();if(!b.hidden&&!adminKey)$('adminKey').focus()};
+async function adminFetch(url,opts={}){const r=await fetch(url,{...opts,headers:{'x-admin-key':adminKey||''}});const d=await r.json().catch(()=>({}));if(!r.ok)throw Object.assign(new Error(d.error||'Falhou.'),{status:r.status});return d}
+$('adminOk').onclick=async()=>{
+  adminKey=$('adminKey').value.trim();if(!adminKey)return;
+  try{await adminFetch('/api/elogios/__teste__',{method:'DELETE'});ss.set('vv-admin',adminKey);$('adminMsg').textContent='Moderação ativa.';$('adminKey').value=''}
+  catch(e){adminKey=null;$('adminMsg').textContent=e.message}
+  atualizaAdmin();
+};
+$('adminKey').addEventListener('keydown',e=>{if(e.key==='Enter')$('adminOk').click()});
+$('adminSair').onclick=()=>{adminKey=null;ss.set('vv-admin',null);$('adminMsg').textContent='';atualizaAdmin()};
+$('list').addEventListener('click',async e=>{
+  const b=e.target.closest('.rm');if(!b)return;
+  if(!b.classList.contains('armed')){b.classList.add('armed');b.textContent='Confirmar';setTimeout(()=>{b.classList.remove('armed');b.textContent='Remover'},3000);return}
+  try{await adminFetch('/api/elogios/'+encodeURIComponent(b.dataset.id),{method:'DELETE'});await carregar(true)}catch(err){$('adminMsg').textContent=err.message}
+});
+$('zerar').onclick=async()=>{
+  const b=$('zerar');
+  if(!b.classList.contains('armed')){b.classList.add('armed');b.textContent='Clique de novo para zerar';setTimeout(()=>{b.classList.remove('armed');b.textContent='Zerar tudo'},4000);return}
+  b.classList.remove('armed');b.textContent='Zerar tudo';
+  try{await adminFetch('/api/elogios',{method:'DELETE'});previa=false;seen.clear();firstLoad=true;$('adminMsg').textContent='Elogios zerados.';await carregar(true)}catch(err){$('adminMsg').textContent=err.message}
+};
+
+// ---------- Atualização automática ----------
+let timer;
+function agendar(){clearTimeout(timer);const ms=document.body.classList.contains('present')?3000:6000;timer=setTimeout(async()=>{if(!document.hidden)await carregar();agendar()},ms)}
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)carregar()});
+
+if(new URLSearchParams(location.search).get('apresentar')==='1')setPresent(true);
+carregar(true).then(agendar);
+</script>
+</body></html>
