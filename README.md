@@ -1,4 +1,4 @@
-# ValidAI Vision — Protótipo Local v0.4
+# ValidAI Vision — Protótipo Local v0.5
 
 ## Rodar
 
@@ -36,6 +36,12 @@ Se um modelo não existir, o próximo é tentado.
 
 A chave fica só no `.env` e nunca vai para o browser. Não compartilhe o `.env`.
 Antes de enviar telas reais da empresa, valide as políticas internas de dados e PII.
+
+## Novidades da v0.5
+
+- Novo layout no padrão Valid.AI: barra superior, menu lateral e card **Executar**.
+- **Colar print**: copie a tela (Win+Shift+S, PrtSc ou "Copiar imagem") e cole com **Ctrl+V** em qualquer lugar da página.
+- Aviso no topo quando a chave do Gemini é recusada ou o modo demonstração está ativo.
 
 ## Novidades da v0.4
 

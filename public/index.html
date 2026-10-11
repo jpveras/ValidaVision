@@ -71,6 +71,9 @@ input[type=file]{display:none}
 .drop-main svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .drop-main .fmt{color:var(--amber);font-weight:400}
 .drop-hint{font-size:12px;color:var(--muted)}
+.drop-hint b{font-weight:500;color:var(--text)}
+kbd{font:inherit;font-size:11px;padding:1px 5px;border:1px solid #cfd8d6;border-bottom-width:2px;border-radius:3px;background:var(--panel)}
+.drop.pasted{border-color:var(--teal);background:var(--teal-soft)}
 .file-name{margin-top:8px;font-size:12px;color:var(--muted)}
 .preview{margin-top:14px;border:1px solid var(--line);border-radius:4px;background:var(--panel);display:flex;align-items:center;justify-content:center;overflow:hidden;color:var(--muted);font-size:13px;min-height:120px}
 .preview img{max-width:100%;max-height:440px;display:block}
@@ -177,7 +180,7 @@ button:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
         <label class="drop" id="drop">
           <input id="file" type="file" accept="image/png,image/jpeg,image/webp">
           <span class="drop-main"><svg viewBox="0 0 24 24"><path d="M12 16V4M7 9l5-5 5 5M4 16v4h16v-4"/></svg>Upload local <span class="fmt">(PNG, JPG ou WEBP)</span></span>
-          <span class="drop-hint">Clique ou arraste a imagem aqui · até 10 MB</span>
+          <span class="drop-hint">Clique, arraste ou <b>cole o print com <kbd>Ctrl</kbd>+<kbd>V</kbd></b> · até 10 MB</span>
         </label>
         <div id="preview" class="preview">Nenhuma imagem selecionada.</div>
       </div>
@@ -227,6 +230,18 @@ h+='</div></div>'});
 const nc=[...(d.notCovered||[])].sort((a,b)=>pr(a.priority).o-pr(b.priority).o);
 if(nc.length)h+=`<div class="block gap"><h3>💡 O que estou esquecendo? Possíveis pontos não cobertos</h3><p>A IA identificou ${comps.length} componentes e sugeriu ${all.length} cenários. Porém, recomenda verificar:</p><ul>${nc.map(n=>`<li>${pbadge(n.priority)} <b>${esc(n.title)}</b><small>${esc(n.reason)}</small></li>`).join('')}</ul></div>`;
 results.innerHTML=h}
+// Colar print (Ctrl+V / Cmd+V) em qualquer lugar da página
+document.addEventListener('paste',e=>{
+  const t=e.target;if(t&&(t.isContentEditable||/^(INPUT|TEXTAREA)$/.test(t.tagName)&&t.type!=='file'))return;
+  const item=[...(e.clipboardData?.items||[])].find(i=>i.kind==='file'&&i.type.startsWith('image/'));
+  if(!item){const hasText=[...(e.clipboardData?.items||[])].some(i=>i.kind==='string');if(hasText)status('A área de transferência não tem uma imagem. Copie o print (ex.: Win+Shift+S ou PrtSc) e cole de novo.',true);return}
+  e.preventDefault();
+  const blob=item.getAsFile();if(!blob)return;
+  const ext=(blob.type.split('/')[1]||'png').replace('jpeg','jpg');
+  const hora=new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit',second:'2-digit'}).replace(/:/g,'');
+  setFile(new File([blob],blob.name&&blob.name!=='image.png'?blob.name:`print-colado-${hora}.${ext}`,{type:blob.type}));
+  if(selectedFile){drop.classList.add('pasted');setTimeout(()=>drop.classList.remove('pasted'),700);status(`Print colado: ${selectedFile.name}. Pronto para análise.`)}
+});
 fileInput.onchange=e=>setFile(e.target.files[0]);['dragenter','dragover'].forEach(e=>drop.addEventListener(e,x=>{x.preventDefault();drop.classList.add('drag')}));['dragleave','drop'].forEach(e=>drop.addEventListener(e,x=>{x.preventDefault();drop.classList.remove('drag')}));drop.addEventListener('drop',e=>setFile(e.dataTransfer.files[0]));
 analyze.onclick=async()=>{if(!selectedFile)return;analyze.disabled=true;status('Analisando a tela com IA…');results.className='empty';results.innerHTML='Identificando componentes e gerando cenários…';const fd=new FormData();fd.append('screenshot',selectedFile);try{const r=await fetch('/api/analyze',{method:'POST',body:fd});const d=await r.json();if(!r.ok)throw new Error(d.error||'Falha na análise.');render(d);status('Análise concluída.')}catch(e){results.className='empty';results.innerHTML=`<span style="color:var(--red)">${esc(e.message)}</span>`;status(e.message,true)}finally{analyze.disabled=false}};
 clearBtn.onclick=()=>{selectedFile=null;fileInput.value='';analyze.disabled=true;preview.textContent='Nenhuma imagem selecionada.';results.className='empty';results.innerHTML='O resultado da análise aparecerá aqui.';status('')};
