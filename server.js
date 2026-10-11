@@ -79,6 +79,9 @@ app.use(express.static(path.join(__dirname, "public")));
 // Elogie um Colega (rotas próprias, não interferem na análise de tela)
 app.use("/api/elogios", elogiosRouter);
 
+// Links curtos para o público (caso o QR Code não funcione)
+app.get(["/elogie", "/e"], (_req, res) => res.redirect(302, "/elogiar.html"));
+
 // Sentimento da Semana (rotas próprias)
 app.use("/api/sentimentos", sentimentosRouter);
 

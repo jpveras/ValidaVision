@@ -1,4 +1,4 @@
-# Valida Vision — v0.8
+# Valida Vision — v0.9
 
 ## Rodar
 
@@ -38,6 +38,15 @@ Os elogios ficam visíveis para quem abrir a página (é a ideia da dinâmica). 
 
 A chave fica só no `.env` e nunca vai para o browser. Não compartilhe o `.env`.
 Antes de enviar telas reais da empresa, valide as políticas internas de dados e PII.
+
+## Novidades da v0.9
+
+- **Tela de demonstração do Elogie um Colega** (modo apresentação, só para o moderador):
+  - **Link curto de reserva**: `/elogie` (ou `/e`) leva à tela de envio, para quem não consegue ler o QR Code.
+    Aparece em destaque no telão e tem botão **Copiar link** (para colar no chat do Teams).
+  - **Nuvem ao vivo** (padrão): a nuvem aparece no primeiro elogio e cresce a cada envio.
+    Ou **Revelar na meta**: suspense até atingir a meta, com "Revelar a nuvem agora".
+  - Aviso no telão a cada elogio novo ("💚 Novo elogio para Ana!"), faixa com os 3 últimos e botão **Tela cheia**.
 
 ## Novidades da v0.8
 
