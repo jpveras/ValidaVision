@@ -264,12 +264,27 @@ const responseSchema = {
         ],
       },
     },
+
+    // "O que estou esquecendo?": pontos que um QA costuma esquecer e que não estão nos cenários.
+    notCovered: {
+      type: "ARRAY",
+      items: {
+        type: "OBJECT",
+        properties: {
+          title: { type: "STRING" },
+          reason: { type: "STRING" },
+          priority: { type: "STRING", enum: ["alta", "media", "baixa"] },
+        },
+        required: ["title", "reason", "priority"],
+      },
+    },
   },
 
   required: [
     "summary",
     "confidence",
     "components",
+    "notCovered",
   ],
 };
 
