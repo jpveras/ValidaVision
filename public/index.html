@@ -3,38 +3,216 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>ValidAI Vision</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-:root{--green:#08783e;--green2:#005f35;--green3:#eaf7ef;--bg:#f3f7f4;--card:#fff;--text:#173b2b;--muted:#64746b;--line:#dce8e0;--red:#b42318;--orange:#b54708;--shadow:0 10px 30px rgba(20,55,35,.08)}
-*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 90% 0,#dff2e7 0,transparent 30%),var(--bg);font-family:Inter,Segoe UI,Arial,sans-serif;color:var(--text)}
-header{height:72px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 38px;gap:14px;position:sticky;top:0;z-index:5}.brand{font-size:22px;font-weight:800;color:var(--green2)}.brand span{font-weight:500;color:var(--muted)}.badge{background:var(--green3);color:var(--green2);padding:6px 10px;border-radius:99px;font-size:11px;font-weight:700}
-main{max-width:1240px;margin:30px auto;padding:0 22px}.hero{margin-bottom:22px}.hero h1{margin:0 0 7px;font-size:32px;letter-spacing:-.5px}.hero p{margin:0;color:var(--muted);font-size:15px}.hero-line{height:4px;width:72px;background:var(--green);border-radius:9px;margin-top:15px}
-.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}.step{background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px 15px;box-shadow:0 3px 12px rgba(20,55,35,.03)}.step b{display:block;font-size:12px;color:var(--green2);margin-bottom:4px}.step span{font-size:12px;color:var(--muted)}
-.layout{display:grid;grid-template-columns:390px 1fr;gap:20px}.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;box-shadow:var(--shadow)}.card h2{margin:0 0 14px;font-size:16px}.drop{min-height:300px;border:2px dashed #b8cbbf;border-radius:14px;background:linear-gradient(180deg,#fbfefc,#f6faf7);display:flex;align-items:center;justify-content:center;text-align:center;padding:22px;cursor:pointer}.drop.drag{border-color:var(--green);background:var(--green3)}.drop strong{display:block;font-size:18px;margin-bottom:7px}.drop span{font-size:12px;color:var(--muted)}input[type=file]{display:none}.actions{display:flex;gap:9px;margin-top:14px}button{border:0;border-radius:9px;padding:11px 15px;font-weight:800;cursor:pointer}button.primary{background:var(--green);color:#fff}button.primary:hover{background:var(--green2)}button.secondary{background:#edf2ee;color:var(--text)}button:disabled{opacity:.5;cursor:not-allowed}.status{min-height:22px;margin-top:12px;font-size:12px;color:var(--green2)}.status.error{color:var(--red)}
-.preview{min-height:300px;border:1px solid var(--line);border-radius:13px;background:#f9fbfa;display:flex;align-items:center;justify-content:center;overflow:hidden;color:#91a097;font-size:13px}.preview img{max-width:100%;max-height:500px;display:block}.results{margin-top:20px}.summary{padding:15px;background:var(--green3);border:1px solid #cfe8d8;border-radius:12px;margin-bottom:14px}.summary b{color:var(--green2)}.meta{display:flex;gap:7px;flex-wrap:wrap;margin-top:9px}.tag{font-size:10px;padding:5px 8px;border-radius:99px;background:#eef2ef;color:#506158;font-weight:700}.component{border:1px solid var(--line);border-radius:13px;margin:11px 0;overflow:hidden}.component-head{padding:14px;background:#fbfdfb;display:flex;justify-content:space-between;gap:10px;align-items:center}.component-head b{font-size:15px}.component-body{padding:0 14px 12px}.scenario{border-top:1px solid var(--line);padding:13px 0}.scenario-title{font-weight:800;font-size:13px;display:flex;gap:7px;align-items:center}.priority{font-size:9px;padding:4px 7px;border-radius:99px;background:#eef2ef}.priority.high{background:#fef3f2;color:var(--red)}.priority.medium{background:#fffaeb;color:var(--orange)}.scenario small{display:block;color:var(--muted);line-height:1.5;margin-top:6px;font-size:11px}.scenario ol{margin:7px 0 0 20px;padding:0;color:#475467;font-size:12px}.empty{text-align:center;padding:34px;color:var(--muted)}
-.priority.low{background:#ecfdf3;color:#067647}.obs{background:#f6faf7;border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:2px 0 6px;font-size:12px;color:#475467}.obs b,.sec-title{display:block;font-size:12px;color:var(--green2);margin-bottom:5px}.obs ul{margin:0;padding-left:18px}.sec-title{margin:10px 0 0}
-.stats{display:flex;gap:7px;flex-wrap:wrap;margin-top:9px}.pt{width:100%;border-collapse:collapse;font-size:12px;margin:8px 0 4px}.pt th,.pt td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line)}.pt th{font-size:11px;color:var(--muted)}.block{border:1px solid var(--line);border-radius:13px;padding:14px;margin:14px 0}.block h3{margin:0 0 4px;font-size:14px}.block p{margin:0 0 8px;font-size:12px;color:var(--muted)}.gap{background:#fffcf5;border-color:#fedf89}.gap li{margin:7px 0;font-size:12px}.gap li small{display:block;color:var(--muted)}
-@media(max-width:900px){.layout,.steps{grid-template-columns:1fr}.hero h1{font-size:27px}}
+:root{
+  --top:#033a45;--teal:#109c8a;--teal2:#0b7f70;--teal-soft:#e6f5f2;--ink:#0b3b47;--text:#25343a;--muted:#6b7a80;
+  --line:#dfe5e3;--page:#eef1f0;--panel:#f5f7f6;--card:#fff;--red:#d64545;--amber:#c98a12;
+  --warn-bg:#fffbea;--warn-line:#f3d77c;--warn-ink:#7a4f00;--info-bg:#eaf6f4;--info-line:#a9dcd3;--info-ink:#0b5e54;
+  --side:104px;--topH:50px
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--page);font-family:Roboto,"Segoe UI",Arial,sans-serif;color:var(--text);font-size:14px}
+
+/* Barra superior */
+.topbar{position:fixed;inset:0 0 auto 0;height:var(--topH);background:var(--top);display:flex;align-items:center;padding:0 18px 0 14px;gap:10px;z-index:10;color:#fff}
+.logo{display:flex;align-items:center;gap:9px;text-decoration:none;color:#fff}
+.logo b{font-size:20px;font-weight:700;letter-spacing:.2px}
+.logo b span{font-weight:400;opacity:.85}
+.ver{font-size:10px;opacity:.7;margin-top:6px}
+.topbar .spacer{flex:1}
+.env{font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;padding:6px 10px;border-radius:99px;background:rgba(255,255,255,.12)}
+
+/* Menu lateral */
+.side{position:fixed;top:var(--topH);bottom:0;left:0;width:var(--side);background:#fff;border-right:1px solid var(--line);padding-top:18px;overflow-y:auto}
+.nav{display:flex;flex-direction:column;align-items:center;gap:6px;padding:16px 6px;color:var(--text);text-decoration:none;font-size:12px;text-align:center;line-height:1.3;border-left:3px solid transparent}
+.nav svg{width:24px;height:24px;stroke:var(--teal);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.nav:hover{background:var(--panel)}
+.nav.active{background:var(--teal-soft);border-left-color:var(--teal);color:var(--teal2);font-weight:500}
+
+/* Área de conteúdo */
+.content{margin:var(--topH) 0 0 var(--side);padding:24px 28px 40px;min-height:calc(100vh - var(--topH))}
+.panel{background:var(--panel);min-height:100%;padding:24px 20px 48px}
+.wrap{max-width:960px;margin:0 auto}
+
+/* Alerta */
+.alert{display:flex;gap:12px;align-items:flex-start;border:1px solid var(--warn-line);background:var(--warn-bg);color:var(--warn-ink);border-radius:6px;padding:16px 18px;margin-bottom:24px}
+.alert svg{flex:none;width:20px;height:20px;stroke:#e0a100;fill:none;stroke-width:2;margin-top:2px}
+.alert b{display:block;margin-bottom:4px}
+.alert.info{border-color:var(--info-line);background:var(--info-bg);color:var(--info-ink)}
+.alert.info svg{stroke:var(--teal)}
+.alert[hidden]{display:none}
+
+/* Título da página */
+.page-head{display:flex;align-items:center;gap:14px}
+.page-icon{width:48px;height:48px;border-radius:10px;background:var(--teal-soft);display:grid;place-items:center}
+.page-icon svg{width:24px;height:24px;stroke:var(--teal);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.page-head h1{margin:0;font-size:32px;font-weight:500;color:var(--ink);letter-spacing:-.3px}
+.page-sub{margin:16px 0 0;font-size:16px;color:var(--text)}
+.divider{height:1px;background:var(--line);margin:22px 0 24px}
+
+/* Cards */
+.card{background:var(--card);border:1px solid var(--line);border-radius:6px;margin-bottom:24px}
+.card-head{padding:20px 24px;border-bottom:1px solid var(--line);font-size:18px;font-weight:500;color:var(--text)}
+.card-body{padding:28px 24px}
+.field{margin-bottom:26px}
+.label{display:block;font-size:13px;font-weight:500;letter-spacing:1px;text-transform:uppercase;color:var(--text);margin-bottom:10px}
+.label .req{color:var(--red)}
+.label .opt{color:var(--muted);font-weight:400}
+
+/* Upload */
+input[type=file]{display:none}
+.drop{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:48px;border:1px solid #cfd8d6;border-radius:4px;background:#fff;cursor:pointer;padding:12px;text-align:center;transition:border-color .15s,background .15s}
+.drop:hover{border-color:var(--teal)}
+.drop.drag{border-color:var(--teal);border-style:dashed;background:var(--teal-soft)}
+.drop-main{display:flex;align-items:center;gap:8px;color:var(--teal2);font-size:13px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase}
+.drop-main svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.drop-main .fmt{color:var(--amber);font-weight:400}
+.drop-hint{font-size:12px;color:var(--muted)}
+.drop-hint b{font-weight:500;color:var(--text)}
+kbd{font:inherit;font-size:11px;padding:1px 5px;border:1px solid #cfd8d6;border-bottom-width:2px;border-radius:3px;background:var(--panel)}
+.drop.pasted{border-color:var(--teal);background:var(--teal-soft)}
+.file-name{margin-top:8px;font-size:12px;color:var(--muted)}
+.preview{margin-top:14px;border:1px solid var(--line);border-radius:4px;background:var(--panel);display:flex;align-items:center;justify-content:center;overflow:hidden;color:var(--muted);font-size:13px;min-height:120px}
+.preview img{max-width:100%;max-height:440px;display:block}
+
+/* Botões */
+.actions{display:flex;justify-content:space-between;align-items:center;gap:12px}
+button{font:inherit;font-size:13px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;border-radius:4px;padding:0 24px;height:48px;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+button svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.btn-outline{background:#fff;border:1px solid #9aa6a9;color:var(--text)}
+.btn-outline:hover{border-color:var(--text)}
+.btn-primary{background:var(--teal);border:1px solid var(--teal);color:#fff;box-shadow:0 2px 4px rgba(16,156,138,.25)}
+.btn-primary:hover{background:var(--teal2);border-color:var(--teal2)}
+button:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
+.status{min-height:20px;margin-top:14px;font-size:13px;color:var(--teal2)}
+.status.error{color:var(--red)}
+
+/* Resultados */
+.empty{text-align:center;padding:30px;color:var(--muted)}
+.summary{padding:16px;background:var(--teal-soft);border:1px solid #c5e8e1;border-radius:6px;margin-bottom:16px;line-height:1.5}
+.summary b{color:var(--teal2)}
+.stats,.meta{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
+.tag{font-size:11px;padding:5px 9px;border-radius:99px;background:#eef2f1;color:#4d5d62;font-weight:500}
+.block{border:1px solid var(--line);border-radius:6px;padding:16px;margin:16px 0}
+.block h3{margin:0 0 4px;font-size:15px;font-weight:500;color:var(--ink)}
+.block p{margin:0 0 8px;font-size:13px;color:var(--muted)}
+.pt{width:100%;border-collapse:collapse;font-size:13px;margin:8px 0 4px}
+.pt th,.pt td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line)}
+.pt th{font-size:11px;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);font-weight:500}
+.component{border:1px solid var(--line);border-radius:6px;margin:12px 0;overflow:hidden}
+.component-head{padding:14px 16px;background:var(--panel);display:flex;justify-content:space-between;gap:10px;align-items:center}
+.component-head b{font-size:15px;font-weight:500;color:var(--ink)}
+.component-body{padding:4px 16px 12px}
+.loc{display:block;color:var(--muted);font-size:12px;margin-top:8px}
+.obs{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:10px 12px;margin:8px 0 6px;font-size:13px;color:#475467}
+.obs b,.sec-title{display:block;font-size:12px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--teal2);margin-bottom:6px}
+.obs ul{margin:0;padding-left:18px}
+.sec-title{margin:14px 0 0}
+.scenario{border-top:1px solid var(--line);padding:13px 0}
+.scenario-title{font-weight:500;font-size:14px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.scenario small{display:block;color:var(--muted);line-height:1.5;margin-top:6px;font-size:12px}
+.scenario ol{margin:8px 0 0 20px;padding:0;color:#475467;font-size:13px}
+.priority{font-size:10px;font-weight:700;padding:4px 8px;border-radius:99px;background:#eef2f1;white-space:nowrap}
+.priority.high{background:#fdecec;color:#b42318}
+.priority.medium{background:#fff6e0;color:#a15c07}
+.priority.low{background:#e6f6ee;color:#067647}
+.gap{background:#fffcf3;border-color:var(--warn-line)}
+.gap ul{padding-left:18px}
+.gap li{margin:8px 0;font-size:13px}
+.gap li small{display:block;color:var(--muted)}
+
+@media(max-width:760px){
+  :root{--side:64px}
+  .nav span{display:none}
+  .content{padding:12px}
+  .panel{padding:16px 12px 32px}
+  .page-head h1{font-size:24px}
+  .card-body{padding:20px 16px}
+  .actions button{padding:0 14px;letter-spacing:.6px}
+  .drop-main{flex-wrap:wrap;justify-content:center}
+  .env{display:none}
+}
 </style></head>
 <body>
-<header><div class="brand">ValidAI <span>Vision</span></div><div class="badge">PROTÓTIPO LOCAL</div></header>
-<main>
-<section class="hero"><h1>Da tela - Ao checklist de testes</h1><p>Envie um print da aplicação e deixe a IA identificar componentes e sugerir pontos de validação.</p><div class="hero-line"></div></section>
-<section class="steps"><div class="step"><b>01 · ENVIE A TELA</b><span>Faça upload de um print da aplicação.</span></div><div class="step"><b>02 · A IA ANALISA</b><span>Componentes visuais são identificados automaticamente.</span></div><div class="step"><b>03 · REVISE OS CENÁRIOS</b><span>Receba sugestões organizadas por componente e prioridade.</span></div></section>
-<section class="layout">
-<div class="card"><h2>1. Envie o print</h2><label class="drop" id="drop"><input id="file" type="file" accept="image/png,image/jpeg,image/webp"><div><strong>Arraste a imagem aqui</strong><span>ou clique para selecionar · PNG, JPG/JPEG ou WEBP · até 10 MB</span></div></label><div class="actions"><button id="analyze" class="primary" disabled>Analisar com IA</button><button id="clear" class="secondary">Limpar</button></div><div id="status" class="status"></div></div>
-<div class="card"><h2>2. Pré-visualização</h2><div id="preview" class="preview">Nenhuma imagem selecionada.</div></div>
-</section>
-<section class="card results"><h2>3. Cenários sugeridos</h2><div id="results" class="empty">O resultado da análise aparecerá aqui.</div></section>
-</main>
+
+<header class="topbar">
+  <a class="logo" href="/">
+    <svg width="28" height="24" viewBox="0 0 28 24" aria-hidden="true"><path d="M1 2h9l4 9 4-9h9L14 23z" fill="#2fc28f"/><path d="M10 2h8l-4 9z" fill="#1a8f6a"/></svg>
+    <b>ValidAI <span>Vision</span></b><span class="ver">v0.5</span>
+  </a>
+  <div class="spacer"></div>
+  <span class="env">Protótipo local</span>
+</header>
+
+<nav class="side" aria-label="Menu">
+  <a class="nav active" href="/" aria-current="page">
+    <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4"/><circle cx="12" cy="10.5" r="2.5"/></svg>
+    <span>Análise de Tela</span>
+  </a>
+  <a class="nav" href="/api/health" target="_blank" rel="noopener">
+    <svg viewBox="0 0 24 24"><path d="M3 12h4l3-7 4 14 3-7h4"/></svg>
+    <span>Status da IA</span>
+  </a>
+</nav>
+
+<main class="content"><div class="panel"><div class="wrap">
+
+  <div id="alert" class="alert" role="status" hidden>
+    <svg id="alertIcon" viewBox="0 0 24 24"><path d="M12 3 2 20h20L12 3z"/><path d="M12 10v4M12 17v.5"/></svg>
+    <div><b id="alertTitle"></b><span id="alertMsg"></span></div>
+  </div>
+
+  <div class="page-head">
+    <div class="page-icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4"/><circle cx="12" cy="10.5" r="2.5"/></svg></div>
+    <h1>Análise de Tela</h1>
+  </div>
+  <p class="page-sub">Envie um print da aplicação e a IA identifica os componentes e sugere cenários de teste por prioridade.</p>
+  <div class="divider"></div>
+
+  <section class="card">
+    <div class="card-head">Executar</div>
+    <div class="card-body">
+      <div class="field">
+        <span class="label">Print da tela <span class="req">(obrigatório)</span></span>
+        <label class="drop" id="drop">
+          <input id="file" type="file" accept="image/png,image/jpeg,image/webp">
+          <span class="drop-main"><svg viewBox="0 0 24 24"><path d="M12 16V4M7 9l5-5 5 5M4 16v4h16v-4"/></svg>Upload local <span class="fmt">(PNG, JPG ou WEBP)</span></span>
+          <span class="drop-hint">Clique, arraste ou <b>cole o print com <kbd>Ctrl</kbd>+<kbd>V</kbd></b> · até 10 MB</span>
+        </label>
+        <div id="preview" class="preview">Nenhuma imagem selecionada.</div>
+      </div>
+      <div class="actions">
+        <button id="clear" class="btn-outline" type="button">Limpar</button>
+        <button id="analyze" class="btn-primary" type="button" disabled>
+          <svg viewBox="0 0 24 24"><rect x="4" y="8" width="16" height="12" rx="2"/><path d="M12 4v4M9 13v1M15 13v1M2 14h2M20 14h2"/></svg>Analisar com IA
+        </button>
+      </div>
+      <div id="status" class="status"></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="card-head">Cenários sugeridos</div>
+    <div class="card-body"><div id="results" class="empty">O resultado da análise aparecerá aqui.</div></div>
+  </section>
+
+</div></div></main>
+
 <script>
 const fileInput=document.getElementById('file'),drop=document.getElementById('drop'),analyze=document.getElementById('analyze'),clearBtn=document.getElementById('clear'),preview=document.getElementById('preview'),statusEl=document.getElementById('status'),results=document.getElementById('results');let selectedFile=null;
+const alertEl=document.getElementById('alert');
 const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
 function status(t,e=false){statusEl.textContent=t;statusEl.className='status '+(e?'error':'')}
-function setFile(f){if(!f)return;if(!['image/png','image/jpeg','image/webp'].includes(f.type))return status('Formato não suportado.',true);if(f.size>10*1024*1024)return status('A imagem deve ter no máximo 10 MB.',true);selectedFile=f;analyze.disabled=false;preview.innerHTML='';const img=document.createElement('img');img.src=URL.createObjectURL(f);img.alt='Print selecionado';preview.appendChild(img);status('Imagem pronta para análise.')}
+function showAlert(title,msg,kind='warn'){document.getElementById('alertTitle').textContent=title;document.getElementById('alertMsg').textContent=msg;alertEl.className='alert'+(kind==='info'?' info':'');document.getElementById('alertIcon').innerHTML=kind==='info'?'<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8v.5"/>':'<path d="M12 3 2 20h20L12 3z"/><path d="M12 10v4M12 17v.5"/>';alertEl.hidden=false}
+function setFile(f){if(!f)return;if(!['image/png','image/jpeg','image/webp'].includes(f.type))return status('Formato não suportado.',true);if(f.size>10*1024*1024)return status('A imagem deve ter no máximo 10 MB.',true);selectedFile=f;analyze.disabled=false;preview.innerHTML='';const img=document.createElement('img');img.src=URL.createObjectURL(f);img.alt='Print selecionado';preview.appendChild(img);status(`Imagem pronta para análise: ${f.name}`)}
 const PR={alta:{i:'🟥',l:'Alta',c:'high',o:0},media:{i:'🟨',l:'Média',c:'medium',o:1},baixa:{i:'🟩',l:'Baixa',c:'low',o:2}};
 const pr=p=>PR[p]||PR.media;
 const pbadge=p=>`<span class="priority ${pr(p).c}">${pr(p).i} ${pr(p).l}</span>`;
 function render(d){
+results.className='';
 const comps=d.components||[];const all=comps.flatMap((c,i)=>(c.testPoints||[]).map((t,j)=>({c,i,t,j})));
 const cnt={alta:0,media:0,baixa:0};all.forEach(x=>{if(cnt[x.t.priority]!==undefined)cnt[x.t.priority]++});
 let h=`<div class="summary"><b>Resumo:</b> ${esc(d.summary)}<div class="stats"><span class="tag">${comps.length} componentes</span><span class="tag">${all.length} cenários</span><span class="tag">🟥 ${cnt.alta} alta</span><span class="tag">🟨 ${cnt.media} média</span><span class="tag">🟩 ${cnt.baixa} baixa</span></div><div class="meta"><span class="tag">Confiança: ${esc(d.confidence)}</span><span class="tag">${esc(d.provider||'IA')}</span><span class="tag">${esc(d.model||'')}</span>${d.demo?'<span class="tag">MODO DEMONSTRAÇÃO</span>':''}</div></div>`;
@@ -44,7 +222,7 @@ h+=`<div class="block"><h3>🎯 Por onde começar</h3><p>Cenários ordenados por
 comps.forEach((c,i)=>{
 const pts=(c.testPoints||[]).map((t,j)=>({t,j})).sort((a,b)=>pr(a.t.priority).o-pr(b.t.priority).o||a.j-b.j);
 h+=`<div class="component"><div class="component-head"><b>${i+1}. ${esc(c.name)}</b><span class="tag">${esc(c.type)} · ${esc(c.confidence)}</span></div><div class="component-body">`;
-if(c.location)h+=`<small style="color:var(--muted);font-size:11px">Localização: ${esc(c.location)}</small>`;
+if(c.location)h+=`<span class="loc">Localização: ${esc(c.location)}</span>`;
 if(c.observations?.length)h+=`<div class="obs"><b>🔎 O que a IA viu</b><ul>${c.observations.map(o=>`<li>${esc(o)}</li>`).join('')}</ul></div>`;
 if(pts.length)h+=`<span class="sec-title">🧪 Cenários sugeridos</span>`;
 pts.forEach(({t,j})=>{h+=`<div class="scenario"><div class="scenario-title">${i+1}.${j+1} ${esc(t.title)} ${pbadge(t.priority)}</div><small><b>Categoria:</b> ${esc(t.category)}</small><small><b>De onde veio a sugestão:</b> ${esc(t.rationale)}</small>${t.steps?.length?'<ol>'+t.steps.map(s=>`<li>${esc(s)}</li>`).join('')+'</ol>':''}<small><b>Resultado esperado:</b> ${esc(t.expected)}</small></div>`});
@@ -52,8 +230,20 @@ h+='</div></div>'});
 const nc=[...(d.notCovered||[])].sort((a,b)=>pr(a.priority).o-pr(b.priority).o);
 if(nc.length)h+=`<div class="block gap"><h3>💡 O que estou esquecendo? Possíveis pontos não cobertos</h3><p>A IA identificou ${comps.length} componentes e sugeriu ${all.length} cenários. Porém, recomenda verificar:</p><ul>${nc.map(n=>`<li>${pbadge(n.priority)} <b>${esc(n.title)}</b><small>${esc(n.reason)}</small></li>`).join('')}</ul></div>`;
 results.innerHTML=h}
-drop.onclick=()=>fileInput.click();fileInput.onchange=e=>setFile(e.target.files[0]);['dragenter','dragover'].forEach(e=>drop.addEventListener(e,x=>{x.preventDefault();drop.classList.add('drag')}));['dragleave','drop'].forEach(e=>drop.addEventListener(e,x=>{x.preventDefault();drop.classList.remove('drag')}));drop.addEventListener('drop',e=>setFile(e.dataTransfer.files[0]));
-analyze.onclick=async()=>{if(!selectedFile)return;analyze.disabled=true;status('Analisando a tela com IA…');results.innerHTML='<div class="empty">Identificando componentes e gerando cenários…</div>';const fd=new FormData();fd.append('screenshot',selectedFile);try{const r=await fetch('/api/analyze',{method:'POST',body:fd});const d=await r.json();if(!r.ok)throw new Error(d.error||'Falha na análise.');render(d);status('Análise concluída.')}catch(e){results.innerHTML=`<div class="empty" style="color:#b42318">${esc(e.message)}</div>`;status(e.message,true)}finally{analyze.disabled=false}};
-clearBtn.onclick=()=>{selectedFile=null;fileInput.value='';analyze.disabled=true;preview.textContent='Nenhuma imagem selecionada.';results.innerHTML='<div class="empty">O resultado da análise aparecerá aqui.</div>';status('')};
-fetch('/api/health').then(r=>r.json()).then(h=>{if(!h.ok)status(h.message,true)}).catch(()=>{});
+// Colar print (Ctrl+V / Cmd+V) em qualquer lugar da página
+document.addEventListener('paste',e=>{
+  const t=e.target;if(t&&(t.isContentEditable||/^(INPUT|TEXTAREA)$/.test(t.tagName)&&t.type!=='file'))return;
+  const item=[...(e.clipboardData?.items||[])].find(i=>i.kind==='file'&&i.type.startsWith('image/'));
+  if(!item){const hasText=[...(e.clipboardData?.items||[])].some(i=>i.kind==='string');if(hasText)status('A área de transferência não tem uma imagem. Copie o print (ex.: Win+Shift+S ou PrtSc) e cole de novo.',true);return}
+  e.preventDefault();
+  const blob=item.getAsFile();if(!blob)return;
+  const ext=(blob.type.split('/')[1]||'png').replace('jpeg','jpg');
+  const hora=new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit',second:'2-digit'}).replace(/:/g,'');
+  setFile(new File([blob],blob.name&&blob.name!=='image.png'?blob.name:`print-colado-${hora}.${ext}`,{type:blob.type}));
+  if(selectedFile){drop.classList.add('pasted');setTimeout(()=>drop.classList.remove('pasted'),700);status(`Print colado: ${selectedFile.name}. Pronto para análise.`)}
+});
+fileInput.onchange=e=>setFile(e.target.files[0]);['dragenter','dragover'].forEach(e=>drop.addEventListener(e,x=>{x.preventDefault();drop.classList.add('drag')}));['dragleave','drop'].forEach(e=>drop.addEventListener(e,x=>{x.preventDefault();drop.classList.remove('drag')}));drop.addEventListener('drop',e=>setFile(e.dataTransfer.files[0]));
+analyze.onclick=async()=>{if(!selectedFile)return;analyze.disabled=true;status('Analisando a tela com IA…');results.className='empty';results.innerHTML='Identificando componentes e gerando cenários…';const fd=new FormData();fd.append('screenshot',selectedFile);try{const r=await fetch('/api/analyze',{method:'POST',body:fd});const d=await r.json();if(!r.ok)throw new Error(d.error||'Falha na análise.');render(d);status('Análise concluída.')}catch(e){results.className='empty';results.innerHTML=`<span style="color:var(--red)">${esc(e.message)}</span>`;status(e.message,true)}finally{analyze.disabled=false}};
+clearBtn.onclick=()=>{selectedFile=null;fileInput.value='';analyze.disabled=true;preview.textContent='Nenhuma imagem selecionada.';results.className='empty';results.innerHTML='O resultado da análise aparecerá aqui.';status('')};
+fetch('/api/health').then(r=>r.json()).then(h=>{if(!h.ok)showAlert('Funcionalidade temporariamente indisponível',h.message);else if(h.demo)showAlert('Modo demonstração ativo','A IA não está sendo chamada; os resultados são dados de exemplo.','info')}).catch(()=>showAlert('Servidor indisponível','Não consegui falar com o servidor local. Verifique se o npm start está rodando.'));
 </script></body></html>
