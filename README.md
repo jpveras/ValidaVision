@@ -43,10 +43,12 @@ Antes de enviar telas reais da empresa, valide as políticas internas de dados e
 
 - **💚 Elogie um Colega** (menu lateral): nome do colega + elogio. Ao chegar a 10 elogios
   (`ELOGIOS_META`), as palavras mais usadas formam uma **nuvem de palavras** que se atualiza sozinha.
-  - **Modo apresentação**: nuvem em tela cheia, QR Code para o público acessar e contador ao vivo.
-    Também abre direto por `/elogios.html?apresentar=1`.
-  - **Moderação**: no modo apresentação, clique em "Moderação" e informe `ELOGIOS_ADMIN_KEY` para
-    remover um elogio ou zerar tudo antes de uma nova apresentação.
+  - **QR Code → `/elogiar.html`**: o público abre só a tela de envio (sem menu, nuvem ou moderação).
+  - **Área do moderador** (link no fim da página `Elogie um Colega`): entre com `ELOGIOS_ADMIN_KEY`.
+    Só o moderador vê o **Modo apresentação**, os botões **Remover** e **Apagar todos**.
+    A senha fica salva só no seu navegador; use "Sair do modo moderador" em computadores compartilhados.
+  - **Modo apresentação**: nuvem em tela cheia, QR Code e contador ao vivo. Atalho:
+    `/elogios.html?apresentar=1` (pede a senha se você ainda não entrou como moderador).
   - Local (`npm start`): os elogios ficam em `data/elogios.json`. Na Vercel: Vercel Blob.
 - Pronto para publicar na **Vercel** (passo a passo abaixo). O `npm start` continua igual.
 - Prints acima de 4 MB são reduzidos no navegador antes do envio (limite da Vercel: 4,5 MB).
