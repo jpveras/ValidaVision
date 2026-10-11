@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { elogiosRouter } from "./elogios.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ENV_PATH = path.join(__dirname, ".env");
@@ -73,6 +74,9 @@ const upload = multer({
 });
 
 app.use(express.static(path.join(__dirname, "public")));
+
+// Elogie um Colega (rotas próprias, não interferem na análise de tela)
+app.use("/api/elogios", elogiosRouter);
 
 
 // ======================================================
@@ -620,8 +624,11 @@ app.use((err, _req, res, _next) => {
 // ======================================================
 
 const startCfg = getConfig();
+const ON_VERCEL = !!process.env.VERCEL;
 
-app.listen(startCfg.port, "127.0.0.1", async () => {
+// Na Vercel o app é exportado e a plataforma cuida do servidor.
+// No computador (npm start), continua escutando só em 127.0.0.1, como antes.
+if (!ON_VERCEL) app.listen(startCfg.port, "127.0.0.1", async () => {
   console.log("");
   console.log(`Valida Vision rodando em http://localhost:${startCfg.port}`);
   console.log(`Modelos: ${startCfg.models.join(" -> ")}`);
@@ -640,3 +647,5 @@ app.listen(startCfg.port, "127.0.0.1", async () => {
   }
   console.log("");
 });
+
+export default app;

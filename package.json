@@ -1,6 +1,6 @@
 {
   "name": "valida-vision-local",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@google/genai": "^1.30.0",
+    "@vercel/blob": "^2.8.1",
     "dotenv": "^16.4.7",
     "express": "^5.1.0",
     "multer": "^2.0.2",

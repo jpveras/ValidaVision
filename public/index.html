@@ -178,16 +178,20 @@ button:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
   <a class="logo" href="/">
     <img id="brandLogo" src="/logo.png" alt="" hidden onload="this.hidden=false;this.nextElementSibling.setAttribute('hidden','')">
     <svg width="28" height="24" viewBox="0 0 28 24" aria-hidden="true"><path d="M1 2h9l4 9 4-9h9L14 23z" fill="#2fc28f"/><path d="M10 2h8l-4 9z" fill="#1a8f6a"/></svg>
-    <b>Valida <span>Vision</span></b><span class="ver">v0.6</span>
+    <b>Valida <span>Vision</span></b><span class="ver">v0.7</span>
   </a>
   <div class="spacer"></div>
-  <span class="env">Protótipo local</span>
+  <span class="env" id="envBadge">Protótipo local</span>
 </header>
 
 <nav class="side" aria-label="Menu">
   <a class="nav active" href="/" aria-current="page">
     <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4"/><circle cx="12" cy="10.5" r="2.5"/></svg>
     <span>Análise de Tela</span>
+  </a>
+  <a class="nav" href="/elogios.html">
+    <svg viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.5 1-1.1a5.5 5.5 0 0 0 0-7.8z"/></svg>
+    <span>Elogie um Colega</span>
   </a>
   <a class="nav" href="/api/health" target="_blank" rel="noopener">
     <svg viewBox="0 0 24 24"><path d="M3 12h4l3-7 4 14 3-7h4"/></svg>
@@ -259,6 +263,20 @@ button:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
 <script>
 const fileInput=document.getElementById('file'),drop=document.getElementById('drop'),analyze=document.getElementById('analyze'),clearBtn=document.getElementById('clear'),preview=document.getElementById('preview'),statusEl=document.getElementById('status'),results=document.getElementById('results');let selectedFile=null;
 const alertEl=document.getElementById('alert');
+if(!/^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname))document.getElementById('envBadge').textContent='Demonstração';
+// A Vercel aceita no máximo 4,5 MB por requisição. Prints maiores que 4 MB são reduzidos
+// no navegador antes do envio; os menores seguem exatamente como antes.
+const UPLOAD_MAX=4*1024*1024;
+async function reduzir(file){
+  const bmp=await createImageBitmap(file);let w=bmp.width,h=bmp.height,lado=Math.max(w,h),limite=2560,q=.9,blob=file;
+  for(let i=0;i<6&&blob.size>UPLOAD_MAX;i++){
+    const k=Math.min(1,limite/lado),cv=document.createElement('canvas');cv.width=Math.round(w*k);cv.height=Math.round(h*k);
+    cv.getContext('2d').drawImage(bmp,0,0,cv.width,cv.height);
+    blob=await new Promise(r=>cv.toBlob(r,'image/jpeg',q));limite*=.8;q=Math.max(.6,q-.08);
+  }
+  bmp.close?.();
+  return new File([blob],file.name.replace(/\.[^.]+$/,'')+'.jpg',{type:'image/jpeg'});
+}
 const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
 function status(t,e=false){statusEl.textContent=t;statusEl.className='status '+(e?'error':'')}
 function showAlert(title,msg,kind='warn'){document.getElementById('alertTitle').textContent=title;document.getElementById('alertMsg').textContent=msg;alertEl.className='alert'+(kind==='info'?' info':'');document.getElementById('alertIcon').innerHTML=kind==='info'?'<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8v.5"/>':'<path d="M12 3 2 20h20L12 3z"/><path d="M12 10v4M12 17v.5"/>';alertEl.hidden=false}
@@ -331,7 +349,7 @@ function markdown(d){
 document.getElementById('expMd').onclick=async()=>{const d=lastResult;if(!d)return;const md=markdown(d);
   try{await navigator.clipboard.writeText(md);flash('Texto copiado. É só colar.')}catch{download(baseName()+'.md',md,'text/markdown;charset=utf-8');flash('Não deu para copiar; baixei como arquivo .md.')}};
 fileInput.onchange=e=>setFile(e.target.files[0]);['dragenter','dragover'].forEach(e=>drop.addEventListener(e,x=>{x.preventDefault();drop.classList.add('drag')}));['dragleave','drop'].forEach(e=>drop.addEventListener(e,x=>{x.preventDefault();drop.classList.remove('drag')}));drop.addEventListener('drop',e=>setFile(e.dataTransfer.files[0]));
-analyze.onclick=async()=>{if(!selectedFile)return;const n=qtyInput.value.trim();if(n&&!(+n>=1&&+n<=50&&Number.isInteger(+n))){status('Quantidade de cenários deve ser um número inteiro de 1 a 50.',true);qtyInput.focus();return}hideExport();analyze.disabled=true;status('Analisando a tela com IA…');results.className='empty';results.innerHTML='Identificando componentes e gerando cenários…';const fd=new FormData();fd.append('screenshot',selectedFile);if(n)fd.append('maxScenarios',n);try{const r=await fetch('/api/analyze',{method:'POST',body:fd});const d=await r.json();if(!r.ok)throw new Error(d.error||'Falha na análise.');render(d);status('Análise concluída.')}catch(e){results.className='empty';results.innerHTML=`<span style="color:var(--red)">${esc(e.message)}</span>`;status(e.message,true)}finally{analyze.disabled=false}};
+analyze.onclick=async()=>{if(!selectedFile)return;const n=qtyInput.value.trim();if(n&&!(+n>=1&&+n<=50&&Number.isInteger(+n))){status('Quantidade de cenários deve ser um número inteiro de 1 a 50.',true);qtyInput.focus();return}hideExport();analyze.disabled=true;status('Analisando a tela com IA…');results.className='empty';results.innerHTML='Identificando componentes e gerando cenários…';const fd=new FormData();let up=selectedFile;if(up.size>UPLOAD_MAX){status('Imagem grande: reduzindo para enviar…');up=await reduzir(up)}fd.append('screenshot',up,up.name);if(n)fd.append('maxScenarios',n);try{const r=await fetch('/api/analyze',{method:'POST',body:fd});const d=await r.json();if(!r.ok)throw new Error(d.error||'Falha na análise.');render(d);status('Análise concluída.')}catch(e){results.className='empty';results.innerHTML=`<span style="color:var(--red)">${esc(e.message)}</span>`;status(e.message,true)}finally{analyze.disabled=false}};
 clearBtn.onclick=()=>{hideExport();selectedFile=null;fileInput.value='';analyze.disabled=true;preview.textContent='Nenhuma imagem selecionada.';results.className='empty';results.innerHTML='O resultado da análise aparecerá aqui.';status('')};
 fetch('/api/health').then(r=>r.json()).then(h=>{if(!h.ok)showAlert('Funcionalidade temporariamente indisponível',h.message);else if(h.demo)showAlert('Modo demonstração ativo','A IA não está sendo chamada; os resultados são dados de exemplo.','info')}).catch(()=>showAlert('Servidor indisponível','Não consegui falar com o servidor local. Verifique se o npm start está rodando.'));
 </script></body></html>
