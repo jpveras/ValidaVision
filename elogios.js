@@ -218,8 +218,17 @@ const limpa = (v, max) =>
 
 const ultimoEnvio = new Map(); // ip -> timestamp (freio simples contra cliques repetidos)
 
+const tentativas = new Map(); // ip -> { n, desde } (freio contra chutes de senha)
+
 function exigeAdmin(req, res) {
   const { adminKey } = conf();
+  const ip = String(req.get("x-forwarded-for") || req.ip || "").split(",")[0].trim();
+  const t = tentativas.get(ip);
+  if (t && Date.now() - t.desde > 10 * 60 * 1000) tentativas.delete(ip);
+  if ((tentativas.get(ip)?.n || 0) >= 8) {
+    res.status(429).json({ error: "Muitas tentativas. Aguarde alguns minutos." });
+    return false;
+  }
   if (!adminKey) {
     res.status(403).json({ error: "Defina ELOGIOS_ADMIN_KEY no .env (ou na Vercel) para liberar esta ação." });
     return false;
@@ -229,14 +238,25 @@ function exigeAdmin(req, res) {
     enviada.length === adminKey.length &&
     crypto.timingSafeEqual(Buffer.from(enviada), Buffer.from(adminKey));
   if (!ok) {
-    res.status(401).json({ error: "Chave de administrador incorreta." });
+    const cur = tentativas.get(ip) || { n: 0, desde: Date.now() };
+    cur.n++;
+    tentativas.set(ip, cur);
+    res.status(401).json({ error: "Senha de moderador incorreta." });
     return false;
   }
+  tentativas.delete(ip);
   return true;
 }
 
 export const elogiosRouter = express.Router();
 elogiosRouter.use(express.json({ limit: "10kb" }));
+
+// Confere a senha do moderador (usada pela tela para liberar a área do moderador).
+elogiosRouter.get("/moderador", (req, res) => {
+  if (!exigeAdmin(req, res)) return;
+  res.set("Cache-Control", "no-store");
+  res.json({ ok: true });
+});
 
 elogiosRouter.get("/", async (_req, res) => {
   try {
