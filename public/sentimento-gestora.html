@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Painel da Gestora · Sentimento da Semana</title>
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/vv-base.css">
+<style>
+.login{max-width:440px;margin:0 auto}
+.login .row{display:flex;gap:10px}
+.login .row .input{flex:1}
+.toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:20px}
+.toolbar select{height:40px;border:1px solid #cfd8d6;border-radius:4px;padding:0 10px;font:inherit;font-size:14px;background:#fff;color:var(--text);min-width:280px}
+.toolbar .grow{flex:1}
+.tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
+.tile{background:#fff;border:1px solid var(--line);border-radius:6px;padding:16px}
+.tile small{display:block;font-size:11px;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.tile b{display:block;font-size:26px;color:var(--ink);font-weight:700;line-height:1.15;word-break:break-word}
+.tile span{display:block;font-size:12px;color:var(--muted);margin-top:4px}
+.tile.main b{color:var(--teal2)}
+.rank{width:100%;border-collapse:collapse;font-size:14px}
+.rank th,.rank td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line)}
+.rank th{font-size:11px;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);font-weight:500}
+.rank td.n{width:80px;text-align:right;font-variant-numeric:tabular-nums}
+.rank .barcell{width:40%}
+.rank .mini{height:8px;border-radius:99px;background:linear-gradient(90deg,var(--teal),#2fc28f)}
+.respostas{display:flex;flex-wrap:wrap;gap:8px}
+.resp{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:99px;padding:6px 6px 6px 12px;background:#fff;font-size:14px}
+.resp .rm{height:26px;padding:0 10px;font-size:10px;border-radius:99px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.print-head{display:none}
+@media(max-width:900px){.tiles{grid-template-columns:1fr 1fr}.grid2{grid-template-columns:1fr}}
+@media print{
+  @page{margin:14mm}
+  body{background:#fff}
+  .topbar,.side,.toolbar,.no-print,#loginCard,.foot-link{display:none!important}
+  .content{margin:0;padding:0}.panel{padding:0;background:#fff}.wrap{max-width:none}
+  .print-head{display:block;margin-bottom:12px}
+  .print-head h1{margin:0;font-size:22px;color:var(--ink)}
+  .print-head p{margin:4px 0 0;color:var(--muted)}
+  .card,.tile{break-inside:avoid}
+  .cloud-box{height:360px;background:#fff}
+  .tile,.mini,.chip-semana{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <a class="logo" href="/">
+    <img id="brandLogo" src="/logo.png" alt="" hidden onload="this.hidden=false;this.nextElementSibling.setAttribute('hidden','')">
+    <svg width="28" height="24" viewBox="0 0 28 24" aria-hidden="true"><path d="M1 2h9l4 9 4-9h9L14 23z" fill="#2fc28f"/><path d="M10 2h8l-4 9z" fill="#1a8f6a"/></svg>
+    <b>Valida <span>Vision</span></b><span class="ver">v0.8</span>
+  </a>
+  <div class="spacer"></div>
+  <span class="env">Painel da gestora</span>
+</header>
+
+<nav class="side" aria-label="Menu">
+  <a class="nav" href="/">
+    <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4"/><circle cx="12" cy="10.5" r="2.5"/></svg>
+    <span>Análise de Tela</span>
+  </a>
+  <a class="nav" href="/elogios.html">
+    <svg viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.5 1-1.1a5.5 5.5 0 0 0 0-7.8z"/></svg>
+    <span>Elogie um Colega</span>
+  </a>
+  <a class="nav active" href="/sentimento.html">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 14.5s1.5 2 4 2 4-2 4-2"/><path d="M9 9.5h.01M15 9.5h.01"/></svg>
+    <span>Sentimento da Semana</span>
+  </a>
+  <a class="nav" href="/api/health" target="_blank" rel="noopener">
+    <svg viewBox="0 0 24 24"><path d="M3 12h4l3-7 4 14 3-7h4"/></svg>
+    <span>Status da IA</span>
+  </a>
+</nav>
+
+<main class="content"><div class="panel"><div class="wrap">
+
+  <div class="page-head no-print">
+    <div class="page-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 14.5s1.5 2 4 2 4-2 4-2"/><path d="M9 9.5h.01M15 9.5h.01"/></svg></div>
+    <h1 class="grow">Sentimento da Equipe</h1>
+  </div>
+  <p class="page-sub no-print">Painel da coordenação: veja como a equipe descreveu cada semana e use isso para planejar ações. As respostas são anônimas.</p>
+  <div class="divider no-print"></div>
+
+  <section class="card login" id="loginCard">
+    <div class="card-head">Acesso da gestora</div>
+    <form class="card-body" id="loginForm" novalidate>
+      <label class="label" for="senha"><span>Senha do painel</span></label>
+      <div class="row">
+        <input class="input" id="senha" type="password" autocomplete="current-password" placeholder="Senha">
+        <button class="btn-primary" type="submit">Entrar</button>
+      </div>
+      <div class="status" id="loginMsg" role="status"></div>
+    </form>
+  </section>
+
+  <div id="painel" hidden>
+    <div class="print-head"><h1>Sentimento da Equipe — Valida Vision</h1><p id="printRotulo"></p></div>
+
+    <div class="toolbar">
+      <select id="semanaSel" aria-label="Semana"></select>
+      <span class="grow"></span>
+      <button class="btn-outline btn-sm" id="copiar" type="button"><svg viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V4H4v12h4"/></svg>Copiar resumo</button>
+      <button class="btn-primary btn-sm" id="pdf" type="button"><svg viewBox="0 0 24 24"><path d="M6 9V3h12v6M6 18H4v-7h16v7h-2M8 14h8v7H8z"/></svg>Baixar PDF</button>
+      <button class="btn-outline btn-sm" id="sair" type="button">Sair</button>
+    </div>
+    <div class="status" id="msg" role="status" style="margin:-10px 0 14px"></div>
+
+    <div class="tiles">
+      <div class="tile main"><small>Palavra da semana</small><b id="tPalavra">—</b><span id="tPalavraN"></span></div>
+      <div class="tile"><small>Participação</small><b id="tPart">—</b><span id="tPartPct"></span></div>
+      <div class="tile"><small>Palavras diferentes</small><b id="tDif">—</b><span>na semana</span></div>
+      <div class="tile"><small>Semana anterior</small><b id="tAnt">—</b><span id="tAntSub"></span></div>
+    </div>
+
+    <section class="card">
+      <div class="card-head"><span>Nuvem de palavras</span><span class="chip-semana" id="chip"></span></div>
+      <div class="card-body" style="padding:16px">
+        <div class="cloud-box" id="cloudBox">
+          <canvas id="cloud" hidden></canvas>
+          <div id="fallback" class="fallback-cloud" hidden></div>
+          <div class="cloud-wait" id="cloudWait"><strong>Sem respostas nesta semana</strong><span>Assim que a equipe responder, a nuvem aparece aqui.</span></div>
+        </div>
+      </div>
+    </section>
+
+    <div class="grid2">
+      <section class="card">
+        <div class="card-head">Ranking</div>
+        <div class="card-body" style="padding:8px 16px 16px"><table class="rank"><thead><tr><th>Palavra</th><th class="barcell"></th><th class="n">Vezes</th></tr></thead><tbody id="rank"></tbody></table></div>
+      </section>
+      <section class="card no-print">
+        <div class="card-head"><span>Respostas da semana</span><span class="counter">Remova apenas palavras impróprias</span></div>
+        <div class="card-body" style="padding:16px"><div class="respostas" id="respostas"></div></div>
+      </section>
+    </div>
+  </div>
+
+  <div class="foot-link no-print"><a href="/sentimento.html">Voltar para o Sentimento da Semana</a></div>
+
+</div></div></main>
+
+<script src="/vendor/wordcloud2.js"></script>
+<script src="/vv-nuvem.js"></script>
+<script>
+const $=id=>document.getElementById(id);
+const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+const ls={get(k){try{return localStorage.getItem(k)}catch{return null}},set(k,v){try{v==null?localStorage.removeItem(k):localStorage.setItem(k,v)}catch{}}};
+let chave=ls.get('vv-gestora'),semanas=[],atual=null,dados=null;
+const msg=(t,e=false)=>{$('msg').textContent=t;$('msg').className='status'+(e?' error':'')};
+
+async function api(url,opts={}){
+  const r=await fetch(url,{...opts,cache:'no-store',headers:{...(opts.headers||{}),'x-gestora-key':chave||''}});
+  const d=await r.json().catch(()=>({}));
+  if(!r.ok)throw Object.assign(new Error(d.error||'Falhou.'),{status:r.status});
+  return d;
+}
+
+function mostrarLogin(texto,erro){
+  $('painel').hidden=true;$('loginCard').hidden=false;
+  $('loginMsg').textContent=texto||'';$('loginMsg').className='status'+(erro?' error':'');
+  $('senha').focus();
+}
+
+$('loginForm').addEventListener('submit',async e=>{
+  e.preventDefault();chave=$('senha').value.trim();if(!chave)return;
+  try{await api('/api/sentimentos/gestora');ls.set('vv-gestora',chave);$('senha').value='';await abrirPainel()}
+  catch(err){chave=null;mostrarLogin(err.status===401?'Senha incorreta.':err.message,true)}
+});
+$('sair').onclick=()=>{chave=null;ls.set('vv-gestora',null);mostrarLogin('Você saiu do painel.')};
+
+async function abrirPainel(){
+  const d=await api('/api/sentimentos/gestora/semanas');
+  semanas=d.semanas;
+  $('semanaSel').innerHTML=semanas.map(s=>`<option value="${s.semana}">${esc(s.rotulo)}${s.semana===d.atual?' (atual)':''} — ${s.total} ${s.total===1?'resposta':'respostas'}</option>`).join('');
+  $('loginCard').hidden=true;$('painel').hidden=false;
+  await carregarSemana(atual&&semanas.some(s=>s.semana===atual)?atual:d.atual);
+}
+
+async function carregarSemana(semana){
+  atual=semana;$('semanaSel').value=semana;msg('');
+  try{
+    dados=await api('/api/sentimentos/gestora/semana/'+semana);
+    const idx=semanas.findIndex(s=>s.semana===semana),ant=semanas[idx+1];
+    let anterior=null;if(ant){try{anterior=await api('/api/sentimentos/gestora/semana/'+ant.semana)}catch{}}
+    render(anterior);
+  }catch(err){if(err.status===401){chave=null;ls.set('vv-gestora',null);return mostrarLogin('Sua sessão expirou. Entre novamente.',true)}msg(err.message,true)}
+}
+$('semanaSel').onchange=e=>carregarSemana(e.target.value);
+
+function render(anterior){
+  const d=dados,top=d.palavras[0];
+  $('chip').textContent=d.rotulo;$('printRotulo').textContent=`${d.rotulo} · ${d.total} de ${d.equipe} pessoas responderam`;
+  $('tPalavra').textContent=top?top[0]:'—';$('tPalavraN').textContent=top?`citada ${top[1]} ${top[1]===1?'vez':'vezes'}`:'sem respostas';
+  $('tPart').textContent=`${d.total} de ${d.equipe}`;$('tPartPct').textContent=`${Math.round(d.total/d.equipe*100)}% da equipe`;
+  $('tDif').textContent=d.palavras.length;
+  $('tAnt').textContent=anterior?.palavraDaSemana||'—';$('tAntSub').textContent=anterior?`${anterior.total} ${anterior.total===1?'resposta':'respostas'}`:'sem semana anterior';
+  const max=top?top[1]:1;
+  $('rank').innerHTML=d.palavras.length?d.palavras.map(([p,n])=>`<tr><td>${esc(p)}</td><td class="barcell"><div class="mini" style="width:${(n/max*100).toFixed(0)}%"></div></td><td class="n">${n}</td></tr>`).join(''):'<tr><td colspan="3" class="empty">Sem respostas nesta semana.</td></tr>';
+  $('respostas').innerHTML=d.respostas.length?d.respostas.map(r=>`<span class="resp">${esc(r.palavra)}<button class="btn-danger rm" type="button" data-id="${esc(r.id)}">Remover</button></span>`).join(''):'<span class="empty">Nenhuma resposta.</span>';
+  $('cloudWait').hidden=!!d.palavras.length;
+  vvNuvem($('cloudBox'),$('cloud'),$('fallback'),d.palavras);
+}
+
+$('respostas').addEventListener('click',async e=>{
+  const b=e.target.closest('.rm');if(!b)return;
+  if(!b.classList.contains('armed')){b.classList.add('armed');b.textContent='Confirmar';setTimeout(()=>{b.classList.remove('armed');b.textContent='Remover'},3000);return}
+  try{await api(`/api/sentimentos/gestora/semana/${atual}/${encodeURIComponent(b.dataset.id)}`,{method:'DELETE'});await abrirPainel();msg('Palavra removida.')}catch(err){msg(err.message,true)}
+});
+
+$('pdf').onclick=()=>{const t=document.title;document.title=`sentimento-equipe-${atual}`;window.print();document.title=t};
+$('copiar').onclick=async()=>{
+  const d=dados;if(!d)return;
+  const linhas=[`Sentimento da equipe — ${d.rotulo}`,`Participação: ${d.total} de ${d.equipe} pessoas (${Math.round(d.total/d.equipe*100)}%)`,d.palavras[0]?`Palavra da semana: ${d.palavras[0][0]}`:'Sem respostas nesta semana.','',...d.palavras.map(([p,n])=>`• ${p} — ${n}`)];
+  try{await navigator.clipboard.writeText(linhas.join('\n'));msg('Resumo copiado. É só colar no e-mail ou no Teams.')}catch{msg('Não consegui copiar automaticamente.',true)}
+};
+
+let rz;addEventListener('resize',()=>{clearTimeout(rz);rz=setTimeout(()=>{if(dados&&!$('painel').hidden)vvNuvem($('cloudBox'),$('cloud'),$('fallback'),dados.palavras)},250)});
+
+(async()=>{if(!chave)return mostrarLogin();try{await api('/api/sentimentos/gestora');await abrirPainel()}catch{chave=null;ls.set('vv-gestora',null);mostrarLogin()}})();
+</script>
+</body></html>

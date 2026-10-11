@@ -5,6 +5,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { elogiosRouter } from "./elogios.js";
+import { sentimentosRouter } from "./sentimentos.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ENV_PATH = path.join(__dirname, ".env");
@@ -77,6 +78,9 @@ app.use(express.static(path.join(__dirname, "public")));
 
 // Elogie um Colega (rotas próprias, não interferem na análise de tela)
 app.use("/api/elogios", elogiosRouter);
+
+// Sentimento da Semana (rotas próprias)
+app.use("/api/sentimentos", sentimentosRouter);
 
 
 // ======================================================
