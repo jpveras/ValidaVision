@@ -394,6 +394,37 @@ app.get("/api/health", async (_req, res) => {
 });
 
 
+
+// ======================================================
+// LIMITE DE CENÁRIOS (campo "Quantidade de cenários" da tela)
+// ======================================================
+
+const MAX_SCENARIOS_LIMIT = 50;
+const PRIORITY_ORDER = { alta: 0, media: 1, baixa: 2 };
+
+function parseMaxScenarios(raw) {
+  const n = Number.parseInt(String(raw ?? "").trim(), 10);
+  if (!Number.isFinite(n) || n < 1) return null; // vazio = a IA decide
+  return Math.min(n, MAX_SCENARIOS_LIMIT);
+}
+
+// Garante o limite mesmo se a IA devolver cenários a mais:
+// mantém os de maior prioridade e remove componentes que ficaram sem cenários.
+function limitScenarios(result, max) {
+  if (!max || !Array.isArray(result?.components)) return result;
+  const all = result.components.flatMap((c, ci) =>
+    (c.testPoints || []).map((t, ti) => ({ ci, ti, o: PRIORITY_ORDER[t.priority] ?? 1 }))
+  );
+  if (all.length <= max) return result;
+  const keep = new Set(
+    all.sort((a, b) => a.o - b.o || a.ci - b.ci || a.ti - b.ti).slice(0, max).map((x) => `${x.ci}:${x.ti}`)
+  );
+  const components = result.components
+    .map((c, ci) => ({ ...c, testPoints: (c.testPoints || []).filter((_, ti) => keep.has(`${ci}:${ti}`)) }))
+    .filter((c) => c.testPoints.length);
+  return { ...result, components };
+}
+
 // ======================================================
 // ROTA DE ANÁLISE
 // ======================================================
@@ -401,13 +432,15 @@ app.get("/api/health", async (_req, res) => {
 app.post("/api/analyze", upload.single("screenshot"), async (req, res) => {
   try {
     const cfg = getConfig();
+    const maxScenarios = parseMaxScenarios(req.body?.maxScenarios);
+    const extra = { requestedScenarios: maxScenarios };
 
     if (!req.file) {
       return res.status(400).json({ error: "Envie uma imagem." });
     }
 
     if (cfg.demoMode) {
-      return res.json({
+      return res.json(limitScenarios({ ...extra,
         summary: "Modo demonstração: tela de consulta com CPF, tipo de operação e botão Continuar (dados fictícios, a IA não foi chamada).",
         confidence: "alta",
         components: [
@@ -447,7 +480,7 @@ app.post("/api/analyze", upload.single("screenshot"), async (req, res) => {
         demo: true,
         provider: "demo",
         model: "demo",
-      });
+      }, maxScenarios));
     }
 
     if (!cfg.apiKey || cfg.apiKey.includes("COLOQUE_SUA_CHAVE")) {
@@ -469,7 +502,12 @@ app.post("/api/analyze", upload.single("screenshot"), async (req, res) => {
               },
             },
             {
-              text: "Analise esta tela e gere o checklist de testes no JSON solicitado.",
+              text:
+                "Analise esta tela e gere o checklist de testes no JSON solicitado." +
+                (maxScenarios
+                  ? ` Gere NO MÁXIMO ${maxScenarios} cenário(s) no total, somando os testPoints de todos os componentes. ` +
+                    `Escolha os de maior risco e prioridade. Componentes sem cenário podem ficar de fora.`
+                  : ""),
             },
           ],
         },
@@ -557,7 +595,7 @@ app.post("/api/analyze", upload.single("screenshot"), async (req, res) => {
       });
     }
 
-    return res.json({ ...result, demo: false, provider: "Gemini", model: usedModel });
+    return res.json({ ...limitScenarios(result, maxScenarios), ...extra, demo: false, provider: "Gemini", model: usedModel });
   } catch (error) {
     console.error("Erro no /api/analyze:", error);
     return res.status(500).json({

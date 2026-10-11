@@ -1,4 +1,4 @@
-# ValidAI Vision — Protótipo Local v0.5
+# ValidAI Vision — Protótipo Local v0.6
 
 ## Rodar
 
@@ -36,6 +36,16 @@ Se um modelo não existir, o próximo é tentado.
 
 A chave fica só no `.env` e nunca vai para o browser. Não compartilhe o `.env`.
 Antes de enviar telas reais da empresa, valide as políticas internas de dados e PII.
+
+## Novidades da v0.6
+
+- **Sua logo no topo**: salve a imagem como `public/logo.png` e recarregue a página. Sem o arquivo, aparece a logo padrão.
+- **Quantidade de cenários** (opcional): informe de 1 a 50, ou use os atalhos 5/10/20. A IA recebe o limite e o servidor
+  garante o corte, mantendo os cenários de maior prioridade. Em branco, a IA decide.
+- **Exportar resultado**, que aparece depois da análise:
+  - **Planilha (CSV)**: abre no Excel; uma linha por cenário, com passos e resultado esperado (útil para importar no Zephyr/Jira).
+  - **PDF**: abre a impressão com o print e os cenários; escolha "Salvar como PDF".
+  - **Copiar texto**: copia em Markdown para colar no Jira, Teams ou e-mail.
 
 ## Novidades da v0.5
 

@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>ValidAI Vision</title>
+<link rel="icon" type="image/png" href="/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
@@ -124,6 +125,41 @@ button:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
 .gap li{margin:8px 0;font-size:13px}
 .gap li small{display:block;color:var(--muted)}
 
+/* Logo própria (public/logo.png) */
+.logo img{height:40px;width:40px;display:block;border-radius:50%}
+.logo img[hidden],.logo svg[hidden]{display:none}
+
+/* Quantidade de cenários */
+.qty{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.qty input{width:120px;height:48px;border:1px solid #cfd8d6;border-radius:4px;padding:0 14px;font:inherit;font-size:15px;color:var(--text)}
+.qty input:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px var(--teal-soft)}
+.qty .chips{display:flex;gap:6px}
+.chip{height:32px;padding:0 12px;font-size:12px;letter-spacing:.4px;border-radius:99px;border:1px solid #cfd8d6;background:#fff;color:var(--text)}
+.chip:hover,.chip.on{border-color:var(--teal);color:var(--teal2);background:var(--teal-soft)}
+.field-hint{margin-top:8px;font-size:12px;color:var(--muted)}
+
+/* Cabeçalho do card com ações */
+.card-head.with-actions{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding-top:14px;padding-bottom:14px}
+.export{display:flex;gap:8px;flex-wrap:wrap}
+.export[hidden]{display:none}
+.export button{height:38px;padding:0 14px;font-size:12px;letter-spacing:.8px}
+.toast{font-size:12px;color:var(--teal2);margin-left:4px;align-self:center}
+
+/* Impressão / PDF: só a imagem e o resultado */
+.print-only,.print-only-inline{display:none}
+@media print{
+  @page{margin:14mm}
+  body{background:#fff}
+  .topbar,.side,#alert,.divider,.page-sub,.drop,.actions,.status,.export,.qty-field,.field>.label{display:none!important}
+  .content{margin:0;padding:0}.panel{padding:0;background:#fff}.wrap{max-width:none}
+  .card{border:0;margin:0 0 10px}.card-body{padding:8px 0}.card-head{padding:8px 0;font-size:16px}
+  .preview{border:0;background:#fff;min-height:0}.preview img{max-height:340px}
+  .screen-only{display:none}.print-only-inline{display:inline}
+  .print-only{display:block;font-size:11px;color:var(--muted);margin-top:4px}
+  .component,.block,.scenario{break-inside:avoid}
+  .summary,.priority,.tag,.component-head,.obs,.gap{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+
 @media(max-width:760px){
   :root{--side:64px}
   .nav span{display:none}
@@ -140,8 +176,9 @@ button:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
 
 <header class="topbar">
   <a class="logo" href="/">
+    <img id="brandLogo" src="/logo.png" alt="" hidden onload="this.hidden=false;this.nextElementSibling.setAttribute('hidden','')">
     <svg width="28" height="24" viewBox="0 0 28 24" aria-hidden="true"><path d="M1 2h9l4 9 4-9h9L14 23z" fill="#2fc28f"/><path d="M10 2h8l-4 9z" fill="#1a8f6a"/></svg>
-    <b>ValidAI <span>Vision</span></b><span class="ver">v0.5</span>
+    <b>ValidAI <span>Vision</span></b><span class="ver">v0.6</span>
   </a>
   <div class="spacer"></div>
   <span class="env">Protótipo local</span>
@@ -173,7 +210,7 @@ button:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
   <div class="divider"></div>
 
   <section class="card">
-    <div class="card-head">Executar</div>
+    <div class="card-head"><span class="screen-only">Executar</span><span class="print-only-inline">Tela analisada</span></div>
     <div class="card-body">
       <div class="field">
         <span class="label">Print da tela <span class="req">(obrigatório)</span></span>
@@ -183,6 +220,17 @@ button:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
           <span class="drop-hint">Clique, arraste ou <b>cole o print com <kbd>Ctrl</kbd>+<kbd>V</kbd></b> · até 10 MB</span>
         </label>
         <div id="preview" class="preview">Nenhuma imagem selecionada.</div>
+        <div id="printMeta" class="print-only"></div>
+      </div>
+      <div class="field qty-field">
+        <label class="label" for="maxScenarios">Quantidade de cenários <span class="opt">(opcional)</span></label>
+        <div class="qty">
+          <input id="maxScenarios" type="number" min="1" max="50" step="1" inputmode="numeric" placeholder="Automático">
+          <div class="chips" role="group" aria-label="Atalhos de quantidade">
+            <button type="button" class="chip" data-n="5">5</button><button type="button" class="chip" data-n="10">10</button><button type="button" class="chip" data-n="20">20</button><button type="button" class="chip" data-n="">Automático</button>
+          </div>
+        </div>
+        <div class="field-hint">Em branco, a IA decide quantos cenários gerar. Com um número (1 a 50), ela retorna no máximo essa quantidade, priorizando os de maior risco.</div>
       </div>
       <div class="actions">
         <button id="clear" class="btn-outline" type="button">Limpar</button>
@@ -195,7 +243,14 @@ button:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
   </section>
 
   <section class="card">
-    <div class="card-head">Cenários sugeridos</div>
+    <div class="card-head with-actions"><span>Cenários sugeridos</span>
+      <div id="export" class="export" hidden>
+        <button type="button" class="btn-outline" id="expCsv" title="Abre no Excel e pode ser importado no Zephyr/Jira"><svg viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M4 20h16"/></svg>Planilha (CSV)</button>
+        <button type="button" class="btn-outline" id="expPdf" title="Abre a janela de impressão: escolha Salvar como PDF"><svg viewBox="0 0 24 24"><path d="M6 9V3h12v6M6 18H4v-7h16v7h-2M8 14h8v7H8z"/></svg>PDF</button>
+        <button type="button" class="btn-outline" id="expMd" title="Copia em texto para colar no Jira, Teams ou e-mail"><svg viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V4H4v12h4"/></svg>Copiar texto</button>
+        <span id="expToast" class="toast" role="status"></span>
+      </div>
+    </div>
     <div class="card-body"><div id="results" class="empty">O resultado da análise aparecerá aqui.</div></div>
   </section>
 
@@ -212,10 +267,11 @@ const PR={alta:{i:'🟥',l:'Alta',c:'high',o:0},media:{i:'🟨',l:'Média',c:'me
 const pr=p=>PR[p]||PR.media;
 const pbadge=p=>`<span class="priority ${pr(p).c}">${pr(p).i} ${pr(p).l}</span>`;
 function render(d){
+lastResult=d;exportBox.hidden=false;document.getElementById("printMeta").textContent=`ValidAI Vision · ${new Date().toLocaleString("pt-BR")} · ${selectedFile?.name||""}`;
 results.className='';
 const comps=d.components||[];const all=comps.flatMap((c,i)=>(c.testPoints||[]).map((t,j)=>({c,i,t,j})));
 const cnt={alta:0,media:0,baixa:0};all.forEach(x=>{if(cnt[x.t.priority]!==undefined)cnt[x.t.priority]++});
-let h=`<div class="summary"><b>Resumo:</b> ${esc(d.summary)}<div class="stats"><span class="tag">${comps.length} componentes</span><span class="tag">${all.length} cenários</span><span class="tag">🟥 ${cnt.alta} alta</span><span class="tag">🟨 ${cnt.media} média</span><span class="tag">🟩 ${cnt.baixa} baixa</span></div><div class="meta"><span class="tag">Confiança: ${esc(d.confidence)}</span><span class="tag">${esc(d.provider||'IA')}</span><span class="tag">${esc(d.model||'')}</span>${d.demo?'<span class="tag">MODO DEMONSTRAÇÃO</span>':''}</div></div>`;
+let h=`<div class="summary"><b>Resumo:</b> ${esc(d.summary)}<div class="stats"><span class="tag">${comps.length} componentes</span><span class="tag">${all.length} cenários</span><span class="tag">🟥 ${cnt.alta} alta</span><span class="tag">🟨 ${cnt.media} média</span><span class="tag">🟩 ${cnt.baixa} baixa</span></div><div class="meta"><span class="tag">Confiança: ${esc(d.confidence)}</span><span class="tag">${esc(d.provider||'IA')}</span><span class="tag">${esc(d.model||'')}</span>${d.requestedScenarios?`<span class="tag">Limite pedido: ${d.requestedScenarios}${all.length<d.requestedScenarios?` (a IA retornou ${all.length})`:''}</span>`:''}${d.demo?'<span class="tag">MODO DEMONSTRAÇÃO</span>':''}</div></div>`;
 if(!comps.length){results.innerHTML=h+'<div class="empty">Nenhum componente identificado.</div>';return}
 const sorted=[...all].sort((a,b)=>pr(a.t.priority).o-pr(b.t.priority).o||a.i-b.i||a.j-b.j);
 h+=`<div class="block"><h3>🎯 Por onde começar</h3><p>Cenários ordenados por prioridade, para decidir o que testar primeiro.</p><div style="overflow-x:auto"><table class="pt"><thead><tr><th>Componente</th><th>Cenário</th><th>Prioridade</th></tr></thead><tbody>${sorted.map(x=>`<tr><td>${esc(x.c.name)}</td><td>${esc(x.t.title)}</td><td>${pbadge(x.t.priority)}</td></tr>`).join('')}</tbody></table></div></div>`;
@@ -242,8 +298,40 @@ document.addEventListener('paste',e=>{
   setFile(new File([blob],blob.name&&blob.name!=='image.png'?blob.name:`print-colado-${hora}.${ext}`,{type:blob.type}));
   if(selectedFile){drop.classList.add('pasted');setTimeout(()=>drop.classList.remove('pasted'),700);status(`Print colado: ${selectedFile.name}. Pronto para análise.`)}
 });
+// ---------- Quantidade de cenários ----------
+const qtyInput=document.getElementById('maxScenarios'),chips=[...document.querySelectorAll('.chip')];
+const syncChips=()=>chips.forEach(c=>c.classList.toggle('on',c.dataset.n===qtyInput.value.trim()));
+chips.forEach(c=>c.onclick=()=>{qtyInput.value=c.dataset.n;syncChips()});qtyInput.oninput=syncChips;syncChips();
+
+// ---------- Exportar ----------
+let lastResult=null;const exportBox=document.getElementById('export'),toast=document.getElementById('expToast');
+function hideExport(){lastResult=null;exportBox.hidden=true;toast.textContent=''}
+function flash(t){toast.textContent=t;clearTimeout(flash.t);flash.t=setTimeout(()=>toast.textContent='',3500)}
+function baseName(){const d=new Date(),p=x=>String(x).padStart(2,'0');return `validai-cenarios-${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}-${p(d.getHours())}${p(d.getMinutes())}`}
+function rows(d){const out=[];(d.components||[]).forEach((c,i)=>{const pts=(c.testPoints||[]).map((t,j)=>({t,j})).sort((a,b)=>pr(a.t.priority).o-pr(b.t.priority).o||a.j-b.j);pts.forEach(({t,j})=>out.push({id:`${i+1}.${j+1}`,c,t}))});return out}
+function download(name,text,type){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)}
+document.getElementById('expCsv').onclick=()=>{
+  const d=lastResult;if(!d)return;
+  const q=v=>{v=String(v??'');return /[";\n\r]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v};
+  const head=['Tipo','ID','Componente','Tipo do componente','Cenário','Prioridade','Categoria','Passos','Resultado esperado','De onde veio a sugestão','Observações da IA'];
+  const lines=[head];
+  rows(d).forEach(({id,c,t})=>lines.push(['Cenário',id,c.name,c.type,t.title,pr(t.priority).l,t.category,(t.steps||[]).map((s,k)=>`${k+1}. ${s}`).join('\n'),t.expected,t.rationale,(c.observations||[]).join('\n')]));
+  (d.notCovered||[]).forEach((n,k)=>lines.push(['Ponto não coberto',`NC${k+1}`,'','',n.title,pr(n.priority).l,'','','',n.reason,'']));
+  download(baseName()+'.csv','\ufeff'+lines.map(r=>r.map(q).join(';')).join('\r\n'),'text/csv;charset=utf-8');
+  flash('Planilha baixada.');
+};
+document.getElementById('expPdf').onclick=()=>{if(!lastResult)return;const t=document.title;document.title=baseName();window.print();document.title=t};
+function markdown(d){
+  const all=rows(d);let m=`# Cenários de teste — ValidAI Vision\n\n_${new Date().toLocaleString('pt-BR')}${selectedFile?` · ${selectedFile.name}`:''}_\n\n**Resumo:** ${d.summary||''}\n\n${(d.components||[]).length} componentes · ${all.length} cenários\n\n## Por onde começar\n\n| Componente | Cenário | Prioridade |\n|---|---|---|\n`;
+  [...all].sort((a,b)=>pr(a.t.priority).o-pr(b.t.priority).o).forEach(({c,t})=>m+=`| ${c.name} | ${t.title} | ${pr(t.priority).i} ${pr(t.priority).l} |\n`);
+  (d.components||[]).forEach((c,i)=>{m+=`\n## ${i+1}. ${c.name} (${c.type})\n`;if(c.observations?.length)m+=`\n**O que a IA viu:**\n${c.observations.map(o=>`- ${o}`).join('\n')}\n`;
+    all.filter(x=>x.c===c).forEach(({id,t})=>{m+=`\n### ${id} ${t.title} — ${pr(t.priority).i} ${pr(t.priority).l}\n- **Categoria:** ${t.category}\n- **De onde veio:** ${t.rationale}\n`;if(t.steps?.length)m+='- **Passos:**\n'+t.steps.map((s,k)=>`  ${k+1}. ${s}`).join('\n')+'\n';m+=`- **Resultado esperado:** ${t.expected}\n`})});
+  if(d.notCovered?.length)m+=`\n## O que estou esquecendo?\n\n${d.notCovered.map(n=>`- ${pr(n.priority).i} **${n.title}** — ${n.reason}`).join('\n')}\n`;
+  return m}
+document.getElementById('expMd').onclick=async()=>{const d=lastResult;if(!d)return;const md=markdown(d);
+  try{await navigator.clipboard.writeText(md);flash('Texto copiado. É só colar.')}catch{download(baseName()+'.md',md,'text/markdown;charset=utf-8');flash('Não deu para copiar; baixei como arquivo .md.')}};
 fileInput.onchange=e=>setFile(e.target.files[0]);['dragenter','dragover'].forEach(e=>drop.addEventListener(e,x=>{x.preventDefault();drop.classList.add('drag')}));['dragleave','drop'].forEach(e=>drop.addEventListener(e,x=>{x.preventDefault();drop.classList.remove('drag')}));drop.addEventListener('drop',e=>setFile(e.dataTransfer.files[0]));
-analyze.onclick=async()=>{if(!selectedFile)return;analyze.disabled=true;status('Analisando a tela com IA…');results.className='empty';results.innerHTML='Identificando componentes e gerando cenários…';const fd=new FormData();fd.append('screenshot',selectedFile);try{const r=await fetch('/api/analyze',{method:'POST',body:fd});const d=await r.json();if(!r.ok)throw new Error(d.error||'Falha na análise.');render(d);status('Análise concluída.')}catch(e){results.className='empty';results.innerHTML=`<span style="color:var(--red)">${esc(e.message)}</span>`;status(e.message,true)}finally{analyze.disabled=false}};
-clearBtn.onclick=()=>{selectedFile=null;fileInput.value='';analyze.disabled=true;preview.textContent='Nenhuma imagem selecionada.';results.className='empty';results.innerHTML='O resultado da análise aparecerá aqui.';status('')};
+analyze.onclick=async()=>{if(!selectedFile)return;const n=qtyInput.value.trim();if(n&&!(+n>=1&&+n<=50&&Number.isInteger(+n))){status('Quantidade de cenários deve ser um número inteiro de 1 a 50.',true);qtyInput.focus();return}hideExport();analyze.disabled=true;status('Analisando a tela com IA…');results.className='empty';results.innerHTML='Identificando componentes e gerando cenários…';const fd=new FormData();fd.append('screenshot',selectedFile);if(n)fd.append('maxScenarios',n);try{const r=await fetch('/api/analyze',{method:'POST',body:fd});const d=await r.json();if(!r.ok)throw new Error(d.error||'Falha na análise.');render(d);status('Análise concluída.')}catch(e){results.className='empty';results.innerHTML=`<span style="color:var(--red)">${esc(e.message)}</span>`;status(e.message,true)}finally{analyze.disabled=false}};
+clearBtn.onclick=()=>{hideExport();selectedFile=null;fileInput.value='';analyze.disabled=true;preview.textContent='Nenhuma imagem selecionada.';results.className='empty';results.innerHTML='O resultado da análise aparecerá aqui.';status('')};
 fetch('/api/health').then(r=>r.json()).then(h=>{if(!h.ok)showAlert('Funcionalidade temporariamente indisponível',h.message);else if(h.demo)showAlert('Modo demonstração ativo','A IA não está sendo chamada; os resultados são dados de exemplo.','info')}).catch(()=>showAlert('Servidor indisponível','Não consegui falar com o servidor local. Verifique se o npm start está rodando.'));
 </script></body></html>
