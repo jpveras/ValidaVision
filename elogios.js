@@ -36,7 +36,7 @@ function env() {
 const conf = () => {
   const e = env();
   return {
-    meta: Math.max(1, Number.parseInt(e.ELOGIOS_META || "10", 10) || 10),
+    meta: Math.max(1, Number.parseInt(e.ELOGIOS_META || "15", 10) || 15),
     adminKey: String(e.ELOGIOS_ADMIN_KEY || "").trim(),
   };
 };
