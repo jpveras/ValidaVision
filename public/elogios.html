@@ -123,10 +123,27 @@ body.present .panel{padding:16px}
 body.present .wrap{max-width:1500px}
 body.present .stage{display:grid;grid-template-columns:1fr 320px;gap:20px;align-items:start}
 body.present .qr-card{display:block}
-body.present .cloud-box{height:calc(100vh - 290px);min-height:420px}
+body.present .cloud-box{height:calc(100vh - 470px);min-height:320px}
+body.present #presentBtn{display:none!important}
+body.present .page-head h1{font-size:26px}
+body.present .elogio p{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 body.present .elogio .rm{opacity:0;transition:opacity .15s}
 body.present .elogio:hover .rm,body.present .elogio .rm:focus{opacity:1}
-body.present .list{grid-template-columns:repeat(auto-fill,minmax(300px,1fr))}
+body.present .list{grid-template-columns:repeat(3,minmax(0,1fr))}
+/* Tela de demonstração: link curto, modo da nuvem e aviso de novo elogio */
+.link-curto{margin-top:12px;font-size:13px;color:var(--muted)}
+.link-curto b{display:block;font-size:21px;color:var(--ink);word-break:break-all;margin-top:2px;letter-spacing:-.2px}
+.demo-ctrl{margin-top:18px;display:flex;flex-direction:column;gap:8px;align-items:stretch}
+.demo-ctrl small{font-size:11px;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);text-align:left}
+.seg{display:flex;border:1px solid #9aa6a9;border-radius:4px;overflow:hidden}
+.seg button{flex:1;border:0;border-radius:0;height:34px;padding:0 6px;font-size:11px;letter-spacing:.4px;background:#fff;color:var(--text);justify-content:center}
+.seg button+button{border-left:1px solid #9aa6a9}
+.seg button.on{background:var(--teal);color:#fff}
+.demo-ctrl .linha{display:flex;gap:8px}
+.demo-ctrl .linha button{flex:1;justify-content:center;padding:0 6px}
+.toast-novo{position:fixed;left:50%;bottom:32px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:14px 26px;border-radius:99px;font-size:22px;font-weight:500;box-shadow:0 10px 30px rgba(0,0,0,.25);z-index:30;max-width:90vw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;animation:sobe .35s ease}
+@keyframes sobe{from{opacity:0;transform:translate(-50%,16px)}to{opacity:1;transform:translate(-50%,0)}}
+@media(max-width:1000px){body.present .list{grid-template-columns:1fr}}
 .qr{padding:18px;text-align:center}
 .qr svg{width:100%;height:auto;display:block;background:#fff}
 .qr .url{font-size:13px;color:var(--ink);word-break:break-all;margin-top:10px;font-weight:500}
@@ -159,7 +176,7 @@ body.present .list{grid-template-columns:repeat(auto-fill,minmax(300px,1fr))}
   <a class="logo" href="/">
     <img id="brandLogo" src="/logo.png" alt="" hidden onload="this.hidden=false;this.nextElementSibling.setAttribute('hidden','')">
     <svg width="28" height="24" viewBox="0 0 28 24" aria-hidden="true"><path d="M1 2h9l4 9 4-9h9L14 23z" fill="#2fc28f"/><path d="M10 2h8l-4 9z" fill="#1a8f6a"/></svg>
-    <b>Valida <span>Vision</span></b><span class="ver">v0.8</span>
+    <b>Valida <span>Vision</span></b><span class="ver">v0.9</span>
   </a>
   <div class="spacer"></div>
   <span class="env" id="envBadge">Protótipo local</span>
@@ -266,11 +283,19 @@ body.present .list{grid-template-columns:repeat(auto-fill,minmax(300px,1fr))}
       <div class="qr">
         <p class="cta">Aponte a câmera do celular e deixe o seu elogio</p>
         <div id="qr"></div>
-        <div class="url" id="qrUrl"></div>
+        <div class="link-curto">Sem câmera? Acesse:<b id="qrUrl"></b></div>
         <div class="count" id="bigCount">0</div>
         <div class="count-label">elogios recebidos</div>
         <div class="warn" id="qrWarn" hidden>Este endereço só abre no seu computador. Use o link publicado na Vercel para o público acessar.</div>
-        <div style="margin-top:18px;display:flex;flex-direction:column;gap:8px;align-items:stretch">
+        <div class="demo-ctrl">
+          <small>Nuvem</small>
+          <div class="seg" role="group" aria-label="Modo da nuvem">
+            <button type="button" id="modoVivo">Ao vivo</button><button type="button" id="modoMeta">Revelar na meta</button>
+          </div>
+          <div class="linha">
+            <button class="btn-outline btn-sm" id="copiarLink" type="button">Copiar link</button>
+            <button class="btn-outline btn-sm" id="telaCheia" type="button">Tela cheia</button>
+          </div>
           <button class="btn-primary btn-sm" id="exitBtn" type="button" style="justify-content:center">Sair da apresentação</button>
         </div>
       </div>
@@ -278,6 +303,8 @@ body.present .list{grid-template-columns:repeat(auto-fill,minmax(300px,1fr))}
   </div>
 
 </div></div></main>
+
+<div class="toast-novo" id="toastNovo" role="status" hidden></div>
 
 <script src="/vendor/wordcloud2.js"></script>
 <script src="/vendor/qrcode.js"></script>
@@ -290,6 +317,9 @@ $('envBadge').textContent=local?'Protótipo local':'Demonstração';
 // A senha do moderador fica só neste navegador (o seu), para não precisar digitar a cada recarga.
 const ls={get(k){try{return localStorage.getItem(k)}catch{return null}},set(k,v){try{v==null?localStorage.removeItem(k):localStorage.setItem(k,v)}catch{}}};
 let state={meta:15,total:0,palavras:[],elogios:[]},previa=false,adminKey=ls.get('vv-moderador'),isMod=false,lastCloudSig='',seen=new Set(),firstLoad=true;
+// Modo da nuvem na tela de demonstração: 'vivo' (cresce a cada elogio) ou 'meta' (revela ao atingir a meta).
+let aoVivo=ls.get('vv-nuvem-modo')!=='meta';
+const presente=()=>document.body.classList.contains('present');
 
 // ---------- Formulário ----------
 const form=$('form'),nome=$('nome'),texto=$('texto'),statusEl=$('status'),enviar=$('enviar');
@@ -330,6 +360,11 @@ function render(){
   const faltam=Math.max(0,meta-total);
   $('faltam').textContent=faltam;$('faltamPre').textContent=faltam===1?'Falta':'Faltam';$('faltamTxt').textContent=faltam===1?'Elogio para revelar a nuvem':'Elogios para revelar a nuvem';
   $('faltamSub').textContent=total===0?'Seja a primeira pessoa a reconhecer um colega!':faltam===1?'Falta só um! Quem vai fazer a nuvem aparecer?':'Cada elogio nos deixa mais perto da revelação. Você pode elogiar mais de um colega!';
+  if(presente()&&aoVivo&&total===0){ // demonstração ao vivo, ainda sem elogios
+    $('faltamPre').textContent='';$('faltam').textContent='💚';
+    $('faltamTxt').textContent='A nuvem começa no primeiro elogio';
+    $('faltamSub').textContent='Aponte a câmera para o QR Code ao lado (ou use o link) e envie o seu!';
+  }
   $('storageWarn').hidden=state.armazenamento!=='temporario';
   renderList();renderCloud();
 }
@@ -337,8 +372,10 @@ function render(){
 function quando(iso){const d=new Date(iso),s=(Date.now()-d)/1000;if(s<60)return'agora';if(s<3600)return`há ${Math.floor(s/60)} min`;return d.toLocaleString('pt-BR',{hour:'2-digit',minute:'2-digit',day:'2-digit',month:'2-digit'})}
 function renderList(){
   const l=state.elogios||[];$('listCount').textContent=l.length?`(${state.total})`:'';
-  if(!l.length){$('list').innerHTML='<div class="empty">Nenhum elogio por aqui ainda. Que tal ser o primeiro?</div>';return}
-  const mostrar=document.body.classList.contains('present')?l.slice(0,6):l;
+  if(!l.length){$('list').innerHTML='<div class="empty">Nenhum elogio por aqui ainda. Que tal ser o primeiro?</div>';firstLoad=false;return}
+  const novos=firstLoad?[]:l.filter(e=>!seen.has(e.id));
+  if(presente()&&novos.length)avisarNovo(novos);
+  const mostrar=presente()?l.slice(0,3):l;
   $('list').innerHTML=mostrar.map(e=>`<div class="elogio${!firstLoad&&!seen.has(e.id)?' new':''}"><b>${esc(e.nome)}</b><p>${esc(e.texto)}</p><small>${quando(e.criadoEm)}</small>${isMod?`<button class="btn-danger rm" data-id="${esc(e.id)}" type="button">Remover</button>`:''}</div>`).join('');
   l.forEach(e=>seen.add(e.id));firstLoad=false;
 }
@@ -346,9 +383,9 @@ function renderList(){
 // ---------- Nuvem ----------
 const CORES=['#0b7f70','#109c8a','#033a45','#2fc28f','#c98a12','#0b3b47','#1a8f6a','#d0811b'];
 function renderCloud(force){
-  const mostrar=state.total>=state.meta||previa;
+  const mostrar=state.total>=state.meta||previa||(presente()&&aoVivo);
   $('cloudWait').hidden=mostrar&&state.palavras.length>0;
-  $('previa').hidden=!isMod||!document.body.classList.contains('present')||state.total>=state.meta||!state.palavras.length;
+  $('previa').hidden=!isMod||!presente()||aoVivo||state.total>=state.meta||!state.palavras.length;
   if(!mostrar||!state.palavras.length){$('cloud').hidden=true;$('fallback').hidden=true;lastCloudSig='';return}
   const box=$('cloudBox'),W=box.clientWidth,H=box.clientHeight;
   const sig=JSON.stringify(state.palavras)+W+'x'+H;
@@ -370,19 +407,38 @@ function renderCloud(force){
 let rz;addEventListener('resize',()=>{clearTimeout(rz);rz=setTimeout(()=>renderCloud(true),250)});
 $('previa').onclick=()=>{previa=true;renderCloud(true)};
 
-// ---------- Modo apresentação ----------
+// ---------- Modo apresentação (tela de demonstração) ----------
 // O QR Code leva o público para a tela simples de envio (sem menu, nuvem ou moderação).
+// O link curto /elogie (ou /e) leva para a mesma tela, para quem não consegue ler o QR.
 const pageUrl=location.origin+'/elogiar.html';
+const linkCurto=location.origin+'/elogie';
+let toastTimer;
+function avisarNovo(novos){
+  const t=$('toastNovo');
+  t.textContent=novos.length===1?`💚 Novo elogio para ${novos[0].nome}!`:`💚 ${novos.length} novos elogios!`;
+  t.hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.hidden=true,4500);
+}
+function atualizaModo(){
+  $('modoVivo').classList.toggle('on',aoVivo);$('modoMeta').classList.toggle('on',!aoVivo);
+  $('modoVivo').setAttribute('aria-pressed',aoVivo);$('modoMeta').setAttribute('aria-pressed',!aoVivo);
+}
+$('modoVivo').onclick=()=>{aoVivo=true;ls.set('vv-nuvem-modo',null);atualizaModo();render();renderCloud(true)};
+$('modoMeta').onclick=()=>{aoVivo=false;previa=false;ls.set('vv-nuvem-modo','meta');atualizaModo();render();renderCloud(true)};
+$('copiarLink').onclick=async()=>{const b=$('copiarLink');try{await navigator.clipboard.writeText(linkCurto);b.textContent='Link copiado!'}catch{b.textContent='Não deu para copiar'}setTimeout(()=>b.textContent='Copiar link',2500)};
+$('telaCheia').onclick=()=>{try{document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen()}catch{}};
+document.addEventListener('fullscreenchange',()=>{$('telaCheia').textContent=document.fullscreenElement?'Sair da tela cheia':'Tela cheia';setTimeout(()=>renderCloud(true),150)});
+atualizaModo();
 function desenharQR(){
   try{const q=qrcode(0,'M');q.addData(pageUrl);q.make();$('qr').innerHTML=q.createSvgTag({scalable:true,margin:2})}catch{$('qr').textContent=''}
-  $('qrUrl').textContent=pageUrl.replace(/^https?:\/\//,'');$('qrWarn').hidden=!local;
+  $('qrUrl').textContent=linkCurto.replace(/^https?:\/\//,'');$('qrWarn').hidden=!local;
 }
 function setPresent(on){
   if(on&&!isMod){abrirLogin('Entre como moderador para abrir o modo apresentação.');pedirApresentar=true;return}
   document.body.classList.toggle('present',on);
   try{const u=new URL(location.href);on?u.searchParams.set('apresentar','1'):u.searchParams.delete('apresentar');history.replaceState(null,'',u)}catch{}
   if(on){desenharQR();window.scrollTo(0,0)}
-  agendar();renderList();setTimeout(()=>renderCloud(true),50);
+  if(!on&&document.fullscreenElement)try{document.exitFullscreen()}catch{}
+  agendar();render();setTimeout(()=>renderCloud(true),50);
 }
 $('presentBtn').onclick=()=>setPresent(true);
 $('exitBtn').onclick=()=>setPresent(false);
