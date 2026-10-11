@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>ValidAI Vision</title>
+<title>Valida Vision</title>
 <link rel="icon" type="image/png" href="/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
@@ -178,7 +178,7 @@ button:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
   <a class="logo" href="/">
     <img id="brandLogo" src="/logo.png" alt="" hidden onload="this.hidden=false;this.nextElementSibling.setAttribute('hidden','')">
     <svg width="28" height="24" viewBox="0 0 28 24" aria-hidden="true"><path d="M1 2h9l4 9 4-9h9L14 23z" fill="#2fc28f"/><path d="M10 2h8l-4 9z" fill="#1a8f6a"/></svg>
-    <b>ValidAI <span>Vision</span></b><span class="ver">v0.6</span>
+    <b>Valida <span>Vision</span></b><span class="ver">v0.6</span>
   </a>
   <div class="spacer"></div>
   <span class="env">Protótipo local</span>
@@ -267,7 +267,7 @@ const PR={alta:{i:'🟥',l:'Alta',c:'high',o:0},media:{i:'🟨',l:'Média',c:'me
 const pr=p=>PR[p]||PR.media;
 const pbadge=p=>`<span class="priority ${pr(p).c}">${pr(p).i} ${pr(p).l}</span>`;
 function render(d){
-lastResult=d;exportBox.hidden=false;document.getElementById("printMeta").textContent=`ValidAI Vision · ${new Date().toLocaleString("pt-BR")} · ${selectedFile?.name||""}`;
+lastResult=d;exportBox.hidden=false;document.getElementById("printMeta").textContent=`Valida Vision · ${new Date().toLocaleString("pt-BR")} · ${selectedFile?.name||""}`;
 results.className='';
 const comps=d.components||[];const all=comps.flatMap((c,i)=>(c.testPoints||[]).map((t,j)=>({c,i,t,j})));
 const cnt={alta:0,media:0,baixa:0};all.forEach(x=>{if(cnt[x.t.priority]!==undefined)cnt[x.t.priority]++});
@@ -307,7 +307,7 @@ chips.forEach(c=>c.onclick=()=>{qtyInput.value=c.dataset.n;syncChips()});qtyInpu
 let lastResult=null;const exportBox=document.getElementById('export'),toast=document.getElementById('expToast');
 function hideExport(){lastResult=null;exportBox.hidden=true;toast.textContent=''}
 function flash(t){toast.textContent=t;clearTimeout(flash.t);flash.t=setTimeout(()=>toast.textContent='',3500)}
-function baseName(){const d=new Date(),p=x=>String(x).padStart(2,'0');return `validai-cenarios-${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}-${p(d.getHours())}${p(d.getMinutes())}`}
+function baseName(){const d=new Date(),p=x=>String(x).padStart(2,'0');return `valida-vision-cenarios-${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}-${p(d.getHours())}${p(d.getMinutes())}`}
 function rows(d){const out=[];(d.components||[]).forEach((c,i)=>{const pts=(c.testPoints||[]).map((t,j)=>({t,j})).sort((a,b)=>pr(a.t.priority).o-pr(b.t.priority).o||a.j-b.j);pts.forEach(({t,j})=>out.push({id:`${i+1}.${j+1}`,c,t}))});return out}
 function download(name,text,type){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)}
 document.getElementById('expCsv').onclick=()=>{
@@ -322,7 +322,7 @@ document.getElementById('expCsv').onclick=()=>{
 };
 document.getElementById('expPdf').onclick=()=>{if(!lastResult)return;const t=document.title;document.title=baseName();window.print();document.title=t};
 function markdown(d){
-  const all=rows(d);let m=`# Cenários de teste — ValidAI Vision\n\n_${new Date().toLocaleString('pt-BR')}${selectedFile?` · ${selectedFile.name}`:''}_\n\n**Resumo:** ${d.summary||''}\n\n${(d.components||[]).length} componentes · ${all.length} cenários\n\n## Por onde começar\n\n| Componente | Cenário | Prioridade |\n|---|---|---|\n`;
+  const all=rows(d);let m=`# Cenários de teste — Valida Vision\n\n_${new Date().toLocaleString('pt-BR')}${selectedFile?` · ${selectedFile.name}`:''}_\n\n**Resumo:** ${d.summary||''}\n\n${(d.components||[]).length} componentes · ${all.length} cenários\n\n## Por onde começar\n\n| Componente | Cenário | Prioridade |\n|---|---|---|\n`;
   [...all].sort((a,b)=>pr(a.t.priority).o-pr(b.t.priority).o).forEach(({c,t})=>m+=`| ${c.name} | ${t.title} | ${pr(t.priority).i} ${pr(t.priority).l} |\n`);
   (d.components||[]).forEach((c,i)=>{m+=`\n## ${i+1}. ${c.name} (${c.type})\n`;if(c.observations?.length)m+=`\n**O que a IA viu:**\n${c.observations.map(o=>`- ${o}`).join('\n')}\n`;
     all.filter(x=>x.c===c).forEach(({id,t})=>{m+=`\n### ${id} ${t.title} — ${pr(t.priority).i} ${pr(t.priority).l}\n- **Categoria:** ${t.category}\n- **De onde veio:** ${t.rationale}\n`;if(t.steps?.length)m+='- **Passos:**\n'+t.steps.map((s,k)=>`  ${k+1}. ${s}`).join('\n')+'\n';m+=`- **Resultado esperado:** ${t.expected}\n`})});

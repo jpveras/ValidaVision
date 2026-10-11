@@ -1,4 +1,4 @@
-# ValidAI Vision — Protótipo Local v0.6
+# Valida Vision — Protótipo Local v0.6
 
 ## Rodar
 

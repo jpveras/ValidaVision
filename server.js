@@ -80,7 +80,7 @@ app.use(express.static(path.join(__dirname, "public")));
 // ======================================================
 
 const systemPrompt = `
-Você é o ValidAI Vision, um assistente especialista em QA e testes de interfaces.
+Você é o Valida Vision, um assistente especialista em QA e testes de interfaces.
 
 Sua tarefa é analisar a captura de tela enviada pelo usuário e transformar APENAS
 os elementos visualmente identificáveis em sugestões de testes.
@@ -623,7 +623,7 @@ const startCfg = getConfig();
 
 app.listen(startCfg.port, "127.0.0.1", async () => {
   console.log("");
-  console.log(`ValidAI Vision rodando em http://localhost:${startCfg.port}`);
+  console.log(`Valida Vision rodando em http://localhost:${startCfg.port}`);
   console.log(`Modelos: ${startCfg.models.join(" -> ")}`);
   console.log(`DEMO_MODE: ${startCfg.demoMode}`);
   console.log(`Chave: ${maskKey(startCfg.apiKey)}`);
