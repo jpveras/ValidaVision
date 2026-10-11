@@ -382,7 +382,9 @@ app.get("/api/health", async (_req, res) => {
   }
 
   try {
-    const { response, data } = await geminiFetch(cfg, "/models?pageSize=200");
+    const { response, data } = await geminiFetch(cfg, "/models?pageSize=200", {
+      signal: AbortSignal.timeout(15000),
+    });
 
     if (!response.ok) {
       return res.status(502).json({
@@ -544,21 +546,39 @@ app.post("/api/analyze", upload.single("screenshot"), async (req, res) => {
     const TRANSIENT = [500, 503, 504];
     const NEXT_MODEL = [404, 429, ...TRANSIENT];
     const MAX_ATTEMPTS = 3;
+    // Tempo máximo: evita que um Gemini travado deixe a tela em "Analisando…" até o limite
+    // de 5 min da Vercel. Cada tentativa tem até 100 s e a análise inteira até 210 s.
+    const ATTEMPT_MS = Number(process.env.GEMINI_ATTEMPT_MS) || 100_000;
+    const deadline = Date.now() + (Number(process.env.GEMINI_TOTAL_MS) || 210_000);
+    const MIN_RESTANTE = Math.min(15_000, ATTEMPT_MS / 2); // não começa tentativa sem tempo útil
+    let timedOut = false;
     let last = null;
     let usedModel = null;
     let googleData = null;
 
     modelLoop: for (const model of cfg.models) {
       for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
-        const { response, data } = await geminiFetch(
-          cfg,
-          `/models/${encodeURIComponent(model)}:generateContent`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload),
-          }
-        );
+        const restante = deadline - Date.now();
+        if (restante < MIN_RESTANTE) break modelLoop; // sem tempo para outra tentativa
+        let response, data;
+        try {
+          ({ response, data } = await geminiFetch(
+            cfg,
+            `/models/${encodeURIComponent(model)}:generateContent`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(payload),
+              signal: AbortSignal.timeout(Math.min(ATTEMPT_MS, restante)),
+            }
+          ));
+        } catch (e) {
+          if (e?.name !== "TimeoutError" && e?.name !== "AbortError") throw e;
+          timedOut = true;
+          console.error(`Gemini (${model}) não respondeu a tempo na tentativa ${attempt}.`);
+          last = { status: 504, data: { error: { message: "Tempo esgotado esperando o Gemini." } } };
+          continue modelLoop; // modelo lento/travado: tenta o próximo da lista
+        }
 
         if (response.ok) {
           usedModel = model;
@@ -575,12 +595,28 @@ app.post("/api/analyze", upload.single("screenshot"), async (req, res) => {
         last = { status: response.status, data };
 
         if (TRANSIENT.includes(response.status) && attempt < MAX_ATTEMPTS) {
-          await sleep(1500 * attempt * attempt); // 1,5s, 6s
-          continue;
+          const espera = 1500 * attempt * attempt; // 1,5s, 6s
+          if (deadline - Date.now() > espera + MIN_RESTANTE) {
+            await sleep(espera);
+            continue;
+          }
         }
         if (NEXT_MODEL.includes(response.status)) continue modelLoop;
         break modelLoop; // 401/403/400: trocar de modelo não resolve
       }
+    }
+
+    if (!googleData && !last) {
+      last = { status: 504, data: { error: { message: "Tempo esgotado esperando o Gemini." } } };
+      timedOut = true;
+    }
+
+    if (last && timedOut && last.status === 504) {
+      return res.status(504).json({
+        error:
+          "A IA está demorando mais que o normal para responder. Tente de novo em instantes " +
+          "ou informe uma quantidade menor de cenários.",
+      });
     }
 
     if (last) {
