@@ -48,6 +48,36 @@
 .dicas{margin:0;padding-left:18px}
 .dicas li{margin:6px 0}
 .guia kbd{font:inherit;font-size:12px;font-weight:500;padding:1px 6px;border:1px solid #cfd8d6;border-bottom-width:2px;border-radius:3px;background:var(--panel);white-space:nowrap}
+/* Análise da semana (IA) */
+.analise .card-head{gap:10px}
+.analise .acoes{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.analise .meta{font-size:12px;color:var(--muted);font-weight:400}
+.clima{display:inline-flex;align-items:center;gap:8px;font-size:14px;font-weight:700;padding:6px 12px;border-radius:99px}
+.clima.positivo{background:#e6f6ee;color:#067647}
+.clima.neutro{background:#eef2f1;color:#3d4f55}
+.clima.atencao{background:#fff6e0;color:#a15c07}
+.clima.alerta{background:#fdecec;color:#b42318}
+.an-leitura{font-size:15px;line-height:1.6;margin:14px 0 6px;color:var(--text)}
+.an-tend{font-size:13px;color:var(--muted);margin:0 0 14px}
+.an-temas{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px}
+.an-temas span{font-size:12px;padding:5px 10px;border-radius:99px;background:var(--teal-soft);color:var(--teal2);font-weight:500}
+.an-h{margin:18px 0 8px;font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--teal2)}
+.sug{list-style:none;margin:0;padding:0;display:grid;gap:10px;counter-reset:s}
+.sug li{counter-increment:s;position:relative;border:1px solid var(--line);border-radius:6px;padding:12px 14px 12px 50px;background:#fff}
+.sug li::before{content:counter(s);position:absolute;left:14px;top:12px;width:24px;height:24px;border-radius:50%;background:var(--teal);color:#fff;font-size:12px;font-weight:700;display:grid;place-items:center}
+.sug b{display:block;color:var(--ink);font-size:15px;margin-bottom:4px}
+.sug .q{float:right;font-size:11px;color:var(--teal2);background:var(--teal-soft);border-radius:99px;padding:3px 9px;margin-left:8px}
+.sug p{margin:3px 0;font-size:13px;line-height:1.5}
+.sug p i{font-style:normal;color:var(--muted)}
+.pergunta{border-left:4px solid var(--teal);background:var(--panel);padding:12px 14px;border-radius:4px;font-size:15px;color:var(--ink);font-style:italic}
+.evitar{margin:0;padding-left:18px;font-size:13px}
+.apoio{margin-top:14px;border:1px solid var(--warn-line);background:var(--warn-bg);color:var(--warn-ink);border-radius:6px;padding:12px 14px;font-size:13px;line-height:1.5}
+.an-vazio{text-align:center;padding:18px 8px;color:var(--muted)}
+.an-vazio p{margin:0 0 14px}
+.an-aviso{font-size:12px;color:var(--muted);margin-top:16px;line-height:1.5}
+.an-desatual{font-size:12px;color:var(--warn-ink);background:var(--warn-bg);border:1px solid var(--warn-line);border-radius:4px;padding:6px 10px;margin-bottom:10px}
+.carregando{display:inline-block;width:14px;height:14px;border:2px solid var(--teal-soft);border-top-color:var(--teal);border-radius:50%;animation:gira .8s linear infinite;vertical-align:-2px}
+@keyframes gira{to{transform:rotate(360deg)}}
 .login-sobre{margin:0 0 18px;color:var(--muted);line-height:1.5}
 @media(max-width:900px){.passos{grid-template-columns:1fr}}
 @media(max-width:900px){.tiles{grid-template-columns:1fr 1fr}.grid2{grid-template-columns:1fr}}
@@ -61,7 +91,9 @@
   .print-head p{margin:4px 0 0;color:var(--muted)}
   .card,.tile{break-inside:avoid}
   .cloud-box{height:360px;background:#fff}
-  .tile,.mini,.chip-semana{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .tile,.mini,.chip-semana,.clima,.an-temas span,.sug li::before,.pergunta,.apoio{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .analise .acoes,.an-vazio button{display:none!important}
+  .sug li{break-inside:avoid}
 }
 </style>
 </head>
@@ -71,7 +103,7 @@
   <a class="logo" href="/">
     <img id="brandLogo" src="/logo.png" alt="" hidden onload="this.hidden=false;this.nextElementSibling.setAttribute('hidden','')">
     <svg width="28" height="24" viewBox="0 0 28 24" aria-hidden="true"><path d="M1 2h9l4 9 4-9h9L14 23z" fill="#2fc28f"/><path d="M10 2h8l-4 9z" fill="#1a8f6a"/></svg>
-    <b>Valida <span>Vision</span></b><span class="ver">v0.9</span>
+    <b>Valida <span>Vision</span></b><span class="ver">v0.10</span>
   </a>
   <div class="spacer"></div>
   <span class="env">Painel da gestora</span>
@@ -133,6 +165,7 @@
           <li><b>Observe a nuvem</b>: quanto maior a palavra, mais pessoas a escolheram. Palavras de mesmo tom (ex.: “cansado”, “puxada”, “corrida”) juntas indicam um padrão.</li>
           <li><b>Confira o ranking</b> para ver os números exatos de cada palavra.</li>
           <li><b>Compartilhe</b>: <kbd>Baixar PDF</kbd> gera uma página pronta para encaminhar; <kbd>Copiar resumo</kbd> copia um texto para colar no e-mail ou no Teams.</li>
+          <li><b>Gere a análise da semana</b>: no card <kbd>💡 Análise da semana</kbd>, clique em <kbd>Gerar análise</kbd>. A IA lê as palavras (sem nomes) e sugere o clima, temas, ações para a equipe e uma pergunta para abrir a conversa. Ela fica salva; use <kbd>Gerar novamente</kbd> se chegarem novas respostas.</li>
           <li><b>Se aparecer algo impróprio</b>, em “Respostas da semana” clique em <kbd>Remover</kbd> e depois em <kbd>Confirmar</kbd>. Ao terminar, clique em <kbd>Sair</kbd>, principalmente em computador compartilhado.</li>
         </ol>
 
@@ -183,6 +216,14 @@
         <div class="card-body" style="padding:16px"><div class="respostas" id="respostas"></div></div>
       </section>
     </div>
+
+    <section class="card analise" id="analiseCard">
+      <div class="card-head">
+        <span>💡 Análise da semana</span>
+        <div class="acoes"><span class="meta" id="anMeta"></span><button class="btn-outline btn-sm" id="anGerar" type="button" hidden>Gerar novamente</button></div>
+      </div>
+      <div class="card-body" id="anCorpo"><div class="an-vazio"><span class="carregando"></span></div></div>
+    </section>
   </div>
 
   <div class="foot-link no-print"><a href="/sentimento.html">Voltar para o Sentimento da Semana</a></div>
@@ -195,7 +236,7 @@
 const $=id=>document.getElementById(id);
 const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
 const ls={get(k){try{return localStorage.getItem(k)}catch{return null}},set(k,v){try{v==null?localStorage.removeItem(k):localStorage.setItem(k,v)}catch{}}};
-let chave=ls.get('vv-gestora'),semanas=[],atual=null,dados=null;
+let chave=ls.get('vv-gestora'),semanas=[],atual=null,dados=null,analise=null,minimoAnalise=3,gerando=false;
 const guia=document.getElementById('guia');
 if(ls.get('vv-gestora-guia')==='fechado')guia.open=false;
 guia.addEventListener('toggle',()=>ls.set('vv-gestora-guia',guia.open?null:'fechado'));
@@ -236,6 +277,7 @@ async function carregarSemana(semana){
     const idx=semanas.findIndex(s=>s.semana===semana),ant=semanas[idx+1];
     let anterior=null;if(ant){try{anterior=await api('/api/sentimentos/gestora/semana/'+ant.semana)}catch{}}
     render(anterior);
+    carregarAnalise(semana);
   }catch(err){if(err.status===401){chave=null;ls.set('vv-gestora',null);return mostrarLogin('Sua sessão expirou. Entre novamente.',true)}msg(err.message,true)}
 }
 $('semanaSel').onchange=e=>carregarSemana(e.target.value);
@@ -254,6 +296,53 @@ function render(anterior){
   vvNuvem($('cloudBox'),$('cloud'),$('fallback'),d.palavras);
 }
 
+
+// ---------- Análise da semana (IA) ----------
+const CLIMA={positivo:['positivo','🟢 Positivo'],neutro:['neutro','⚪ Neutro'],atencao:['atencao','🟠 Atenção'],alerta:['alerta','🔴 Alerta']};
+const dataHora=iso=>new Date(iso).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
+async function carregarAnalise(semana){
+  analise=null;$('anMeta').textContent='';$('anGerar').hidden=true;
+  $('anCorpo').innerHTML='<div class="an-vazio"><span class="carregando"></span></div>';
+  try{const r=await api(`/api/sentimentos/gestora/semana/${semana}/analise`);if(semana!==atual)return;analise=r.analise;minimoAnalise=r.minimo||3}catch{analise=null}
+  renderAnalise();
+}
+function renderAnalise(){
+  const d=dados,corpo=$('anCorpo');
+  if(gerando){corpo.innerHTML='<div class="an-vazio"><p><span class="carregando"></span> Gerando a análise com IA… costuma levar de 15 a 40 segundos.</p></div>';$('anGerar').hidden=true;return}
+  if(!analise){
+    $('anMeta').textContent='';$('anGerar').hidden=true;
+    const falta=Math.max(0,minimoAnalise-d.total);
+    corpo.innerHTML=falta
+      ?`<div class="an-vazio"><p>A análise fica disponível a partir de <b>${minimoAnalise} respostas</b> na semana. ${d.total?`Esta semana tem ${d.total}; ${falta===1?'falta 1':`faltam ${falta}`}.`:'Esta semana ainda não tem respostas.'}</p></div>`
+      :`<div class="an-vazio"><p>A IA lê as palavras desta semana (sem nomes), compara com a semana anterior e sugere ações para você trabalhar com a equipe.</p><button class="btn-primary btn-sm" type="button" id="anPrimeira">Gerar análise</button></div>`;
+    const b=document.getElementById('anPrimeira');if(b)b.onclick=gerarAnalise;
+    return;
+  }
+  const a=analise.analise,c=CLIMA[a.clima]||CLIMA.neutro;
+  $('anMeta').textContent=`Gerada em ${dataHora(analise.geradaEm)} com ${analise.totalNaGeracao} respostas`;
+  $('anGerar').hidden=false;
+  const desatual=d.total!==analise.totalNaGeracao?`<div class="an-desatual">A semana agora tem ${d.total} respostas (a análise usou ${analise.totalNaGeracao}). Clique em <b>Gerar novamente</b> para atualizar.</div>`:'';
+  corpo.innerHTML=`${desatual}
+    <span class="clima ${c[0]}">Clima geral: ${c[1]}</span>
+    <p class="an-leitura">${esc(a.leitura)}</p>
+    <p class="an-tend">↔ ${esc(a.tendencia)}</p>
+    ${a.temas?.length?`<div class="an-temas">${a.temas.map(t=>`<span>${esc(t)}</span>`).join('')}</div>`:''}
+    <div class="an-h">Sugestões de ação</div>
+    <ol class="sug">${(a.sugestoes||[]).map(s=>`<li><span class="q">${esc(s.quando)}</span><b>${esc(s.titulo)}</b><p><i>Por quê:</i> ${esc(s.porque)}</p><p><i>Como:</i> ${esc(s.como)}</p></li>`).join('')}</ol>
+    <div class="an-h">Pergunta para abrir a conversa com a equipe</div>
+    <div class="pergunta">“${esc(a.perguntaAbertura)}”</div>
+    ${a.evitar?.length?`<div class="an-h">Evite</div><ul class="evitar">${a.evitar.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:''}
+    ${a.apoio?`<div class="apoio">🤝 <b>Apoio:</b> ${esc(a.apoio)}</div>`:''}
+    <p class="an-aviso">Sugestões geradas por IA a partir das palavras anônimas da equipe. Use como apoio à sua leitura — a decisão é sua. Não é um diagnóstico.</p>`;
+}
+async function gerarAnalise(){
+  if(gerando)return;gerando=true;renderAnalise();const semana=atual;
+  try{const r=await api(`/api/sentimentos/gestora/semana/${semana}/analise`,{method:'POST'});if(semana===atual){analise=r.analise;msg('Análise gerada.')}}
+  catch(err){if(semana===atual)msg(err.message,true)}
+  finally{gerando=false;if(semana===atual)renderAnalise()}
+}
+$('anGerar').onclick=gerarAnalise;
+
 $('respostas').addEventListener('click',async e=>{
   const b=e.target.closest('.rm');if(!b)return;
   if(!b.classList.contains('armed')){b.classList.add('armed');b.textContent='Confirmar';setTimeout(()=>{b.classList.remove('armed');b.textContent='Remover'},3000);return}
@@ -264,6 +353,7 @@ $('pdf').onclick=()=>{const t=document.title;document.title=`sentimento-equipe-$
 $('copiar').onclick=async()=>{
   const d=dados;if(!d)return;
   const linhas=[`Sentimento da equipe — ${d.rotulo}`,`Participação: ${d.total} de ${d.equipe} pessoas (${Math.round(d.total/d.equipe*100)}%)`,d.palavras[0]?`Palavra da semana: ${d.palavras[0][0]}`:'Sem respostas nesta semana.','',...d.palavras.map(([p,n])=>`• ${p} — ${n}`)];
+  if(analise){const a=analise.analise;linhas.push('','ANÁLISE DA SEMANA',`Clima geral: ${(CLIMA[a.clima]||CLIMA.neutro)[1].replace(/^\S+\s/,'')}`,a.leitura,`Tendência: ${a.tendencia}`,'','Sugestões de ação:',...(a.sugestoes||[]).map((s,i)=>`${i+1}. ${s.titulo} (${s.quando}) — ${s.como}`),'',`Pergunta para a equipe: "${a.perguntaAbertura}"`);if(a.apoio)linhas.push('',`Apoio: ${a.apoio}`);linhas.push('','(Sugestões geradas por IA a partir das palavras anônimas.)')}
   try{await navigator.clipboard.writeText(linhas.join('\n'));msg('Resumo copiado. É só colar no e-mail ou no Teams.')}catch{msg('Não consegui copiar automaticamente.',true)}
 };
 
