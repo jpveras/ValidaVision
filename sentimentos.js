@@ -7,7 +7,7 @@
 // ANÔNIMO: nenhum nome, IP ou identificador é gravado. Cada resposta guarda
 // só a palavra, a semana e a data/hora.
 //
-// Armazenamento: Vercel Blob em sentimentos/<semana>/<arquivo>.json quando
+// Armazenamento: Vercel Blob em sentimentos/<semana>.json (um arquivo por semana) quando
 // BLOB_READ_WRITE_TOKEN existe; senão data/sentimentos.json (npm start) ou
 // /tmp na Vercel sem Blob.
 // ======================================================
@@ -20,6 +20,7 @@ import crypto from "node:crypto";
 import dotenv from "dotenv";
 import { fileURLToPath } from "node:url";
 import { gerarJSON, iaConfig, IAErro } from "./ia.js";
+import { lerDoc, atualizarDoc, listarDocs, _colecao } from "./colecao.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PREFIX = "sentimentos/";
@@ -116,98 +117,49 @@ const fileStore = {
   },
 };
 
-let blobSdk = null;
-let blobAccess = null;
-const blobCache = new Map(); // pathname -> resposta (respostas não mudam)
-const sdk = async () => (blobSdk ||= await import("@vercel/blob"));
-const ordemAcesso = () =>
-  blobAccess ? [blobAccess] : [...new Set([process.env.ELOGIOS_BLOB_ACCESS || "private", "public"])];
-const erroDeAcesso = (e) => /access|private|public/i.test(String(e?.message));
-
-async function listarTudo(prefix) {
-  const { list } = await sdk();
-  const blobs = [];
-  let cursor;
-  do {
-    const r = await list({ prefix, limit: 1000, cursor });
-    blobs.push(...r.blobs);
-    cursor = r.hasMore ? r.cursor : undefined;
-  } while (cursor);
-  return blobs;
-}
+// Vercel Blob: um arquivo JSON por semana (sentimentos/<semana>.json), ver colecao.js.
+// Leitura = 1 operação simples; escrita segura contra envios simultâneos.
+const docSemana = (semana) => `${PREFIX}${semana}.json`;
 
 const blobStore = {
   kind: () => "vercel-blob",
+  // Só o painel da gestora usa (lista os arquivos uma vez ao abrir).
   async semanas() {
     const c = {};
-    for (const b of await listarTudo(PREFIX)) {
-      const s = b.pathname.slice(PREFIX.length).split("/")[0];
-      if (SEMANA_RE.test(s)) c[s] = (c[s] || 0) + 1;
-    }
+    const docs = (await listarDocs(PREFIX))
+      .map((b) => b.pathname.slice(PREFIX.length).replace(/\.json$/, ""))
+      .filter((s) => SEMANA_RE.test(s));
+    await Promise.all(docs.map(async (s) => (c[s] = (await this.daSemana(s)).length)));
     return c;
   },
   async daSemana(semana) {
-    const { get } = await sdk();
-    const blobs = await listarTudo(`${PREFIX}${semana}/`);
-    await Promise.all(
-      blobs
-        .filter((b) => !blobCache.has(b.pathname))
-        .map(async (b) => {
-          for (const access of ordemAcesso()) {
-            try {
-              const r = await get(b.pathname, { access, useCache: false });
-              if (!r) return;
-              blobAccess = access;
-              blobCache.set(b.pathname, { ...JSON.parse(await new Response(r.stream).text()), _path: b.pathname });
-              return;
-            } catch (e) {
-              if (!erroDeAcesso(e)) return console.error("Sentimento ilegível:", b.pathname, e?.message);
-            }
-          }
-        })
-    );
-    const vivos = new Set(blobs.map((b) => b.pathname));
-    return [...blobCache.values()].filter((r) => r.semana === semana && vivos.has(r._path));
+    return (await lerDoc(docSemana(semana)))?.itens || [];
   },
   async adicionar(item) {
-    const { put } = await sdk();
-    const pathname = `${PREFIX}${item.semana}/${item.criadoEm.replace(/[:.]/g, "-")}-${item.id}.json`;
-    let ultimo;
-    for (const access of ordemAcesso()) {
-      try {
-        await put(pathname, JSON.stringify(item), { access, contentType: "application/json", addRandomSuffix: false });
-        blobAccess = access;
-        blobCache.set(pathname, { ...item, _path: pathname });
-        return;
-      } catch (e) {
-        ultimo = e;
-        if (!erroDeAcesso(e)) throw e;
-      }
-    }
-    throw ultimo;
+    return (await atualizarDoc(docSemana(item.semana), (cur) => ({ itens: [...(cur?.itens || []), item] }))).itens;
   },
   async remover(semana, id) {
-    const { del } = await sdk();
-    const alvo = (await this.daSemana(semana)).find((r) => r.id === id);
-    if (alvo) {
-      await del(alvo._path);
-      blobCache.delete(alvo._path);
-    }
+    return (await atualizarDoc(docSemana(semana), (cur) => ({ itens: (cur?.itens || []).filter((r) => r.id !== id) }))).itens;
   },
 };
 
 const store = () => (process.env.BLOB_READ_WRITE_TOKEN ? blobStore : fileStore);
 
-// Cache curto por semana (várias pessoas atualizando a tela ao mesmo tempo).
+// Cache por semana: várias pessoas com a tela aberta não geram uma consulta cada.
+// Depois de gravar, o cache já recebe a lista nova.
+const CACHE_TTL = 15000;
 const cache = new Map();
 async function respostasDa(semana, force = false) {
   const c = cache.get(semana);
-  if (!force && c && Date.now() - c.at < 3000) return c.data;
+  if (!force && c && Date.now() - c.at < CACHE_TTL) return c.data;
   const data = await store().daSemana(semana);
   cache.set(semana, { at: Date.now(), data });
   return data;
 }
-const invalidar = (semana) => cache.delete(semana);
+async function aposGravar(semana, itens) {
+  if (Array.isArray(itens)) cache.set(semana, { at: Date.now(), data: itens });
+  else await respostasDa(semana, true);
+}
 
 // ---------------- Palavras ----------------
 
@@ -299,16 +251,19 @@ sentimentosRouter.post("/", async (req, res) => {
     const v = validaPalavra(req.body?.palavra);
     if (v.erro) return res.status(400).json({ error: v.erro });
     const ip = String(req.get("x-forwarded-for") || req.ip || "").split(",")[0].trim();
-    if (Date.now() - (ultimoEnvio.get(ip) || 0) < 3000) {
-      return res.status(429).json({ error: "Aguarde alguns segundos e tente de novo." });
+    // Toda a equipe pode sair pelo mesmo IP da empresa: limite por minuto, folgado.
+    const agora = Date.now();
+    const janela = (ultimoEnvio.get(ip) || []).filter((t) => agora - t < 60_000);
+    if (janela.length >= 40) {
+      return res.status(429).json({ error: "Muitos envios em sequência. Aguarde alguns segundos e tente de novo." });
     }
-    ultimoEnvio.set(ip, Date.now());
+    janela.push(agora);
+    ultimoEnvio.set(ip, janela);
     if (ultimoEnvio.size > 5000) ultimoEnvio.clear();
 
     const semana = semanaDe();
     const item = { id: crypto.randomUUID().slice(0, 8), semana, palavra: v.palavra, criadoEm: new Date().toISOString() };
-    await store().adicionar(item);
-    invalidar(semana);
+    await aposGravar(semana, await store().adicionar(item));
     res.status(201).json({ ok: true, semana, rotulo: rotuloSemana(semana) });
   } catch (e) {
     console.error("Erro ao salvar sentimento:", e);
@@ -364,8 +319,7 @@ sentimentosRouter.delete("/gestora/semana/:semana/:id", async (req, res) => {
   const semana = String(req.params.semana);
   if (!SEMANA_RE.test(semana)) return res.status(400).json({ error: "Semana inválida." });
   try {
-    await store().remover(semana, String(req.params.id));
-    invalidar(semana);
+    await aposGravar(semana, await store().remover(semana, String(req.params.id)));
     res.json({ ok: true });
   } catch (e) {
     console.error("Erro ao remover sentimento:", e);
@@ -390,19 +344,10 @@ async function lerAnalise(semana) {
   if (analiseCache.has(semana)) return analiseCache.get(semana);
   let a = null;
   if (process.env.BLOB_READ_WRITE_TOKEN) {
-    const { get } = await sdk();
-    for (const access of ordemAcesso()) {
-      try {
-        const r = await get(`${ANALISE_PREFIX}${semana}.json`, { access, useCache: false });
-        if (r) a = JSON.parse(await new Response(r.stream).text());
-        blobAccess = blobAccess || access;
-        break;
-      } catch (e) {
-        if (!erroDeAcesso(e)) {
-          console.error("Análise ilegível:", semana, e?.message);
-          break;
-        }
-      }
+    try {
+      a = await lerDoc(`${ANALISE_PREFIX}${semana}.json`);
+    } catch (e) {
+      console.error("Análise ilegível:", semana, e?.message);
     }
   } else {
     try {
@@ -417,25 +362,7 @@ async function lerAnalise(semana) {
 
 async function salvarAnalise(semana, registro) {
   if (process.env.BLOB_READ_WRITE_TOKEN) {
-    const { put } = await sdk();
-    let ultimo;
-    for (const access of ordemAcesso()) {
-      try {
-        await put(`${ANALISE_PREFIX}${semana}.json`, JSON.stringify(registro), {
-          access,
-          contentType: "application/json",
-          addRandomSuffix: false,
-          allowOverwrite: true,
-        });
-        blobAccess = access;
-        ultimo = null;
-        break;
-      } catch (e) {
-        ultimo = e;
-        if (!erroDeAcesso(e)) throw e;
-      }
-    }
-    if (ultimo) throw ultimo;
+    await atualizarDoc(`${ANALISE_PREFIX}${semana}.json`, () => registro);
   } else {
     let todas = {};
     try {
@@ -608,4 +535,4 @@ sentimentosRouter.post("/gestora/semana/:semana/analise", async (req, res) => {
 });
 
 // Usado nos testes
-export const _interno = { semanaDe, rotuloSemana, validaPalavra, contar, blobStore, setSdk: (m) => { blobSdk = m; blobAccess = null; blobCache.clear(); cache.clear(); analiseCache.clear(); }, textoParaIA };
+export const _interno = { semanaDe, rotuloSemana, validaPalavra, contar, blobStore, setSdk: (m) => { _colecao.setSdk(m); cache.clear(); analiseCache.clear(); }, textoParaIA };
