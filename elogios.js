@@ -4,7 +4,7 @@
 //
 // Onde ficam os elogios:
 // - Publicado na Vercel com Blob conectado (BLOB_READ_WRITE_TOKEN): Vercel Blob,
-//   um arquivo por elogio (envios simultâneos não se sobrescrevem).
+//   um único arquivo JSON (colecao.js), com gravação segura contra envios simultâneos.
 // - Rodando local (npm start): arquivo data/elogios.json.
 // - Na Vercel sem Blob: /tmp (temporário; a página avisa).
 // ======================================================
@@ -16,6 +16,7 @@ import crypto from "node:crypto";
 import { fileURLToPath } from "node:url";
 import dotenv from "dotenv";
 import { readFileSync } from "node:fs";
+import { lerDoc, atualizarDoc, listarDocs, apagarDocs, _colecao } from "./colecao.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PREFIX = "elogios/";
@@ -74,105 +75,74 @@ const fileStore = {
   },
 };
 
-let blobSdk = null;
-let blobAccess = null; // descoberto na primeira escrita/leitura: "private" ou "public"
-const blobCache = new Map(); // pathname -> elogio (elogios não mudam depois de criados)
+// Vercel Blob: TODOS os elogios num único arquivo JSON (ver colecao.js).
+// Leitura = 1 operação simples; escrita segura contra envios simultâneos.
+const DOC = `${PREFIX}_dados.json`;
+let migracaoFeita = false;
 
-async function sdk() {
-  blobSdk ||= await import("@vercel/blob");
-  return blobSdk;
+// Versões anteriores gravavam um arquivo por elogio. Se o arquivo único ainda não existe,
+// importa esses arquivos antigos uma única vez (por instância) e apaga os antigos.
+async function migrarLegado() {
+  const antigos = (await listarDocs(PREFIX)).filter((b) => b.pathname !== DOC);
+  if (!antigos.length) return null;
+  const itens = [];
+  for (const b of antigos) {
+    try {
+      const d = await lerDoc(b.pathname);
+      if (d?.id) itens.push(d);
+    } catch {
+      /* ignora arquivo ilegível */
+    }
+  }
+  return { itens, paths: antigos.map((b) => b.pathname) };
 }
 
 const blobStore = {
   kind: () => "vercel-blob",
   async all() {
-    const { list, get } = await sdk();
-    const blobs = [];
-    let cursor;
-    do {
-      const r = await list({ prefix: PREFIX, limit: 1000, cursor });
-      blobs.push(...r.blobs);
-      cursor = r.hasMore ? r.cursor : undefined;
-    } while (cursor);
-
-    const vivos = new Set(blobs.map((b) => b.pathname));
-    for (const k of blobCache.keys()) if (!vivos.has(k)) blobCache.delete(k);
-
-    const faltando = blobs.filter((b) => !blobCache.has(b.pathname));
-    await Promise.all(
-      faltando.map(async (b) => {
-        try {
-          const order = blobAccess ? [blobAccess] : [process.env.ELOGIOS_BLOB_ACCESS || "private", "public"];
-          for (const access of [...new Set(order)]) {
-            try {
-              const r = await get(b.pathname, { access, useCache: false });
-              if (!r) return;
-              const txt = await new Response(r.stream).text();
-              blobAccess = access;
-              blobCache.set(b.pathname, { ...JSON.parse(txt), _path: b.pathname });
-              return;
-            } catch (e) {
-              if (!/access|private|public/i.test(String(e?.message))) throw e;
-            }
-          }
-        } catch (e) {
-          console.error("Elogio ilegível:", b.pathname, e?.message);
-        }
-      })
-    );
-    return [...blobCache.values()];
-  },
-  async add(item) {
-    const { put } = await sdk();
-    const pathname = `${PREFIX}${item.criadoEm.replace(/[:.]/g, "-")}-${item.id}.json`;
-    const order = blobAccess ? [blobAccess] : [process.env.ELOGIOS_BLOB_ACCESS || "private", "public"];
-    let lastErr;
-    for (const access of [...new Set(order)]) {
-      try {
-        await put(pathname, JSON.stringify(item), {
-          access,
-          contentType: "application/json",
-          addRandomSuffix: false,
+    let d = await lerDoc(DOC);
+    if (!d && !migracaoFeita) {
+      migracaoFeita = true;
+      const m = await migrarLegado();
+      if (m?.itens.length) {
+        d = await atualizarDoc(DOC, (cur) => {
+          const atuais = cur?.itens || [];
+          return { itens: [...atuais, ...m.itens.filter((x) => !atuais.some((y) => y.id === x.id))] };
         });
-        blobAccess = access;
-        blobCache.set(pathname, { ...item, _path: pathname });
-        return;
-      } catch (e) {
-        lastErr = e;
-        if (!/access|private|public/i.test(String(e?.message))) throw e;
+        await apagarDocs(m.paths).catch((e) => console.error("Falha ao limpar elogios antigos:", e?.message));
       }
     }
-    throw lastErr;
+    return d?.itens || [];
+  },
+  async add(item) {
+    return (await atualizarDoc(DOC, (cur) => ({ itens: [...(cur?.itens || []), item] }))).itens;
   },
   async remove(id) {
-    const { del } = await sdk();
-    const alvo = (await this.all()).find((e) => e.id === id);
-    if (alvo) {
-      await del(alvo._path);
-      blobCache.delete(alvo._path);
-    }
+    return (await atualizarDoc(DOC, (cur) => ({ itens: (cur?.itens || []).filter((e) => e.id !== id) }))).itens;
   },
   async clear() {
-    const { del } = await sdk();
-    const paths = (await this.all()).map((e) => e._path);
-    for (let i = 0; i < paths.length; i += 500) await del(paths.slice(i, i + 500));
-    blobCache.clear();
+    return (await atualizarDoc(DOC, () => ({ itens: [] }))).itens;
   },
 };
 
 const store = () => (process.env.BLOB_READ_WRITE_TOKEN ? blobStore : fileStore);
 
-// Cache curto da leitura: com várias pessoas atualizando a tela, evita
-// listar o armazenamento a cada requisição.
+// Cache da leitura: com várias telas atualizando ao mesmo tempo (telão, celulares),
+// só consultamos o armazenamento a cada READ_TTL. Depois de gravar, o cache já
+// recebe a lista nova, sem nova consulta.
 let readCache = { at: 0, data: null };
-const READ_TTL = 3000;
+const READ_TTL = 8000;
+const ordenar = (l) => [...l].sort((a, b) => a.criadoEm.localeCompare(b.criadoEm));
 async function lerTodos(force = false) {
   if (!force && readCache.data && Date.now() - readCache.at < READ_TTL) return readCache.data;
-  const data = (await store().all()).sort((a, b) => a.criadoEm.localeCompare(b.criadoEm));
+  const data = ordenar(await store().all());
   readCache = { at: Date.now(), data };
   return data;
 }
-const invalidar = () => (readCache = { at: 0, data: null });
+async function aposGravar(itens) {
+  if (Array.isArray(itens)) readCache = { at: Date.now(), data: ordenar(itens) };
+  else await lerTodos(true);
+}
 
 // ---------------- Nuvem de palavras ----------------
 
@@ -216,7 +186,7 @@ const limpa = (v, max) =>
     .trim()
     .slice(0, max);
 
-const ultimoEnvio = new Map(); // ip -> timestamp (freio simples contra cliques repetidos)
+const ultimoEnvio = new Map(); // ip -> horários dos envios no último minuto
 
 const tentativas = new Map(); // ip -> { n, desde } (freio contra chutes de senha)
 
@@ -290,15 +260,18 @@ elogiosRouter.post("/", async (req, res) => {
 
     const ip = String(req.get("x-forwarded-for") || req.ip || "").split(",")[0].trim();
     const agora = Date.now();
-    if (agora - (ultimoEnvio.get(ip) || 0) < 3000) {
-      return res.status(429).json({ error: "Calma! Aguarde alguns segundos para enviar outro elogio." });
+    // Na empresa, todos saem pelo mesmo IP: o limite é por janela de 1 minuto, folgado
+    // para uma sala inteira enviando junto, mas barra uma enxurrada automática.
+    const janela = (ultimoEnvio.get(ip) || []).filter((t) => agora - t < 60_000);
+    if (janela.length >= 40) {
+      return res.status(429).json({ error: "Muitos envios em sequência. Aguarde alguns segundos e tente de novo." });
     }
-    ultimoEnvio.set(ip, agora);
+    janela.push(agora);
+    ultimoEnvio.set(ip, janela);
     if (ultimoEnvio.size > 5000) ultimoEnvio.clear();
 
     const item = { id: crypto.randomUUID().slice(0, 8), nome, texto, criadoEm: new Date().toISOString() };
-    await store().add(item);
-    invalidar();
+    await aposGravar(await store().add(item));
     res.status(201).json({ ok: true, id: item.id });
   } catch (e) {
     console.error("Erro ao salvar elogio:", e);
@@ -309,8 +282,7 @@ elogiosRouter.post("/", async (req, res) => {
 elogiosRouter.delete("/:id", async (req, res) => {
   if (!exigeAdmin(req, res)) return;
   try {
-    await store().remove(String(req.params.id));
-    invalidar();
+    await aposGravar(await store().remove(String(req.params.id)));
     res.json({ ok: true });
   } catch (e) {
     console.error("Erro ao remover elogio:", e);
@@ -321,8 +293,7 @@ elogiosRouter.delete("/:id", async (req, res) => {
 elogiosRouter.delete("/", async (req, res) => {
   if (!exigeAdmin(req, res)) return;
   try {
-    await store().clear();
-    invalidar();
+    await aposGravar(await store().clear());
     res.json({ ok: true });
   } catch (e) {
     console.error("Erro ao zerar elogios:", e);
@@ -331,4 +302,4 @@ elogiosRouter.delete("/", async (req, res) => {
 });
 
 // Usado nos testes
-export const _interno = { contarPalavras, tokens, blobStore, setSdk: (m) => { blobSdk = m; blobAccess = null; blobCache.clear(); } };
+export const _interno = { contarPalavras, tokens, blobStore, setSdk: (m) => { _colecao.setSdk(m); migracaoFeita = false; readCache = { at: 0, data: null }; } };

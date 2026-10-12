@@ -1,4 +1,4 @@
-# Valida Vision — v0.10
+# Valida Vision — v0.11
 
 ## Rodar
 
@@ -25,7 +25,7 @@ Se o `ok` vier `true`, a chave e o modelo estão certos.
 
 ## Modelos
 
-`GEMINI_MODEL` aceita uma lista separada por vírgula (ex.: `gemini-3.7-flash,gemini-3.6-flash`).
+`GEMINI_MODEL` aceita uma lista separada por vírgula (ex.: `gemini-3.6-flash,gemini-3.7-flash`).
 Se um modelo não existir, o próximo é tentado.
 
 ## Modo demonstração
@@ -38,6 +38,18 @@ Os elogios ficam visíveis para quem abrir a página (é a ideia da dinâmica). 
 
 A chave fica só no `.env` e nunca vai para o browser. Não compartilhe o `.env`.
 Antes de enviar telas reais da empresa, valide as políticas internas de dados e PII.
+
+## Novidades da v0.11 (manutenção)
+
+- **Armazenamento econômico na Vercel Blob**: elogios ficam num único arquivo
+  (`elogios/_dados.json`) e os sentimentos, um arquivo por semana (`sentimentos/<semana>.json`).
+  As telas passam a usar só leituras simples (o plano gratuito permite 10 mil/mês), em vez de listar
+  arquivos a cada atualização (que consumia o limite de 2 mil operações avançadas/mês).
+  Gravação segura contra envios simultâneos (ETag/`ifMatch`). Elogios no formato antigo são
+  importados automaticamente.
+- **Várias pessoas na mesma rede**: o limite anti-repetição agora é de 40 envios por minuto por IP
+  (antes 1 a cada 3 s, o que barrava colegas saindo pelo mesmo IP da empresa).
+- Removidas dependências não usadas (`@google/genai`, `openai`) e o `node_modules.zip`.
 
 ## Novidades da v0.10
 
@@ -94,7 +106,7 @@ Antes de enviar telas reais da empresa, valide as políticas internas de dados e
    → **Connect** ao projeto. Isso cria a variável `BLOB_READ_WRITE_TOKEN` automaticamente.
 3. **Settings → Environment Variables**, adicione:
    - `GEMINI_API_KEY` = sua chave **nova** do Gemini
-   - `GEMINI_MODEL` = `gemini-3.7-flash,gemini-3.6-flash`
+   - `GEMINI_MODEL` = `gemini-3.6-flash,gemini-3.7-flash`
    - `ELOGIOS_ADMIN_KEY` = uma senha sua para moderar os elogios
    - (opcional) `DEMO_MODE` = `true` se quiser apresentar sem chamar a IA
 4. **Deployments → ⋯ → Redeploy** para aplicar as variáveis.
@@ -132,4 +144,4 @@ A cada `git push` no `main`, a Vercel publica a nova versão sozinha.
 
 O servidor tenta até 3 vezes cada modelo e, se continuar sobrecarregado, passa ao próximo
 da lista `GEMINI_MODEL`. Deixe pelo menos dois modelos no `.env`, por exemplo:
-`GEMINI_MODEL=gemini-3.7-flash,gemini-3.6-flash`
+`GEMINI_MODEL=gemini-3.6-flash,gemini-3.7-flash`
