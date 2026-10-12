@@ -1,4 +1,4 @@
-# Valida Vision — v0.9
+# Valida Vision — v0.10
 
 ## Rodar
 
@@ -38,6 +38,18 @@ Os elogios ficam visíveis para quem abrir a página (é a ideia da dinâmica). 
 
 A chave fica só no `.env` e nunca vai para o browser. Não compartilhe o `.env`.
 Antes de enviar telas reais da empresa, valide as políticas internas de dados e PII.
+
+## Novidades da v0.10
+
+- **💡 Análise da semana** no Painel da Gestora: com um clique, a IA (Gemini) lê as palavras
+  anônimas da semana (só a contagem agregada — nenhum identificador é enviado), compara com a
+  semana anterior e sugere: clima geral, leitura, temas, 3 a 5 ações coletivas (por quê, como,
+  quando), uma pergunta para abrir a conversa com a equipe, o que evitar e, se houver sinais de
+  esgotamento, recomendação de apoio do RH.
+  - Disponível a partir de 3 respostas na semana; fica salva por semana (Vercel Blob) e entra no
+    PDF e no "Copiar resumo". "Gerar novamente" atualiza quando chegam novas respostas.
+  - Chamada à IA em módulo próprio (`ia.js`), com tempo máximo e modelo reserva; a Análise de
+    Tela não foi alterada.
 
 ## Novidades da v0.9
 

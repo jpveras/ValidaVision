@@ -19,6 +19,7 @@ import path from "node:path";
 import crypto from "node:crypto";
 import dotenv from "dotenv";
 import { fileURLToPath } from "node:url";
+import { gerarJSON, iaConfig, IAErro } from "./ia.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PREFIX = "sentimentos/";
@@ -372,5 +373,239 @@ sentimentosRouter.delete("/gestora/semana/:semana/:id", async (req, res) => {
   }
 });
 
+
+// ======================================================
+// ANÁLISE DA SEMANA (IA) — só para a gestora
+// A IA recebe apenas as palavras agregadas (nunca nomes, que nem existem).
+// A análise fica salva por semana para não gastar outra chamada ao reabrir.
+// ======================================================
+
+const ANALISE_PREFIX = "analises-sentimento/";
+const MIN_RESPOSTAS_ANALISE = 3;
+const analiseCache = new Map();
+const analiseLocalFile = () =>
+  path.join(process.env.VERCEL ? "/tmp" : path.join(__dirname, "data"), "analises-sentimento.json");
+
+async function lerAnalise(semana) {
+  if (analiseCache.has(semana)) return analiseCache.get(semana);
+  let a = null;
+  if (process.env.BLOB_READ_WRITE_TOKEN) {
+    const { get } = await sdk();
+    for (const access of ordemAcesso()) {
+      try {
+        const r = await get(`${ANALISE_PREFIX}${semana}.json`, { access, useCache: false });
+        if (r) a = JSON.parse(await new Response(r.stream).text());
+        blobAccess = blobAccess || access;
+        break;
+      } catch (e) {
+        if (!erroDeAcesso(e)) {
+          console.error("Análise ilegível:", semana, e?.message);
+          break;
+        }
+      }
+    }
+  } else {
+    try {
+      a = JSON.parse(await fs.readFile(analiseLocalFile(), "utf8"))[semana] || null;
+    } catch {
+      a = null;
+    }
+  }
+  analiseCache.set(semana, a);
+  return a;
+}
+
+async function salvarAnalise(semana, registro) {
+  if (process.env.BLOB_READ_WRITE_TOKEN) {
+    const { put } = await sdk();
+    let ultimo;
+    for (const access of ordemAcesso()) {
+      try {
+        await put(`${ANALISE_PREFIX}${semana}.json`, JSON.stringify(registro), {
+          access,
+          contentType: "application/json",
+          addRandomSuffix: false,
+          allowOverwrite: true,
+        });
+        blobAccess = access;
+        ultimo = null;
+        break;
+      } catch (e) {
+        ultimo = e;
+        if (!erroDeAcesso(e)) throw e;
+      }
+    }
+    if (ultimo) throw ultimo;
+  } else {
+    let todas = {};
+    try {
+      todas = JSON.parse(await fs.readFile(analiseLocalFile(), "utf8"));
+    } catch {
+      /* primeiro registro */
+    }
+    todas[semana] = registro;
+    await fs.mkdir(path.dirname(analiseLocalFile()), { recursive: true });
+    await fs.writeFile(analiseLocalFile(), JSON.stringify(todas, null, 2));
+  }
+  analiseCache.set(semana, registro);
+}
+
+const ANALISE_SYSTEM = `
+Você apoia uma gestora de equipe a cuidar do clima do time. Toda sexta-feira, cada pessoa
+da equipe escreve, de forma ANÔNIMA, uma palavra que define a própria semana. Você recebe
+apenas essas palavras agregadas (com quantas vezes cada uma apareceu), a participação e,
+quando houver, as palavras da semana anterior.
+
+Sua tarefa: fazer uma leitura cuidadosa e sugerir ações práticas para a gestora trabalhar
+com a equipe.
+
+REGRAS:
+- Baseie-se SOMENTE nas palavras recebidas. Não invente fatos, causas ou contexto que não
+  estejam evidentes; quando algo for hipótese, diga "pode indicar".
+- As respostas são anônimas: as ações devem ser COLETIVAS (reunião, dinâmica, ajuste de
+  demanda, reconhecimento, rituais). Nunca sugira descobrir quem escreveu cada palavra.
+- Considere o peso de cada palavra (quantas vezes apareceu) e o equilíbrio entre palavras
+  positivas, neutras e negativas.
+- Participação baixa (menos da metade da equipe) também é um sinal: comente quando ocorrer.
+- Se houver semana anterior, compare o tom e diga se melhorou, piorou ou se manteve.
+- Você NÃO faz diagnóstico de saúde mental. Se aparecerem palavras de esgotamento, tristeza
+  forte ou desmotivação (ex.: esgotado, exausto, desmotivado, sobrecarregado, ansioso),
+  preencha "apoio" recomendando, com delicadeza, envolver o RH ou programas de bem-estar
+  da empresa. Caso contrário, deixe "apoio" como string vazia.
+- Clima: "positivo" (predomínio de palavras boas), "neutro" (equilíbrio), "atencao"
+  (predomínio de desgaste/pressão) ou "alerta" (sinais fortes de esgotamento ou piora
+  importante).
+- Gere de 3 a 5 sugestões, da mais importante para a menos. Cada uma com título curto,
+  "porque" (ligado às palavras), "como" (passos concretos e simples) e "quando"
+  (ex.: "esta semana", "na próxima reunião", "nas próximas semanas").
+- "perguntaAbertura": uma pergunta aberta e acolhedora para a gestora usar com a equipe.
+- "evitar": 1 a 3 cuidados (ex.: não tentar identificar autores; não minimizar o cansaço).
+- Português do Brasil, tom acolhedor, direto e profissional. Frases curtas.
+- Responda SOMENTE com o JSON solicitado.
+`;
+
+const ANALISE_SCHEMA = {
+  type: "OBJECT",
+  properties: {
+    clima: { type: "STRING", enum: ["positivo", "neutro", "atencao", "alerta"] },
+    leitura: { type: "STRING" },
+    temas: { type: "ARRAY", items: { type: "STRING" } },
+    tendencia: { type: "STRING" },
+    sugestoes: {
+      type: "ARRAY",
+      items: {
+        type: "OBJECT",
+        properties: {
+          titulo: { type: "STRING" },
+          porque: { type: "STRING" },
+          como: { type: "STRING" },
+          quando: { type: "STRING" },
+        },
+        required: ["titulo", "porque", "como", "quando"],
+      },
+    },
+    perguntaAbertura: { type: "STRING" },
+    evitar: { type: "ARRAY", items: { type: "STRING" } },
+    apoio: { type: "STRING" },
+  },
+  required: ["clima", "leitura", "temas", "tendencia", "sugestoes", "perguntaAbertura", "evitar", "apoio"],
+};
+
+const ANALISE_DEMO = {
+  clima: "atencao",
+  leitura: "Modo demonstração (a IA não foi chamada): exemplo de leitura com predomínio de palavras de cansaço e ritmo intenso, mas com sinais de entrega.",
+  temas: ["Ritmo intenso", "Cansaço", "Sensação de entrega"],
+  tendencia: "Sem semana anterior para comparar.",
+  sugestoes: [
+    { titulo: "Conversa rápida de alinhamento", porque: "Exemplo de demonstração.", como: "Reúna a equipe por 15 minutos e ouça o que mais pesou.", quando: "esta semana" },
+    { titulo: "Revisar prioridades", porque: "Exemplo de demonstração.", como: "Liste as demandas e combine o que pode esperar.", quando: "na próxima reunião" },
+    { titulo: "Reconhecer o esforço", porque: "Exemplo de demonstração.", como: "Agradeça publicamente as entregas da semana.", quando: "esta semana" },
+  ],
+  perguntaAbertura: "O que mais pesou nesta semana e o que podemos ajustar juntos?",
+  evitar: ["Tentar descobrir quem escreveu cada palavra."],
+  apoio: "",
+};
+
+function textoParaIA(semana, atual, anterior, equipe) {
+  const linhas = [
+    `Semana: ${rotuloSemana(semana)}`,
+    `Participação: ${atual.length} de ${equipe} pessoas (${Math.round((atual.length / equipe) * 100)}%)`,
+    `Palavras desta semana (palavra: vezes):`,
+    ...contar(atual).map(([p, n]) => `- ${p}: ${n}`),
+  ];
+  if (anterior?.respostas?.length) {
+    linhas.push("", `Semana anterior (${rotuloSemana(anterior.semana)}), ${anterior.respostas.length} respostas:`);
+    linhas.push(...contar(anterior.respostas).map(([p, n]) => `- ${p}: ${n}`));
+  } else {
+    linhas.push("", "Não há semana anterior com respostas para comparar.");
+  }
+  return linhas.join("\n");
+}
+
+async function semanaAnteriorCom(semana) {
+  const todas = Object.keys(await store().semanas())
+    .filter((s) => s < semana)
+    .sort();
+  const ant = todas.at(-1);
+  return ant ? { semana: ant, respostas: await respostasDa(ant) } : null;
+}
+
+sentimentosRouter.get("/gestora/semana/:semana/analise", async (req, res) => {
+  if (!exigeGestora(req, res)) return;
+  const semana = String(req.params.semana);
+  if (!SEMANA_RE.test(semana)) return res.status(400).json({ error: "Semana inválida." });
+  try {
+    res.json({ analise: await lerAnalise(semana), minimo: MIN_RESPOSTAS_ANALISE });
+  } catch (e) {
+    console.error("Erro ao ler análise:", e);
+    res.status(500).json({ error: "Não consegui carregar a análise." });
+  }
+});
+
+sentimentosRouter.post("/gestora/semana/:semana/analise", async (req, res) => {
+  if (!exigeGestora(req, res)) return;
+  const semana = String(req.params.semana);
+  if (!SEMANA_RE.test(semana)) return res.status(400).json({ error: "Semana inválida." });
+  try {
+    const atual = await respostasDa(semana, true);
+    if (atual.length < MIN_RESPOSTAS_ANALISE) {
+      return res.status(400).json({
+        error: `São necessárias pelo menos ${MIN_RESPOSTAS_ANALISE} respostas para gerar a análise (esta semana tem ${atual.length}).`,
+      });
+    }
+    const { equipe } = conf();
+    let analise, modelo;
+    if (iaConfig().demoMode) {
+      analise = ANALISE_DEMO;
+      modelo = "demo";
+    } else {
+      const anterior = await semanaAnteriorCom(semana);
+      ({ data: analise, model: modelo } = await gerarJSON({
+        system: ANALISE_SYSTEM,
+        texto: textoParaIA(semana, atual, anterior, equipe),
+        schema: ANALISE_SCHEMA,
+      }));
+    }
+    const registro = {
+      semana,
+      geradaEm: new Date().toISOString(),
+      modelo,
+      totalNaGeracao: atual.length,
+      analise: {
+        ...analise,
+        sugestoes: (analise.sugestoes || []).slice(0, 5),
+        evitar: (analise.evitar || []).slice(0, 3),
+      },
+    };
+    await salvarAnalise(semana, registro);
+    res.json({ analise: registro });
+  } catch (e) {
+    console.error("Erro ao gerar análise:", e);
+    res.status(e instanceof IAErro ? e.status : 500).json({
+      error: e instanceof IAErro ? e.message : "Não consegui gerar a análise agora. Tente de novo.",
+    });
+  }
+});
+
 // Usado nos testes
-export const _interno = { semanaDe, rotuloSemana, validaPalavra, contar, blobStore, setSdk: (m) => { blobSdk = m; blobAccess = null; blobCache.clear(); cache.clear(); } };
+export const _interno = { semanaDe, rotuloSemana, validaPalavra, contar, blobStore, setSdk: (m) => { blobSdk = m; blobAccess = null; blobCache.clear(); cache.clear(); analiseCache.clear(); }, textoParaIA };
