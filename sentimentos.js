@@ -250,6 +250,38 @@ sentimentosRouter.get("/", async (_req, res) => {
   }
 });
 
+const hashChave = (c) => crypto.createHash("sha256").update(String(c)).digest("hex");
+const mesmaChave = (a, b) => typeof a === "string" && a.length === b.length && crypto.timingSafeEqual(Buffer.from(a), Buffer.from(b));
+
+// A própria pessoa apaga uma palavra que enviou nesta semana (precisa da chave recebida no envio).
+const tentativasApagar = new Map();
+sentimentosRouter.delete("/minha/:id", async (req, res) => {
+  try {
+    const ip = String(req.get("x-forwarded-for") || req.ip || "").split(",")[0].trim();
+    const agora = Date.now();
+    const janela = (tentativasApagar.get(ip) || []).filter((t) => agora - t < 60_000);
+    if (janela.length >= 30) return res.status(429).json({ error: "Muitas tentativas. Aguarde alguns segundos." });
+    janela.push(agora);
+    tentativasApagar.set(ip, janela);
+    if (tentativasApagar.size > 5000) tentativasApagar.clear();
+
+    const chave = String(req.get("x-sentimento-chave") || "");
+    const id = String(req.params.id || "");
+    if (!chave || !id) return res.status(400).json({ error: "Pedido incompleto." });
+    const semana = semanaDe();
+    const item = (await respostasDa(semana, true)).find((r) => r.id === id);
+    if (!item) return res.status(404).json({ error: "Essa palavra já não está na semana atual." });
+    if (!item.chave || !mesmaChave(item.chave, hashChave(chave))) {
+      return res.status(403).json({ error: "Só quem enviou a palavra pode apagá-la." });
+    }
+    await aposGravar(semana, await store().remover(semana, id));
+    res.json({ ok: true });
+  } catch (e) {
+    console.error("Erro ao apagar a própria palavra:", e);
+    res.status(500).json({ error: "Não consegui apagar a palavra agora. Tente de novo." });
+  }
+});
+
 const ultimoEnvio = new Map(); // só em memória, para frear cliques repetidos; nunca é gravado
 sentimentosRouter.post("/", async (req, res) => {
   try {
@@ -267,9 +299,18 @@ sentimentosRouter.post("/", async (req, res) => {
     if (ultimoEnvio.size > 5000) ultimoEnvio.clear();
 
     const semana = semanaDe();
-    const item = { id: crypto.randomUUID().slice(0, 8), semana, palavra: v.palavra, criadoEm: new Date().toISOString() };
+    // Chave aleatória para a própria pessoa poder apagar a palavra depois. Ela fica só no
+    // navegador de quem enviou; aqui guardamos apenas o hash (não identifica ninguém).
+    const chave = crypto.randomBytes(18).toString("base64url");
+    const item = {
+      id: crypto.randomUUID().slice(0, 8),
+      semana,
+      palavra: v.palavra,
+      criadoEm: new Date().toISOString(),
+      chave: hashChave(chave),
+    };
     await aposGravar(semana, await store().adicionar(item));
-    res.status(201).json({ ok: true, semana, rotulo: rotuloSemana(semana) });
+    res.status(201).json({ ok: true, semana, rotulo: rotuloSemana(semana), id: item.id, chave });
   } catch (e) {
     console.error("Erro ao salvar sentimento:", e);
     res.status(500).json({ error: "Não consegui registrar sua palavra. Tente de novo." });

@@ -1,4 +1,4 @@
-# Valida Vision — v0.12
+# Valida Vision — v0.13
 
 ## Rodar
 
@@ -38,6 +38,14 @@ Os elogios ficam visíveis para quem abrir a página (é a ideia da dinâmica). 
 
 A chave fica só no `.env` e nunca vai para o browser. Não compartilhe o `.env`.
 Antes de enviar telas reais da empresa, valide as políticas internas de dados e PII.
+
+## Novidades da v0.13
+
+- **Apagar a própria palavra** no Sentimento da Semana: abaixo do campo aparecem as palavras que a
+  pessoa enviou na semana, cada uma com o botão **Apagar** (pede confirmação). Ao apagar, o envio
+  volta a ficar disponível. Só o navegador que enviou consegue apagar: no envio ele recebe uma chave
+  aleatória e o servidor guarda apenas o hash dela (nada que identifique a pessoa).
+  Palavras enviadas antes da v0.13 continuam podendo ser removidas pela gestora no painel.
 
 ## Novidades da v0.12
 
@@ -86,6 +94,7 @@ Antes de enviar telas reais da empresa, valide as políticas internas de dados e
   - Depois da primeira palavra, a pessoa vê a nuvem da equipe naquela semana e quantas palavras já chegaram.
   - Cada navegador pode enviar até 3 palavras por semana (`SENTIMENTO_MAX_ENVIOS`; semana de segunda a
     domingo, horário de Brasília). O campo continua liberado até a pessoa usar todos os envios.
+  - A pessoa pode **apagar** as próprias palavras da semana (botão Apagar, com confirmação).
 - **Painel da gestora** (`/sentimento-gestora.html`, link no rodapé da página): senha própria
   `SENTIMENTO_GESTORA_KEY`. Mostra palavra da semana, total de respostas, ranking, comparação com a semana
   anterior, histórico de todas as semanas, **Baixar PDF**, **Copiar resumo** e remoção de palavras impróprias.
