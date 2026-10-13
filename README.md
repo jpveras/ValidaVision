@@ -1,4 +1,4 @@
-# Valida Vision — v0.11
+# Valida Vision — v0.12
 
 ## Rodar
 
@@ -39,6 +39,13 @@ Os elogios ficam visíveis para quem abrir a página (é a ideia da dinâmica). 
 A chave fica só no `.env` e nunca vai para o browser. Não compartilhe o `.env`.
 Antes de enviar telas reais da empresa, valide as políticas internas de dados e PII.
 
+## Novidades da v0.12
+
+- **Sentimento da Semana com até 3 palavras**: cada pessoa pode enviar até 3 palavras por semana
+  (`SENTIMENTO_MAX_ENVIOS`). Depois de enviar, o campo continua liberado e a tela mostra quantas
+  ainda pode mandar. O painel da gestora e a análise da IA passam a contar **palavras enviadas**
+  (não pessoas), já que as respostas continuam anônimas.
+
 ## Novidades da v0.11 (manutenção)
 
 - **Armazenamento econômico na Vercel Blob**: elogios ficam num único arquivo
@@ -76,10 +83,11 @@ Antes de enviar telas reais da empresa, valide as políticas internas de dados e
 
 - **🙂 Sentimento da Semana** (menu lateral): toda sexta, cada pessoa da equipe informa **uma palavra**
   que define a sua semana. As respostas são **anônimas** (não guardamos nome, IP nem identificador).
-  - Depois de responder, a pessoa vê a nuvem da equipe naquela semana e quantos já responderam.
-  - O mesmo navegador responde uma vez por semana (semana de segunda a domingo, horário de Brasília).
+  - Depois da primeira palavra, a pessoa vê a nuvem da equipe naquela semana e quantas palavras já chegaram.
+  - Cada navegador pode enviar até 3 palavras por semana (`SENTIMENTO_MAX_ENVIOS`; semana de segunda a
+    domingo, horário de Brasília). O campo continua liberado até a pessoa usar todos os envios.
 - **Painel da gestora** (`/sentimento-gestora.html`, link no rodapé da página): senha própria
-  `SENTIMENTO_GESTORA_KEY`. Mostra palavra da semana, participação, ranking, comparação com a semana
+  `SENTIMENTO_GESTORA_KEY`. Mostra palavra da semana, total de respostas, ranking, comparação com a semana
   anterior, histórico de todas as semanas, **Baixar PDF**, **Copiar resumo** e remoção de palavras impróprias.
 - Variáveis: `SENTIMENTO_GESTORA_KEY` (obrigatória para o painel) e `SENTIMENTO_EQUIPE` (padrão 15).
 
