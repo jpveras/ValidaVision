@@ -1,4 +1,5 @@
 import { modeloIndisponivel, cotaEsgotada, marcarCota } from "./ia.js";
+import { reservaConfig, gerarNaReserva, statusReserva } from "./reserva.js";
 import express from "express";
 import multer from "multer";
 import dotenv from "dotenv";
@@ -418,6 +419,7 @@ app.get("/api/health", async (_req, res) => {
       models: cfg.models,
       modelsFound: found,
       alternatives,
+      reserva: await statusReserva(),
       message: found.length
         ? "Chave válida."
         : "Chave válida, mas nenhum modelo de GEMINI_MODEL foi encontrado. Ajuste o .env.",
@@ -460,6 +462,40 @@ function limitScenarios(result, max) {
     .map((c, ci) => ({ ...c, testPoints: (c.testPoints || []).filter((_, ti) => keep.has(`${ci}:${ti}`)) }))
     .filter((c) => c.testPoints.length);
   return { ...result, components };
+}
+
+// A IA reserva segue o formato pelo texto do pedido (não por schema obrigatório):
+// aqui garantimos campos e valores válidos antes de mostrar na tela.
+function normalizaAnalise(r) {
+  const nivel = (v, p = "media") => {
+    const x = String(v || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    return ["alta", "media", "baixa"].includes(x) ? x : p;
+  };
+  const um = (v, lista, p) => (lista.includes(String(v || "").toLowerCase()) ? String(v).toLowerCase() : p);
+  const arr = (v) => (Array.isArray(v) ? v : v ? [v] : []);
+  const txt = (v) => (v == null ? "" : typeof v === "string" ? v : JSON.stringify(v));
+  const TIPOS = ["input", "button", "select", "checkbox", "radio", "link", "table", "menu", "pagination", "message", "other"];
+  const CATS = ["funcional", "validacao", "navegacao", "erro", "usabilidade", "limite", "seguranca"];
+  return {
+    summary: txt(r?.summary),
+    confidence: nivel(r?.confidence),
+    components: arr(r?.components).map((c) => ({
+      name: txt(c?.name) || "Componente",
+      type: um(c?.type, TIPOS, "other"),
+      location: txt(c?.location),
+      confidence: nivel(c?.confidence),
+      observations: arr(c?.observations).map(txt),
+      testPoints: arr(c?.testPoints).map((t) => ({
+        title: txt(t?.title) || "Cenário",
+        category: um(String(t?.category || "").normalize("NFD").replace(/[\u0300-\u036f]/g, ""), CATS, "funcional"),
+        priority: nivel(t?.priority),
+        steps: arr(t?.steps).map(txt),
+        expected: txt(t?.expected),
+        rationale: txt(t?.rationale),
+      })),
+    })).filter((c) => c.testPoints.length || c.observations.length),
+    notCovered: arr(r?.notCovered).map((n) => ({ title: txt(n?.title), reason: txt(n?.reason), priority: nivel(n?.priority) })).filter((n) => n.title),
+  };
 }
 
 // ======================================================
@@ -526,6 +562,12 @@ app.post("/api/analyze", upload.single("screenshot"), async (req, res) => {
       });
     }
 
+    const userText =
+      "Analise esta tela e gere o checklist de testes no JSON solicitado." +
+      (maxScenarios
+        ? ` Gere NO MÁXIMO ${maxScenarios} cenário(s) no total, somando os testPoints de todos os componentes. ` +
+          `Escolha os de maior risco e prioridade. Componentes sem cenário podem ficar de fora.`
+        : "");
     const payload = {
       system_instruction: { parts: [{ text: systemPrompt }] },
       contents: [
@@ -538,14 +580,7 @@ app.post("/api/analyze", upload.single("screenshot"), async (req, res) => {
                 data: req.file.buffer.toString("base64"),
               },
             },
-            {
-              text:
-                "Analise esta tela e gere o checklist de testes no JSON solicitado." +
-                (maxScenarios
-                  ? ` Gere NO MÁXIMO ${maxScenarios} cenário(s) no total, somando os testPoints de todos os componentes. ` +
-                    `Escolha os de maior risco e prioridade. Componentes sem cenário podem ficar de fora.`
-                  : ""),
-            },
+            { text: userText },
           ],
         },
       ],
@@ -565,8 +600,10 @@ app.post("/api/analyze", upload.single("screenshot"), async (req, res) => {
     const MAX_ATTEMPTS = 2; // cada tentativa conta na cota gratuita do Google
     // Tempo máximo: evita que um Gemini travado deixe a tela em "Analisando…" até o limite
     // de 5 min da Vercel. Cada tentativa tem até 100 s e a análise inteira até 210 s.
-    const ATTEMPT_MS = Number(process.env.GEMINI_ATTEMPT_MS) || 100_000;
-    const deadline = Date.now() + (Number(process.env.GEMINI_TOTAL_MS) || 210_000);
+    // Com a IA reserva configurada, o Gemini tem menos tempo (RESERVA_APOS_S) e o resto fica para a reserva.
+    const reserva = reservaConfig();
+    const ATTEMPT_MS = Math.min(Number(process.env.GEMINI_ATTEMPT_MS) || 100_000, reserva.ativa ? reserva.aposMs : Infinity);
+    const deadline = Date.now() + (reserva.ativa ? reserva.aposMs : Number(process.env.GEMINI_TOTAL_MS) || 210_000);
     const MIN_RESTANTE = Math.min(15_000, ATTEMPT_MS / 2); // não começa tentativa sem tempo útil
     let timedOut = false;
     let last = null;
@@ -638,46 +675,57 @@ app.post("/api/analyze", upload.single("screenshot"), async (req, res) => {
       timedOut = true;
     }
 
-    if (last && timedOut && last.status === 504) {
-      return res.status(504).json({
-        error:
-          "A IA está demorando mais que o normal para responder. Tente de novo em instantes " +
-          "ou informe uma quantidade menor de cenários.",
-      });
-    }
-
+    // Resposta do Gemini → resultado, ou o erro que seria mostrado.
+    let result = null;
+    let erroGemini = null; // { status, body }
     if (last) {
-      return res.status(502).json({
-        error: explainError(last.status, last.data, cfg),
-        details: last.data?.error?.message,
-      });
+      erroGemini =
+        timedOut && last.status === 504
+          ? { status: 504, body: { error: "A IA está demorando mais que o normal para responder. Tente de novo em instantes ou informe uma quantidade menor de cenários." } }
+          : { status: 502, body: { error: explainError(last.status, last.data, cfg), details: last.data?.error?.message } };
+    } else {
+      const text = googleData?.candidates?.[0]?.content?.parts
+        ?.map((part) => part.text || "")
+        .join("")
+        .trim();
+      if (!text) {
+        const blocked = googleData?.promptFeedback?.blockReason;
+        erroGemini = { status: 502, body: { error: blocked ? `A Gemini bloqueou a imagem (${blocked}). Tente outro print.` : "A Gemini não retornou conteúdo para a análise. Tente novamente." } };
+      } else {
+        try {
+          result = JSON.parse(text);
+        } catch {
+          console.error("Resposta não-JSON da Gemini:", text);
+          erroGemini = { status: 502, body: { error: "A IA retornou uma resposta que não pôde ser convertida em JSON. Tente novamente." } };
+        }
+      }
     }
 
-    const text = googleData?.candidates?.[0]?.content?.parts
-      ?.map((part) => part.text || "")
-      .join("")
-      .trim();
-
-    if (!text) {
-      const blocked = googleData?.promptFeedback?.blockReason;
-      return res.status(502).json({
-        error: blocked
-          ? `A Gemini bloqueou a imagem (${blocked}). Tente outro print.`
-          : "A Gemini não retornou conteúdo para a análise. Tente novamente.",
-      });
+    let provider = "Gemini";
+    if (!result && reserva.ativa) {
+      // Gemini falhou ou demorou: tenta a IA reserva (Mistral).
+      console.error("Gemini sem resultado; usando a IA reserva.", erroGemini?.body?.error);
+      try {
+        const r = await gerarNaReserva({
+          system: systemPrompt,
+          texto: userText,
+          schema: responseSchema,
+          imagem: { mime: req.file.mimetype, base64: req.file.buffer.toString("base64") },
+          totalMs: 120_000,
+          tentativaMs: 70_000,
+        });
+        result = normalizaAnalise(r.data);
+        provider = r.provider;
+        usedModel = r.model;
+      } catch (e) {
+        console.error("IA reserva também falhou:", e?.message);
+        erroGemini.body.error += ` A IA reserva (Mistral) também não conseguiu: ${e?.message || "erro"}`;
+      }
     }
 
-    let result;
-    try {
-      result = JSON.parse(text);
-    } catch {
-      console.error("Resposta não-JSON da Gemini:", text);
-      return res.status(502).json({
-        error: "A IA retornou uma resposta que não pôde ser convertida em JSON. Tente novamente.",
-      });
-    }
+    if (!result) return res.status(erroGemini.status).json(erroGemini.body);
 
-    return res.json({ ...limitScenarios(result, maxScenarios), ...extra, demo: false, provider: "Gemini", model: usedModel });
+    return res.json({ ...limitScenarios(result, maxScenarios), ...extra, demo: false, provider, model: usedModel });
   } catch (error) {
     console.error("Erro no /api/analyze:", error);
     return res.status(500).json({
