@@ -20,6 +20,9 @@
 .done .minha{color:var(--teal2);font-weight:700}
 .destaque{font-size:14px;color:var(--muted)}
 .destaque b{color:var(--ink);font-size:16px}
+.meus{margin-top:10px;font-size:13px;color:var(--muted)}
+.meus .minha{color:var(--teal2);font-weight:700}
+.status.ok{color:var(--teal2)}
 @media(max-width:760px){.palavra-row{flex-direction:column}.palavra-row button{justify-content:center}}
 </style>
 </head>
@@ -29,7 +32,7 @@
   <a class="logo" href="/">
     <img id="brandLogo" src="/logo.png" alt="" hidden onload="this.hidden=false;this.nextElementSibling.setAttribute('hidden','')">
     <svg width="28" height="24" viewBox="0 0 28 24" aria-hidden="true"><path d="M1 2h9l4 9 4-9h9L14 23z" fill="#2fc28f"/><path d="M10 2h8l-4 9z" fill="#1a8f6a"/></svg>
-    <b>Valida <span>Vision</span></b><span class="ver">v0.11</span>
+    <b>Valida <span>Vision</span></b><span class="ver">v0.12</span>
   </a>
   <div class="spacer"></div>
   <span class="env" id="envBadge">Protótipo local</span>
@@ -66,7 +69,7 @@
     <h1 class="grow">Sentimento da Semana</h1>
     <span class="chip-semana" id="semanaChip">…</span>
   </div>
-  <p class="page-sub">Toda sexta-feira, conte em <b>uma palavra</b> como foi a sua semana. As respostas são anônimas e viram uma nuvem que ajuda a coordenação a entender e cuidar da equipe.</p>
+  <p class="page-sub">Toda sexta-feira, conte em <b>uma palavra</b> como foi a sua semana — pode mandar até <b id="maxTxt">3</b> palavras. As respostas são anônimas e viram uma nuvem que ajuda a coordenação a entender e cuidar da equipe.</p>
   <div class="divider"></div>
 
   <section class="card">
@@ -79,12 +82,13 @@
           <button class="btn-primary" type="submit" id="enviar"><svg viewBox="0 0 24 24"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>Enviar</button>
         </div>
         <div class="status" id="status" role="status"></div>
+        <p class="meus" id="meus" hidden></p>
       </form>
       <div class="done" id="done" hidden>
         <div class="ok"><svg viewBox="0 0 24 24"><path d="M5 12.5 10 17 19 7"/></svg></div>
         <div>
           <h2>Obrigado por compartilhar! 💚</h2>
-          <p>Você já respondeu nesta semana<span id="minhaTxt"></span>. Na próxima sexta tem mais.</p>
+          <p>Você já enviou suas palavras desta semana<span id="minhaTxt"></span>. Na próxima semana tem mais.</p>
         </div>
       </div>
       <div class="privacy">🔒 <span><b>Sua resposta é anônima.</b> Não guardamos seu nome, e-mail ou qualquer dado que identifique você — só a palavra e a semana.</span></div>
@@ -122,8 +126,24 @@ $('envBadge').textContent=local?'Protótipo local':'Demonstração';
 // Guardado só neste navegador: se já respondeu nesta semana (e a própria palavra, para a pessoa lembrar).
 const ls={get(k){try{return localStorage.getItem(k)}catch{return null}},set(k,v){try{localStorage.setItem(k,v)}catch{}}};
 let dados=null,assinatura='';
-const statusEl=$('status'),status=(t,e=false)=>{statusEl.textContent=t;statusEl.className='status'+(e?' error':'')};
-const jaRespondeu=()=>dados&&ls.get('vv-sentimento-semana')===dados.semana;
+const statusEl=$('status'),status=(t,tipo='')=>{statusEl.textContent=t;statusEl.className='status'+(tipo===true?' error':tipo?' '+tipo:'')};
+const maxEnvios=()=>dados?.maxEnvios||3;
+// Palavras enviadas por este navegador na semana atual: {semana, palavras:[...]}.
+function meusEnvios(){
+  if(!dados)return [];
+  try{const m=JSON.parse(ls.get('vv-sentimento-envios')||'null');if(m&&m.semana===dados.semana&&Array.isArray(m.palavras))return m.palavras}catch{}
+  // Formato antigo (uma resposta por semana)
+  if(ls.get('vv-sentimento-semana')===dados.semana)return [ls.get('vv-sentimento-palavra')||''];
+  return [];
+}
+function guardarEnvio(semana,palavra){
+  const lista=dados&&dados.semana===semana?meusEnvios():[];
+  lista.push(palavra);ls.set('vv-sentimento-envios',JSON.stringify({semana,palavras:lista}));
+  ls.set('vv-sentimento-semana',semana);ls.set('vv-sentimento-palavra',palavra);
+}
+const jaRespondeu=()=>meusEnvios().length>0;
+const esgotou=()=>meusEnvios().length>=maxEnvios();
+const citar=l=>l.filter(Boolean).map(p=>`“${p}”`).join(', ');
 
 $('palavra').addEventListener('input',e=>$('cnt').textContent=`${e.target.value.length}/30`);
 
@@ -131,12 +151,17 @@ function render(){
   if(!dados)return;
   $('semanaChip').textContent=dados.rotulo;
   $('storageWarn').hidden=dados.armazenamento!=='temporario';
-  const resp=jaRespondeu();
-  $('form').hidden=resp;$('done').hidden=!resp;
-  const minha=ls.get('vv-sentimento-palavra');$('minhaTxt').innerHTML=resp&&minha?` com <span class="minha"></span>`:'';
-  if(resp&&minha)document.querySelector('#minhaTxt .minha').textContent=`“${minha}”`;
+  $('maxTxt').textContent=maxEnvios();
+  const resp=jaRespondeu(),fim=esgotou(),meus=meusEnvios(),txt=citar(meus);
+  $('form').hidden=fim;$('done').hidden=!fim;
+  $('minhaTxt').innerHTML=fim&&txt?': <span class="minha"></span>':'';
+  if(fim&&txt)document.querySelector('#minhaTxt .minha').textContent=txt;
+  const resta=maxEnvios()-meus.length;
+  $('meus').hidden=!resp||fim;
+  if(resp&&!fim)$('meus').innerHTML=`Você já enviou ${meus.length} de ${maxEnvios()}${txt?': <span class="minha"></span>':''}. Pode enviar mais ${resta} ${resta===1?'palavra':'palavras'} nesta semana.`;
+  if(resp&&!fim&&txt)$('meus').querySelector('.minha').textContent=txt;
   $('bar').style.width=Math.min(100,dados.total/dados.equipe*100)+'%';
-  $('progTxt').textContent=`${dados.total} de ${dados.equipe} ${dados.total===1?'pessoa respondeu':'pessoas responderam'}`;
+  $('progTxt').textContent=`${dados.total} ${dados.total===1?'palavra enviada':'palavras enviadas'} pela equipe`;
   const mostrar=resp&&dados.palavras.length>0;
   $('cloudWait').hidden=mostrar;
   if(resp&&!dados.palavras.length){$('waitTitle').textContent='Ainda não há respostas nesta semana';$('waitSub').textContent='';}
@@ -154,13 +179,17 @@ $('form').addEventListener('submit',async e=>{
   e.preventDefault();
   const p=$('palavra').value.trim();
   if(!p){status('Escreva uma palavra.',true);return $('palavra').focus()}
+  if(esgotou()){status(`Você já enviou as ${maxEnvios()} palavras desta semana.`,true);return}
   $('enviar').disabled=true;status('Enviando…');
   try{
     const r=await fetch('/api/sentimentos',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({palavra:p})});
     const d=await r.json().catch(()=>({}));
     if(!r.ok)throw new Error(d.error||'Não consegui enviar. Tente de novo.');
-    ls.set('vv-sentimento-semana',d.semana);ls.set('vv-sentimento-palavra',p);
-    status('');$('palavra').value='';await carregar();
+    guardarEnvio(d.semana,p);
+    $('palavra').value='';$('cnt').textContent='0/30';await carregar();
+    const resta=maxEnvios()-meusEnvios().length;
+    status(resta>0?`Palavra enviada! 💚 Se quiser, mande mais ${resta===1?'uma':resta}.`:'Palavra enviada! 💚','ok');
+    if(resta>0)$('palavra').focus();
   }catch(err){status(err.message,true)}finally{$('enviar').disabled=false}
 });
 

@@ -4,6 +4,8 @@
 // A equipe vê a nuvem da semana atual; a gestora tem um painel com senha
 // (SENTIMENTO_GESTORA_KEY) com histórico, ranking e remoção.
 //
+// Cada navegador pode enviar até SENTIMENTO_MAX_ENVIOS palavras por semana (padrão 3).
+//
 // ANÔNIMO: nenhum nome, IP ou identificador é gravado. Cada resposta guarda
 // só a palavra, a semana e a data/hora.
 //
@@ -42,6 +44,8 @@ const conf = () => {
   return {
     equipe: Math.max(1, Number.parseInt(e.SENTIMENTO_EQUIPE || "15", 10) || 15),
     gestoraKey: String(e.SENTIMENTO_GESTORA_KEY || "").trim(),
+    // Quantas palavras cada pessoa pode enviar por semana (controle feito no navegador).
+    maxEnvios: Math.min(10, Math.max(1, Number.parseInt(e.SENTIMENTO_MAX_ENVIOS || "3", 10) || 3)),
   };
 };
 
@@ -228,6 +232,7 @@ const resumo = (semana, respostas) => {
     semana,
     rotulo: rotuloSemana(semana),
     equipe: conf().equipe,
+    maxEnvios: conf().maxEnvios,
     total: respostas.length,
     palavraDaSemana: palavras[0]?.[0] || null,
     palavras,
@@ -393,7 +398,9 @@ REGRAS:
   demanda, reconhecimento, rituais). Nunca sugira descobrir quem escreveu cada palavra.
 - Considere o peso de cada palavra (quantas vezes apareceu) e o equilíbrio entre palavras
   positivas, neutras e negativas.
-- Participação baixa (menos da metade da equipe) também é um sinal: comente quando ocorrer.
+- Cada pessoa pode enviar mais de uma palavra por semana, então o total de palavras NÃO é o
+  número de pessoas. Poucas respostas (menos palavras do que pessoas na equipe) também é um
+  sinal: comente quando ocorrer.
 - Se houver semana anterior, compare o tom e diga se melhorou, piorou ou se manteve.
 - Você NÃO faz diagnóstico de saúde mental. Se aparecerem palavras de esgotamento, tristeza
   forte ou desmotivação (ex.: esgotado, exausto, desmotivado, sobrecarregado, ansioso),
@@ -453,10 +460,10 @@ const ANALISE_DEMO = {
   apoio: "",
 };
 
-function textoParaIA(semana, atual, anterior, equipe) {
+function textoParaIA(semana, atual, anterior, equipe, maxEnvios = conf().maxEnvios) {
   const linhas = [
     `Semana: ${rotuloSemana(semana)}`,
-    `Participação: ${atual.length} de ${equipe} pessoas (${Math.round((atual.length / equipe) * 100)}%)`,
+    `Respostas: ${atual.length} palavras enviadas (equipe de ${equipe} pessoas; cada pessoa pode enviar até ${maxEnvios})`,
     `Palavras desta semana (palavra: vezes):`,
     ...contar(atual).map(([p, n]) => `- ${p}: ${n}`),
   ];
@@ -500,7 +507,7 @@ sentimentosRouter.post("/gestora/semana/:semana/analise", async (req, res) => {
         error: `São necessárias pelo menos ${MIN_RESPOSTAS_ANALISE} respostas para gerar a análise (esta semana tem ${atual.length}).`,
       });
     }
-    const { equipe } = conf();
+    const { equipe, maxEnvios } = conf();
     let analise, modelo;
     if (iaConfig().demoMode) {
       analise = ANALISE_DEMO;
@@ -509,7 +516,7 @@ sentimentosRouter.post("/gestora/semana/:semana/analise", async (req, res) => {
       const anterior = await semanaAnteriorCom(semana);
       ({ data: analise, model: modelo } = await gerarJSON({
         system: ANALISE_SYSTEM,
-        texto: textoParaIA(semana, atual, anterior, equipe),
+        texto: textoParaIA(semana, atual, anterior, equipe, maxEnvios),
         schema: ANALISE_SCHEMA,
       }));
     }

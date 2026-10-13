@@ -403,12 +403,19 @@ app.get("/api/health", async (_req, res) => {
 
     const available = (data.models || []).map((m) => m.name.replace(/^models\//, ""));
     const found = cfg.models.filter((m) => available.includes(m));
+    // Outros modelos que a chave pode usar como reserva em GEMINI_MODEL (só os que geram texto).
+    const alternatives = (data.models || [])
+      .filter((m) => (m.supportedGenerationMethods || []).includes("generateContent"))
+      .map((m) => m.name.replace(/^models\//, ""))
+      .filter((n) => /gemini/i.test(n) && /flash|pro/i.test(n) && !/tts|audio|image|live|embedding/i.test(n))
+      .filter((n) => !cfg.models.includes(n));
 
     return res.json({
       ok: true,
       key: maskKey(cfg.apiKey),
       models: cfg.models,
       modelsFound: found,
+      alternatives,
       message: found.length
         ? "Chave válida."
         : "Chave válida, mas nenhum modelo de GEMINI_MODEL foi encontrado. Ajuste o .env.",

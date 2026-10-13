@@ -103,7 +103,7 @@
   <a class="logo" href="/">
     <img id="brandLogo" src="/logo.png" alt="" hidden onload="this.hidden=false;this.nextElementSibling.setAttribute('hidden','')">
     <svg width="28" height="24" viewBox="0 0 28 24" aria-hidden="true"><path d="M1 2h9l4 9 4-9h9L14 23z" fill="#2fc28f"/><path d="M10 2h8l-4 9z" fill="#1a8f6a"/></svg>
-    <b>Valida <span>Vision</span></b><span class="ver">v0.11</span>
+    <b>Valida <span>Vision</span></b><span class="ver">v0.12</span>
   </a>
   <div class="spacer"></div>
   <span class="env">Painel da gestora</span>
@@ -161,7 +161,7 @@
         <h3>Passo a passo</h3>
         <ol class="passos">
           <li><b>Escolha a semana</b> no seletor logo abaixo. A semana atual já vem marcada com “(atual)”; as anteriores ficam no histórico.</li>
-          <li><b>Leia os quatro cartões</b>: a <b>palavra da semana</b> (a mais citada), a <b>participação</b> (quantos dos 15 responderam), quantas <b>palavras diferentes</b> apareceram e a palavra da <b>semana anterior</b>, para comparar.</li>
+          <li><b>Leia os quatro cartões</b>: a <b>palavra da semana</b> (a mais citada), as <b>respostas</b> (quantas palavras a equipe enviou; cada pessoa pode mandar até 3), quantas <b>palavras diferentes</b> apareceram e a palavra da <b>semana anterior</b>, para comparar.</li>
           <li><b>Observe a nuvem</b>: quanto maior a palavra, mais pessoas a escolheram. Palavras de mesmo tom (ex.: “cansado”, “puxada”, “corrida”) juntas indicam um padrão.</li>
           <li><b>Confira o ranking</b> para ver os números exatos de cada palavra.</li>
           <li><b>Compartilhe</b>: <kbd>Baixar PDF</kbd> gera uma página pronta para encaminhar; <kbd>Copiar resumo</kbd> copia um texto para colar no e-mail ou no Teams.</li>
@@ -171,7 +171,7 @@
 
         <h3>Dicas para analisar</h3>
         <ul class="dicas">
-          <li><b>Participação baixa</b> (menos da metade) também é um sinal: pode valer lembrar a equipe ou entender o motivo.</li>
+          <li><b>Poucas respostas</b> (menos palavras do que pessoas na equipe) também é um sinal: pode valer lembrar a equipe ou entender o motivo.</li>
           <li><b>Compare com a semana anterior</b>: a mudança de tom de uma semana para outra costuma dizer mais do que uma semana isolada.</li>
           <li><b>Palavras negativas repetidas por várias semanas</b> merecem conversa e plano de ação; uma semana puxada isolada pode ser só pico de demanda.</li>
           <li>Leve <b>o padrão</b>, e não respostas isoladas, para a conversa com a equipe — e preserve o anonimato: não tente descobrir quem escreveu o quê.</li>
@@ -190,7 +190,7 @@
 
     <div class="tiles">
       <div class="tile main"><small>Palavra da semana</small><b id="tPalavra">—</b><span id="tPalavraN"></span></div>
-      <div class="tile"><small>Participação</small><b id="tPart">—</b><span id="tPartPct"></span></div>
+      <div class="tile"><small>Respostas</small><b id="tPart">—</b><span id="tPartPct"></span></div>
       <div class="tile"><small>Palavras diferentes</small><b id="tDif">—</b><span>na semana</span></div>
       <div class="tile"><small>Semana anterior</small><b id="tAnt">—</b><span id="tAntSub"></span></div>
     </div>
@@ -284,9 +284,9 @@ $('semanaSel').onchange=e=>carregarSemana(e.target.value);
 
 function render(anterior){
   const d=dados,top=d.palavras[0];
-  $('chip').textContent=d.rotulo;$('printRotulo').textContent=`${d.rotulo} · ${d.total} de ${d.equipe} pessoas responderam`;
+  $('chip').textContent=d.rotulo;$('printRotulo').textContent=`${d.rotulo} · ${d.total} ${d.total===1?'palavra enviada':'palavras enviadas'}`;
   $('tPalavra').textContent=top?top[0]:'—';$('tPalavraN').textContent=top?`citada ${top[1]} ${top[1]===1?'vez':'vezes'}`:'sem respostas';
-  $('tPart').textContent=`${d.total} de ${d.equipe}`;$('tPartPct').textContent=`${Math.round(d.total/d.equipe*100)}% da equipe`;
+  $('tPart').textContent=String(d.total);$('tPartPct').textContent=`${d.total===1?'palavra enviada':'palavras enviadas'} · até ${d.maxEnvios||3} por pessoa`;
   $('tDif').textContent=d.palavras.length;
   $('tAnt').textContent=anterior?.palavraDaSemana||'—';$('tAntSub').textContent=anterior?`${anterior.total} ${anterior.total===1?'resposta':'respostas'}`:'sem semana anterior';
   const max=top?top[1]:1;
@@ -352,7 +352,7 @@ $('respostas').addEventListener('click',async e=>{
 $('pdf').onclick=()=>{const t=document.title;document.title=`sentimento-equipe-${atual}`;window.print();document.title=t};
 $('copiar').onclick=async()=>{
   const d=dados;if(!d)return;
-  const linhas=[`Sentimento da equipe — ${d.rotulo}`,`Participação: ${d.total} de ${d.equipe} pessoas (${Math.round(d.total/d.equipe*100)}%)`,d.palavras[0]?`Palavra da semana: ${d.palavras[0][0]}`:'Sem respostas nesta semana.','',...d.palavras.map(([p,n])=>`• ${p} — ${n}`)];
+  const linhas=[`Sentimento da equipe — ${d.rotulo}`,`Respostas: ${d.total} ${d.total===1?'palavra enviada':'palavras enviadas'} (até ${d.maxEnvios||3} por pessoa; equipe de ${d.equipe})`,d.palavras[0]?`Palavra da semana: ${d.palavras[0][0]}`:'Sem respostas nesta semana.','',...d.palavras.map(([p,n])=>`• ${p} — ${n}`)];
   if(analise){const a=analise.analise;linhas.push('','ANÁLISE DA SEMANA',`Clima geral: ${(CLIMA[a.clima]||CLIMA.neutro)[1].replace(/^\S+\s/,'')}`,a.leitura,`Tendência: ${a.tendencia}`,'','Sugestões de ação:',...(a.sugestoes||[]).map((s,i)=>`${i+1}. ${s.titulo} (${s.quando}) — ${s.como}`),'',`Pergunta para a equipe: "${a.perguntaAbertura}"`);if(a.apoio)linhas.push('',`Apoio: ${a.apoio}`);linhas.push('','(Sugestões geradas por IA a partir das palavras anônimas.)')}
   try{await navigator.clipboard.writeText(linhas.join('\n'));msg('Resumo copiado. É só colar no e-mail ou no Teams.')}catch{msg('Não consegui copiar automaticamente.',true)}
 };
