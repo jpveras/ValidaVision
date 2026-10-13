@@ -379,6 +379,21 @@ sentimentosRouter.get("/gestora/semana/:semana", async (req, res) => {
   }
 });
 
+// A gestora apaga a análise salva de uma semana (ex.: depois de remover as palavras).
+// Precisa vir ANTES da rota de remover palavra (/:semana/:id), senão "analise" vira um id.
+sentimentosRouter.delete("/gestora/semana/:semana/analise", async (req, res) => {
+  if (!exigeGestora(req, res)) return;
+  const semana = String(req.params.semana);
+  if (!SEMANA_RE.test(semana)) return res.status(400).json({ error: "Semana inválida." });
+  try {
+    await apagarAnalise(semana);
+    res.json({ ok: true });
+  } catch (e) {
+    console.error("Erro ao apagar análise:", e);
+    res.status(500).json({ error: "Não consegui apagar a análise agora." });
+  }
+});
+
 sentimentosRouter.delete("/gestora/semana/:semana/:id", async (req, res) => {
   if (!exigeGestora(req, res)) return;
   const semana = String(req.params.semana);
@@ -440,6 +455,24 @@ async function salvarAnalise(semana, registro) {
     await fs.writeFile(analiseLocalFile(), JSON.stringify(todas, null, 2));
   }
   analiseCache.set(semana, registro);
+}
+
+async function apagarAnalise(semana) {
+  if (process.env.BLOB_READ_WRITE_TOKEN) {
+    // Grava "null" no lugar (mesma lógica segura de gravação; ler devolve "sem análise").
+    await atualizarDoc(`${ANALISE_PREFIX}${semana}.json`, () => null);
+  } else {
+    let todas = {};
+    try {
+      todas = JSON.parse(await fs.readFile(analiseLocalFile(), "utf8"));
+    } catch {
+      /* nada salvo */
+    }
+    delete todas[semana];
+    await fs.mkdir(path.dirname(analiseLocalFile()), { recursive: true });
+    await fs.writeFile(analiseLocalFile(), JSON.stringify(todas, null, 2));
+  }
+  analiseCache.set(semana, null);
 }
 
 const ANALISE_SYSTEM = `

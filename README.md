@@ -1,4 +1,4 @@
-# Valida Vision — v0.18
+# Valida Vision — v0.19
 
 ## Rodar
 
@@ -38,6 +38,12 @@ Os elogios ficam visíveis para quem abrir a página (é a ideia da dinâmica). 
 
 A chave fica só no `.env` e nunca vai para o browser. Não compartilhe o `.env`.
 Antes de enviar telas reais da empresa, valide as políticas internas de dados e PII.
+
+## Novidades da v0.19
+
+- **Apagar a análise da semana**: no Painel da Gestora, o card "💡 Análise da semana" ganhou o botão
+  **Apagar análise** (pede confirmação). Útil depois de remover as palavras da semana. Com menos de
+  3 respostas, o "Gerar novamente" some e o aviso sugere apagar.
 
 ## Novidades da v0.18
 
