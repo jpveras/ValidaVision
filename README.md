@@ -1,4 +1,4 @@
-# Valida Vision — v0.13
+# Valida Vision — v0.14
 
 ## Rodar
 
@@ -38,6 +38,12 @@ Os elogios ficam visíveis para quem abrir a página (é a ideia da dinâmica). 
 
 A chave fica só no `.env` e nunca vai para o browser. Não compartilhe o `.env`.
 Antes de enviar telas reais da empresa, valide as políticas internas de dados e PII.
+
+## Novidades da v0.14
+
+- **Campo liberado de novo quando a gestora remove palavras**: ao abrir (ou voltar para) a tela do
+  Sentimento, o navegador confere se as palavras que enviou ainda existem. As que a gestora removeu
+  saem da lista e os envios voltam a ficar disponíveis. Se a semana for zerada, o campo volta por completo.
 
 ## Novidades da v0.13
 

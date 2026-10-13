@@ -41,7 +41,7 @@
   <a class="logo" href="/">
     <img id="brandLogo" src="/logo.png" alt="" hidden onload="this.hidden=false;this.nextElementSibling.setAttribute('hidden','')">
     <svg width="28" height="24" viewBox="0 0 28 24" aria-hidden="true"><path d="M1 2h9l4 9 4-9h9L14 23z" fill="#2fc28f"/><path d="M10 2h8l-4 9z" fill="#1a8f6a"/></svg>
-    <b>Valida <span>Vision</span></b><span class="ver">v0.13</span>
+    <b>Valida <span>Vision</span></b><span class="ver">v0.14</span>
   </a>
   <div class="spacer"></div>
   <span class="env" id="envBadge">Protótipo local</span>
@@ -167,7 +167,7 @@ const statusApagar=(t,e=false)=>{$('statusApagar').textContent=t;$('statusApagar
 function renderMinhas(){
   const meus=meusEnvios();
   $('minhas').hidden=!meus.length;
-  if(!meus.length)return;
+  if(!meus.length){$('chips').textContent='';return}
   const resta=maxEnvios()-meus.length;
   $('minhasH').innerHTML=`<b>Suas palavras desta semana</b> · ${meus.length} de ${maxEnvios()}`+(resta>0?` · pode enviar mais ${resta}`:'');
   const box=$('chips');box.textContent='';
@@ -220,8 +220,27 @@ function render(){
   else{$('cloud').hidden=true;$('fallback').hidden=true;assinatura=''}
 }
 
+// Se a gestora removeu palavras, tira da lista deste navegador e libera o campo de novo.
+async function sincronizar(){
+  const meus=meusEnvios();if(!meus.length)return;
+  let lista=meus;
+  if(!dados.total)lista=[]; // semana zerada
+  else{
+    const naNuvem=new Set(dados.palavras.map(([p])=>p));
+    const norm=p=>String(p||'').toLocaleLowerCase('pt-BR').trim();
+    // Palavras antigas (sem id): saem se não aparecem mais na nuvem.
+    lista=lista.filter(m=>m.id||naNuvem.has(norm(m.palavra)));
+    const ids=lista.filter(m=>m.id).map(m=>m.id);
+    if(ids.length){
+      try{const r=await fetch('/api/sentimentos/minhas?ids='+encodeURIComponent(ids.join(',')),{cache:'no-store'});const d=await r.json();
+        if(r.ok&&d.semana===dados.semana){const ok=new Set(d.existem);lista=lista.filter(m=>!m.id||ok.has(m.id))}}catch{}
+    }
+  }
+  if(lista.length!==meus.length)salvarEnvios(dados.semana,lista);
+}
+
 async function carregar(){
-  try{const r=await fetch('/api/sentimentos',{cache:'no-store'});const d=await r.json();if(!r.ok)throw new Error(d.error);dados=d;render()}
+  try{const r=await fetch('/api/sentimentos',{cache:'no-store'});const d=await r.json();if(!r.ok)throw new Error(d.error);dados=d;await sincronizar();render()}
   catch(e){status(e.message||'Não consegui carregar agora.',true)}
 }
 
@@ -246,5 +265,6 @@ $('form').addEventListener('submit',async e=>{
 let rz;addEventListener('resize',()=>{clearTimeout(rz);rz=setTimeout(()=>{assinatura='';render()},250)});
 carregar();
 setInterval(()=>{if(!document.hidden&&jaRespondeu())carregar()},15000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&dados)carregar()});
 </script>
 </body></html>
