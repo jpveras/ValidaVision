@@ -87,6 +87,32 @@ export async function atualizarDoc(pathname, fn, tentativas = 8) {
   }
 }
 
+/**
+ * Grava o documento inteiro sem conferir a versão (o último a gravar vence).
+ * Para documentos com um só "dono" que podem ser substituídos sem perda (ex.: análise da semana).
+ */
+export async function gravarDocDireto(pathname, data) {
+  const { put } = await sdk();
+  let ultimo;
+  for (const access of ordemAcesso()) {
+    try {
+      await put(pathname, JSON.stringify(data), {
+        access,
+        contentType: "application/json",
+        addRandomSuffix: false,
+        cacheControlMaxAge: 60,
+        allowOverwrite: true,
+      });
+      blobAccess = access;
+      return;
+    } catch (e) {
+      ultimo = e;
+      if (!erroDeAcesso(e)) throw e;
+    }
+  }
+  throw ultimo;
+}
+
 /** Lista os documentos de uma "pasta" (operação avançada: use só em telas raras). */
 export async function listarDocs(prefix) {
   const { list } = await sdk();
