@@ -23,7 +23,8 @@ import { fileURLToPath } from "node:url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 // Modelos que leem imagens (developers.cloudflare.com/workers-ai/models e docs.mistral.ai/capabilities/vision).
-const CF_MODELS = ["@cf/meta/llama-4-scout-17b-16e-instruct", "@cf/mistralai/mistral-small-3.1-24b-instruct"];
+// Ordem pelo teste real de 13/10: mistral-small respondeu em ~27 s; llama-4-scout passou de 70 s.
+const CF_MODELS = ["@cf/mistralai/mistral-small-3.1-24b-instruct", "@cf/meta/llama-4-scout-17b-16e-instruct"];
 const MISTRAL_MODELS = ["mistral-medium-2508", "mistral-small-2506"];
 const CF_ACCOUNT_PADRAO = "b3cc5e4502af4e4d71ea25c711a6fe0d"; // ID da conta não é segredo
 
