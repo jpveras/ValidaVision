@@ -1,4 +1,4 @@
-# Valida Vision — v0.14
+# Valida Vision — v0.15
 
 ## Rodar
 
@@ -25,7 +25,7 @@ Se o `ok` vier `true`, a chave e o modelo estão certos.
 
 ## Modelos
 
-`GEMINI_MODEL` aceita uma lista separada por vírgula (ex.: `gemini-3.6-flash,gemini-3.7-flash`).
+`GEMINI_MODEL` aceita uma lista separada por vírgula (ex.: `gemini-3.6-flash,gemini-3.8-flash,gemini-3.7-flash,gemini-3.5-flash`).
 Se um modelo não existir, o próximo é tentado.
 
 ## Modo demonstração
@@ -38,6 +38,14 @@ Os elogios ficam visíveis para quem abrir a página (é a ideia da dinâmica). 
 
 A chave fica só no `.env` e nunca vai para o browser. Não compartilhe o `.env`.
 Antes de enviar telas reais da empresa, valide as políticas internas de dados e PII.
+
+## Novidades da v0.15
+
+- **Modelos Gemini atualizados**: o `gemini-2.5-flash` deixou de estar disponível para chaves novas;
+  a lista recomendada passa a ser `gemini-3.6-flash,gemini-3.8-flash,gemini-3.7-flash,gemini-3.5-flash`.
+- Quando um modelo está descontinuado ou não liberado para a chave, o sistema pula para o próximo
+  da lista (antes parava com erro). Na Análise da semana, cada modelo tem uma nova tentativa
+  quando o Google está sobrecarregado, e a mensagem final explica a sobrecarga.
 
 ## Novidades da v0.14
 
@@ -129,7 +137,7 @@ Antes de enviar telas reais da empresa, valide as políticas internas de dados e
    → **Connect** ao projeto. Isso cria a variável `BLOB_READ_WRITE_TOKEN` automaticamente.
 3. **Settings → Environment Variables**, adicione:
    - `GEMINI_API_KEY` = sua chave **nova** do Gemini
-   - `GEMINI_MODEL` = `gemini-3.6-flash,gemini-3.7-flash`
+   - `GEMINI_MODEL` = `gemini-3.6-flash,gemini-3.8-flash,gemini-3.7-flash,gemini-3.5-flash`
    - `ELOGIOS_ADMIN_KEY` = uma senha sua para moderar os elogios
    - (opcional) `DEMO_MODE` = `true` se quiser apresentar sem chamar a IA
 4. **Deployments → ⋯ → Redeploy** para aplicar as variáveis.
@@ -167,4 +175,4 @@ A cada `git push` no `main`, a Vercel publica a nova versão sozinha.
 
 O servidor tenta até 3 vezes cada modelo e, se continuar sobrecarregado, passa ao próximo
 da lista `GEMINI_MODEL`. Deixe pelo menos dois modelos no `.env`, por exemplo:
-`GEMINI_MODEL=gemini-3.6-flash,gemini-3.7-flash`
+`GEMINI_MODEL=gemini-3.6-flash,gemini-3.8-flash,gemini-3.7-flash,gemini-3.5-flash`
