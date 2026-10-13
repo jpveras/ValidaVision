@@ -1,4 +1,4 @@
-# Valida Vision — v0.16
+# Valida Vision — v0.17
 
 ## Rodar
 
@@ -38,6 +38,17 @@ Os elogios ficam visíveis para quem abrir a página (é a ideia da dinâmica). 
 
 A chave fica só no `.env` e nunca vai para o browser. Não compartilhe o `.env`.
 Antes de enviar telas reais da empresa, valide as políticas internas de dados e PII.
+
+## Novidades da v0.17
+
+- **IA reserva (Mistral, plano gratuito)**: se o Gemini falhar (sobrecarga, cota do dia, modelo
+  indisponível) ou não responder em `RESERVA_APOS_S` segundos (padrão 75), a Análise de Tela e a
+  Análise da semana são feitas pela Mistral. A tela mostra qual IA respondeu.
+  - Ative com `MISTRAL_API_KEY` (crie em console.mistral.ai, plano "Experiment": só telefone verificado,
+    sem cartão). Opcional: `MISTRAL_MODEL` (padrão `mistral-medium-2508,mistral-small-2506`).
+  - Sem a chave, nada muda: só o Gemini é usado.
+  - Atenção: no plano gratuito da Mistral, os pedidos podem ser usados para treinar os modelos dela.
+  - O Status da IA (`/api/health`) mostra também a situação da reserva.
 
 ## Novidades da v0.16
 

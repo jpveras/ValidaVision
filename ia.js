@@ -6,6 +6,7 @@
 // ======================================================
 
 import dotenv from "dotenv";
+import { reservaConfig, gerarNaReserva } from "./reserva.js";
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -80,7 +81,24 @@ export class IAErro extends Error {
  * modelo lento/sobrecarregado/inexistente → próximo. Cada tentativa tem tempo máximo.
  * Retorna { data, model }.
  */
-export async function gerarJSON({ system, texto, schema, temperatura = 0.4, tentativaMs, totalMs }) {
+export async function gerarJSON(opts) {
+  // Gemini primeiro; se falhar ou demorar, a IA reserva (Mistral), quando configurada.
+  const reserva = reservaConfig();
+  try {
+    return await gerarGemini(reserva.ativa ? { ...opts, totalMs: Math.min(opts.totalMs || 150_000, reserva.aposMs) } : opts);
+  } catch (e) {
+    if (!reserva.ativa || !(e instanceof IAErro) || e.message === "A chave do Gemini foi recusada.") throw e;
+    console.error("Gemini sem resultado; usando a IA reserva:", e.message);
+    try {
+      const r = await gerarNaReserva({ system: opts.system, texto: opts.texto, schema: opts.schema, totalMs: 70_000, tentativaMs: 45_000 });
+      return { data: r.data, model: r.model, provider: r.provider };
+    } catch (e2) {
+      throw new IAErro(`${e.message} A IA reserva (Mistral) também não conseguiu: ${e2?.message || "erro"}`, e.status);
+    }
+  }
+}
+
+async function gerarGemini({ system, texto, schema, temperatura = 0.4, tentativaMs, totalMs }) {
   const cfg = iaConfig();
   if (!cfg.apiKey || cfg.apiKey.includes("COLOQUE_SUA_CHAVE")) {
     throw new IAErro("GEMINI_API_KEY não configurada.", 500);
@@ -140,7 +158,7 @@ export async function gerarJSON({ system, texto, schema, temperatura = 0.4, tent
       }
       const txt = (data?.candidates?.[0]?.content?.parts || []).map((p) => p.text || "").join("").trim();
       try {
-        return { data: JSON.parse(txt), model };
+        return { data: JSON.parse(txt), model, provider: "Gemini" };
       } catch {
         ultimo = "A IA devolveu uma resposta inválida.";
         continue modelos;

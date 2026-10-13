@@ -568,13 +568,13 @@ sentimentosRouter.post("/gestora/semana/:semana/analise", async (req, res) => {
       });
     }
     const { equipe, maxEnvios } = conf();
-    let analise, modelo;
+    let analise, modelo, provedor = "demo";
     if (iaConfig().demoMode) {
       analise = ANALISE_DEMO;
       modelo = "demo";
     } else {
       const anterior = await semanaAnteriorCom(semana);
-      ({ data: analise, model: modelo } = await gerarJSON({
+      ({ data: analise, model: modelo, provider: provedor } = await gerarJSON({
         system: ANALISE_SYSTEM,
         texto: textoParaIA(semana, atual, anterior, equipe, maxEnvios),
         schema: ANALISE_SCHEMA,
@@ -584,11 +584,18 @@ sentimentosRouter.post("/gestora/semana/:semana/analise", async (req, res) => {
       semana,
       geradaEm: new Date().toISOString(),
       modelo,
+      provedor,
       totalNaGeracao: atual.length,
       analise: {
         ...analise,
-        sugestoes: (analise.sugestoes || []).slice(0, 5),
-        evitar: (analise.evitar || []).slice(0, 3),
+        clima: ["positivo", "neutro", "atencao", "alerta"].includes(analise.clima) ? analise.clima : "neutro",
+        leitura: String(analise.leitura || ""),
+        tendencia: String(analise.tendencia || ""),
+        perguntaAbertura: String(analise.perguntaAbertura || ""),
+        apoio: String(analise.apoio || ""),
+        temas: (Array.isArray(analise.temas) ? analise.temas : []).map(String).slice(0, 6),
+        sugestoes: (Array.isArray(analise.sugestoes) ? analise.sugestoes : []).filter((x) => x && x.titulo).slice(0, 5),
+        evitar: (Array.isArray(analise.evitar) ? analise.evitar : []).map(String).slice(0, 3),
       },
     };
     await salvarAnalise(semana, registro);
