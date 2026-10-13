@@ -19,7 +19,7 @@ const app = express();
 // O valor do .env tem prioridade sobre variáveis do Windows.
 // ======================================================
 
-const DEFAULT_MODELS = ["gemini-3.7-flash", "gemini-3.6-flash"];
+const DEFAULT_MODELS = ["gemini-3.6-flash", "gemini-3.8-flash", "gemini-3.7-flash", "gemini-3.5-flash"];
 
 function cleanKey(raw) {
   return String(raw || "")
@@ -141,6 +141,13 @@ REGRAS:
 - Responda SOMENTE com o JSON solicitado.
 `;
 
+
+// Modelo descontinuado, inexistente ou não liberado para esta chave: vale tentar o próximo.
+function modeloIndisponivel(status, data) {
+  const msg = String(data?.error?.message || "");
+  return [400, 403, 404].includes(status) &&
+    /no longer available|not found|not supported|is not available|deprecated|unsupported model/i.test(msg);
+}
 
 // ======================================================
 // FORMATO DE RESPOSTA DA IA
@@ -615,8 +622,8 @@ app.post("/api/analyze", upload.single("screenshot"), async (req, res) => {
             continue;
           }
         }
-        if (NEXT_MODEL.includes(response.status)) continue modelLoop;
-        break modelLoop; // 401/403/400: trocar de modelo não resolve
+        if (NEXT_MODEL.includes(response.status) || modeloIndisponivel(response.status, data)) continue modelLoop;
+        break modelLoop; // 401/403/400 de chave ou pedido: trocar de modelo não resolve
       }
     }
 

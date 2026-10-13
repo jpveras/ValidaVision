@@ -11,7 +11,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const DEFAULT_MODELS = ["gemini-3.6-flash", "gemini-3.7-flash"];
+const DEFAULT_MODELS = ["gemini-3.6-flash", "gemini-3.8-flash", "gemini-3.7-flash", "gemini-3.5-flash"];
 
 export function iaConfig() {
   let fileEnv = {};
@@ -48,6 +48,13 @@ async function chamar(cfg, model, payload, signal) {
   return { response, data };
 }
 
+// Modelo descontinuado, inexistente ou não liberado para esta chave: vale tentar o próximo.
+export function modeloIndisponivel(status, data) {
+  const msg = String(data?.error?.message || "");
+  return [400, 403, 404].includes(status) &&
+    /no longer available|not found|not supported|is not available|deprecated|unsupported model/i.test(msg);
+}
+
 export class IAErro extends Error {
   constructor(msg, status = 502) {
     super(msg);
@@ -65,39 +72,61 @@ export async function gerarJSON({ system, texto, schema, temperatura = 0.4, tent
   if (!cfg.apiKey || cfg.apiKey.includes("COLOQUE_SUA_CHAVE")) {
     throw new IAErro("GEMINI_API_KEY não configurada.", 500);
   }
-  const ATTEMPT_MS = tentativaMs || Number(process.env.GEMINI_ATTEMPT_MS) || 60_000;
-  const deadline = Date.now() + (totalMs || Number(process.env.GEMINI_TOTAL_MS) || 120_000);
+  const ATTEMPT_MS = tentativaMs || 45_000;
+  const deadline = Date.now() + (totalMs || 150_000);
   const payload = {
     system_instruction: { parts: [{ text: system }] },
     contents: [{ role: "user", parts: [{ text: texto }] }],
     generationConfig: { responseMimeType: "application/json", responseSchema: schema, temperature: temperatura },
   };
 
+  const MIN_RESTANTE = Math.min(10_000, ATTEMPT_MS / 2);
+  const espera = (ms) => new Promise((r) => setTimeout(r, ms));
   let ultimo = "A IA não respondeu.";
-  for (const model of cfg.models) {
-    const restante = deadline - Date.now();
-    if (restante < Math.min(10_000, ATTEMPT_MS / 2)) break;
-    let response, data;
-    try {
-      ({ response, data } = await chamar(cfg, model, payload, AbortSignal.timeout(Math.min(ATTEMPT_MS, restante))));
-    } catch (e) {
-      if (e?.name !== "TimeoutError" && e?.name !== "AbortError") throw e;
-      console.error(`IA (${model}) não respondeu a tempo.`);
-      ultimo = "A IA está demorando mais que o normal. Tente de novo em instantes.";
-      continue;
-    }
-    if (!response.ok) {
-      console.error(`IA (${model}) erro`, response.status, data?.error?.message);
-      ultimo = data?.error?.message || `Erro ${response.status} da IA.`;
-      if ([404, 429, 500, 503, 504].includes(response.status)) continue;
-      throw new IAErro(response.status === 403 || response.status === 401 ? "A chave do Gemini foi recusada." : ultimo);
-    }
-    const txt = (data?.candidates?.[0]?.content?.parts || []).map((p) => p.text || "").join("").trim();
-    try {
-      return { data: JSON.parse(txt), model };
-    } catch {
-      ultimo = "A IA devolveu uma resposta inválida.";
-      continue;
+  let sobrecarga = false;
+  modelos: for (const model of cfg.models) {
+    // Até 2 tentativas por modelo quando o Google responde "sobrecarregado"; depois, o próximo.
+    for (let tentativa = 1; tentativa <= 2; tentativa++) {
+      const restante = deadline - Date.now();
+      if (restante < MIN_RESTANTE) break modelos;
+      let response, data;
+      try {
+        ({ response, data } = await chamar(cfg, model, payload, AbortSignal.timeout(Math.min(ATTEMPT_MS, restante))));
+      } catch (e) {
+        if (e?.name !== "TimeoutError" && e?.name !== "AbortError") throw e;
+        console.error(`IA (${model}) não respondeu a tempo.`);
+        ultimo = "A IA está demorando mais que o normal. Tente de novo em instantes.";
+        continue modelos;
+      }
+      if (!response.ok) {
+        console.error(`IA (${model}) erro`, response.status, data?.error?.message);
+        if ([500, 503, 504].includes(response.status)) {
+          sobrecarga = true;
+          ultimo = "O Gemini está sobrecarregado no momento (alta demanda). Tente de novo em alguns minutos.";
+          if (tentativa === 1 && deadline - Date.now() > 2000 + MIN_RESTANTE) {
+            await espera(2000);
+            continue;
+          }
+          continue modelos;
+        }
+        if (response.status === 429) {
+          ultimo = "Limite de uso do Gemini atingido no momento. Tente de novo em alguns minutos.";
+          continue modelos;
+        }
+        if (response.status === 404 || modeloIndisponivel(response.status, data)) {
+          // Modelo descontinuado ou inexistente: não mostra a mensagem dele se outro falhou por sobrecarga.
+          if (!sobrecarga) ultimo = `O modelo ${model} não está disponível. Ajuste GEMINI_MODEL.`;
+          continue modelos;
+        }
+        throw new IAErro(response.status === 403 || response.status === 401 ? "A chave do Gemini foi recusada." : data?.error?.message || `Erro ${response.status} da IA.`);
+      }
+      const txt = (data?.candidates?.[0]?.content?.parts || []).map((p) => p.text || "").join("").trim();
+      try {
+        return { data: JSON.parse(txt), model };
+      } catch {
+        ultimo = "A IA devolveu uma resposta inválida.";
+        continue modelos;
+      }
     }
   }
   throw new IAErro(ultimo, 504);
