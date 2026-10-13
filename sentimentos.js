@@ -22,7 +22,7 @@ import crypto from "node:crypto";
 import dotenv from "dotenv";
 import { fileURLToPath } from "node:url";
 import { gerarJSON, iaConfig, IAErro } from "./ia.js";
-import { lerDoc, atualizarDoc, listarDocs, _colecao } from "./colecao.js";
+import { lerDoc, atualizarDoc, gravarDocDireto, apagarDocs, listarDocs, _colecao } from "./colecao.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PREFIX = "sentimentos/";
@@ -420,8 +420,12 @@ const analiseCache = new Map();
 const analiseLocalFile = () =>
   path.join(process.env.VERCEL ? "/tmp" : path.join(__dirname, "data"), "analises-sentimento.json");
 
-async function lerAnalise(semana) {
-  if (analiseCache.has(semana)) return analiseCache.get(semana);
+// Cache curto: o servidor roda em várias instâncias, e uma análise apagada ou refeita
+// em uma delas precisa sumir/aparecer nas outras.
+const ANALISE_TTL = 20_000;
+async function lerAnalise(semana, force = false) {
+  const c = analiseCache.get(semana);
+  if (!force && c && Date.now() - c.at < ANALISE_TTL) return c.a;
   let a = null;
   if (process.env.BLOB_READ_WRITE_TOKEN) {
     try {
@@ -436,13 +440,14 @@ async function lerAnalise(semana) {
       a = null;
     }
   }
-  analiseCache.set(semana, a);
+  analiseCache.set(semana, { a, at: Date.now() });
   return a;
 }
 
 async function salvarAnalise(semana, registro) {
   if (process.env.BLOB_READ_WRITE_TOKEN) {
-    await atualizarDoc(`${ANALISE_PREFIX}${semana}.json`, () => registro);
+    // A análise é um documento único por semana, substituído por inteiro: grava direto.
+    await gravarDocDireto(`${ANALISE_PREFIX}${semana}.json`, registro);
   } else {
     let todas = {};
     try {
@@ -454,13 +459,13 @@ async function salvarAnalise(semana, registro) {
     await fs.mkdir(path.dirname(analiseLocalFile()), { recursive: true });
     await fs.writeFile(analiseLocalFile(), JSON.stringify(todas, null, 2));
   }
-  analiseCache.set(semana, registro);
+  analiseCache.set(semana, { a: registro, at: Date.now() });
 }
 
 async function apagarAnalise(semana) {
   if (process.env.BLOB_READ_WRITE_TOKEN) {
-    // Grava "null" no lugar (mesma lógica segura de gravação; ler devolve "sem análise").
-    await atualizarDoc(`${ANALISE_PREFIX}${semana}.json`, () => null);
+    // Exclui o arquivo da análise de vez (ler devolve "sem análise").
+    await apagarDocs([`${ANALISE_PREFIX}${semana}.json`]);
   } else {
     let todas = {};
     try {
@@ -472,7 +477,7 @@ async function apagarAnalise(semana) {
     await fs.mkdir(path.dirname(analiseLocalFile()), { recursive: true });
     await fs.writeFile(analiseLocalFile(), JSON.stringify(todas, null, 2));
   }
-  analiseCache.set(semana, null);
+  analiseCache.set(semana, { a: null, at: Date.now() });
 }
 
 const ANALISE_SYSTEM = `
@@ -582,7 +587,7 @@ sentimentosRouter.get("/gestora/semana/:semana/analise", async (req, res) => {
   const semana = String(req.params.semana);
   if (!SEMANA_RE.test(semana)) return res.status(400).json({ error: "Semana inválida." });
   try {
-    res.json({ analise: await lerAnalise(semana), minimo: MIN_RESPOSTAS_ANALISE });
+    res.json({ analise: await lerAnalise(semana, true), minimo: MIN_RESPOSTAS_ANALISE });
   } catch (e) {
     console.error("Erro ao ler análise:", e);
     res.status(500).json({ error: "Não consegui carregar a análise." });
