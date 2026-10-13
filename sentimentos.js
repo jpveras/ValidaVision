@@ -253,6 +253,25 @@ sentimentosRouter.get("/", async (_req, res) => {
 const hashChave = (c) => crypto.createHash("sha256").update(String(c)).digest("hex");
 const mesmaChave = (a, b) => typeof a === "string" && a.length === b.length && crypto.timingSafeEqual(Buffer.from(a), Buffer.from(b));
 
+// Quais das palavras enviadas por este navegador (ids) ainda existem na semana atual.
+// Usado para liberar o campo de novo quando a gestora remove palavras. Só confirma ids que o
+// próprio navegador já conhece; não expõe nada das outras respostas.
+sentimentosRouter.get("/minhas", async (req, res) => {
+  try {
+    const ids = String(req.query.ids || "")
+      .split(",")
+      .map((x) => x.trim())
+      .filter((x) => /^[a-z0-9-]{4,40}$/i.test(x))
+      .slice(0, 20);
+    const semana = semanaDe();
+    const existentes = new Set((await respostasDa(semana)).map((r) => r.id));
+    res.json({ semana, existem: ids.filter((id) => existentes.has(id)) });
+  } catch (e) {
+    console.error("Erro ao conferir palavras:", e);
+    res.status(500).json({ error: "Não consegui conferir agora." });
+  }
+});
+
 // A própria pessoa apaga uma palavra que enviou nesta semana (precisa da chave recebida no envio).
 const tentativasApagar = new Map();
 sentimentosRouter.delete("/minha/:id", async (req, res) => {
