@@ -103,7 +103,7 @@
   <a class="logo" href="/">
     <img id="brandLogo" src="/logo.png" alt="" hidden onload="this.hidden=false;this.nextElementSibling.setAttribute('hidden','')">
     <svg width="28" height="24" viewBox="0 0 28 24" aria-hidden="true"><path d="M1 2h9l4 9 4-9h9L14 23z" fill="#2fc28f"/><path d="M10 2h8l-4 9z" fill="#1a8f6a"/></svg>
-    <b>Valida <span>Vision</span></b><span class="ver">v0.18</span>
+    <b>Valida <span>Vision</span></b><span class="ver">v0.19</span>
   </a>
   <div class="spacer"></div>
   <span class="env">Painel da gestora</span>
@@ -165,7 +165,7 @@
           <li><b>Observe a nuvem</b>: quanto maior a palavra, mais pessoas a escolheram. Palavras de mesmo tom (ex.: “cansado”, “puxada”, “corrida”) juntas indicam um padrão.</li>
           <li><b>Confira o ranking</b> para ver os números exatos de cada palavra.</li>
           <li><b>Compartilhe</b>: <kbd>Baixar PDF</kbd> gera uma página pronta para encaminhar; <kbd>Copiar resumo</kbd> copia um texto para colar no e-mail ou no Teams.</li>
-          <li><b>Gere a análise da semana</b>: no card <kbd>💡 Análise da semana</kbd>, clique em <kbd>Gerar análise</kbd>. A IA lê as palavras (sem nomes) e sugere o clima, temas, ações para a equipe e uma pergunta para abrir a conversa. Ela fica salva; use <kbd>Gerar novamente</kbd> se chegarem novas respostas.</li>
+          <li><b>Gere a análise da semana</b>: no card <kbd>💡 Análise da semana</kbd>, clique em <kbd>Gerar análise</kbd>. A IA lê as palavras (sem nomes) e sugere o clima, temas, ações para a equipe e uma pergunta para abrir a conversa. Ela fica salva; use <kbd>Gerar novamente</kbd> se chegarem novas respostas ou <kbd>Apagar análise</kbd> para removê-la.</li>
           <li><b>Se aparecer algo impróprio</b>, em “Respostas da semana” clique em <kbd>Remover</kbd> e depois em <kbd>Confirmar</kbd>. Ao terminar, clique em <kbd>Sair</kbd>, principalmente em computador compartilhado.</li>
         </ol>
 
@@ -220,7 +220,7 @@
     <section class="card analise" id="analiseCard">
       <div class="card-head">
         <span>💡 Análise da semana</span>
-        <div class="acoes"><span class="meta" id="anMeta"></span><button class="btn-outline btn-sm" id="anGerar" type="button" hidden>Gerar novamente</button></div>
+        <div class="acoes"><span class="meta" id="anMeta"></span><button class="btn-outline btn-sm" id="anGerar" type="button" hidden>Gerar novamente</button><button class="btn-danger btn-sm no-print" id="anApagar" type="button" hidden>Apagar análise</button></div>
       </div>
       <div class="card-body" id="anCorpo"><div class="an-vazio"><span class="carregando"></span></div></div>
     </section>
@@ -301,16 +301,16 @@ function render(anterior){
 const CLIMA={positivo:['positivo','🟢 Positivo'],neutro:['neutro','⚪ Neutro'],atencao:['atencao','🟠 Atenção'],alerta:['alerta','🔴 Alerta']};
 const dataHora=iso=>new Date(iso).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
 async function carregarAnalise(semana){
-  analise=null;$('anMeta').textContent='';$('anGerar').hidden=true;
+  analise=null;$('anMeta').textContent='';$('anGerar').hidden=true;$('anApagar').hidden=true;
   $('anCorpo').innerHTML='<div class="an-vazio"><span class="carregando"></span></div>';
   try{const r=await api(`/api/sentimentos/gestora/semana/${semana}/analise`);if(semana!==atual)return;analise=r.analise;minimoAnalise=r.minimo||3}catch{analise=null}
   renderAnalise();
 }
 function renderAnalise(){
   const d=dados,corpo=$('anCorpo');
-  if(gerando){corpo.innerHTML='<div class="an-vazio"><p><span class="carregando"></span> Gerando a análise com IA… costuma levar de 15 a 40 segundos.</p></div>';$('anGerar').hidden=true;return}
+  if(gerando){corpo.innerHTML='<div class="an-vazio"><p><span class="carregando"></span> Gerando a análise com IA… costuma levar de 15 a 40 segundos.</p></div>';$('anGerar').hidden=true;$('anApagar').hidden=true;return}
   if(!analise){
-    $('anMeta').textContent='';$('anGerar').hidden=true;
+    $('anMeta').textContent='';$('anGerar').hidden=true;$('anApagar').hidden=true;
     const falta=Math.max(0,minimoAnalise-d.total);
     corpo.innerHTML=falta
       ?`<div class="an-vazio"><p>A análise fica disponível a partir de <b>${minimoAnalise} respostas</b> na semana. ${d.total?`Esta semana tem ${d.total}; ${falta===1?'falta 1':`faltam ${falta}`}.`:'Esta semana ainda não tem respostas.'}</p></div>`
@@ -320,8 +320,10 @@ function renderAnalise(){
   }
   const a=analise.analise,c=CLIMA[a.clima]||CLIMA.neutro;
   $('anMeta').textContent=`Gerada em ${dataHora(analise.geradaEm)} com ${analise.totalNaGeracao} respostas`+(analise.provedor&&analise.provedor!=='demo'?` · ${analise.provedor}`:'');
-  $('anGerar').hidden=false;
-  const desatual=d.total!==analise.totalNaGeracao?`<div class="an-desatual">A semana agora tem ${d.total} respostas (a análise usou ${analise.totalNaGeracao}). Clique em <b>Gerar novamente</b> para atualizar.</div>`:'';
+  const podeGerar=d.total>=minimoAnalise;
+  $('anGerar').hidden=!podeGerar;$('anApagar').hidden=false;
+  const desatual=d.total!==analise.totalNaGeracao
+    ?`<div class="an-desatual">A semana agora tem ${d.total} ${d.total===1?'resposta':'respostas'} (a análise usou ${analise.totalNaGeracao}). ${podeGerar?'Clique em <b>Gerar novamente</b> para atualizar.':`Com menos de ${minimoAnalise} respostas não dá para gerar de novo; se quiser, use <b>Apagar análise</b>.`}</div>`:'';
   corpo.innerHTML=`${desatual}
     <span class="clima ${c[0]}">Clima geral: ${c[1]}</span>
     <p class="an-leitura">${esc(a.leitura)}</p>
@@ -342,6 +344,15 @@ async function gerarAnalise(){
   finally{gerando=false;if(semana===atual)renderAnalise()}
 }
 $('anGerar').onclick=gerarAnalise;
+let anApagarTimer;
+$('anApagar').onclick=async()=>{
+  const b=$('anApagar');
+  if(!b.classList.contains('armed')){b.classList.add('armed');b.textContent='Confirmar';clearTimeout(anApagarTimer);anApagarTimer=setTimeout(()=>{b.classList.remove('armed');b.textContent='Apagar análise'},4000);return}
+  clearTimeout(anApagarTimer);b.disabled=true;const semana=atual;
+  try{await api(`/api/sentimentos/gestora/semana/${semana}/analise`,{method:'DELETE'});if(semana===atual){analise=null;msg('Análise apagada.');renderAnalise()}}
+  catch(err){msg(err.message,true)}
+  finally{b.disabled=false;b.classList.remove('armed');b.textContent='Apagar análise'}
+};
 
 $('respostas').addEventListener('click',async e=>{
   const b=e.target.closest('.rm');if(!b)return;
