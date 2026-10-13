@@ -11,7 +11,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const DEFAULT_MODELS = ["gemini-3.6-flash", "gemini-3.8-flash", "gemini-3.7-flash", "gemini-3.5-flash"];
+const DEFAULT_MODELS = ["gemini-3.6-flash", "gemini-3.8-flash", "gemini-3.7-flash", "gemini-3.5-flash", "gemini-3.5-flash-lite", "gemini-3.1-flash-lite"];
 
 export function iaConfig() {
   let fileEnv = {};
@@ -55,6 +55,19 @@ export function modeloIndisponivel(status, data) {
     /no longer available|not found|not supported|is not available|deprecated|unsupported model/i.test(msg);
 }
 
+// Cota do plano gratuito esgotada (429 "quota"): não adianta insistir naquele modelo por um tempo.
+// Fica só na memória desta instância do servidor.
+const cotaAte = new Map();
+export const cotaEsgotada = (model) => (cotaAte.get(model) || 0) > Date.now();
+export function marcarCota(model, data) {
+  const msg = String(data?.error?.message || "");
+  if (!/quota/i.test(msg)) return;
+  // "Please retry in 9h13m55s" → no máximo 1 h de pausa (a instância pode viver menos que isso).
+  const m = msg.match(/retry in (?:(\d+)h)?(?:(\d+)m)?(?:([\d.]+)s)?/i);
+  const ms = m ? ((+m[1] || 0) * 3600 + (+m[2] || 0) * 60 + (+m[3] || 0)) * 1000 : 10 * 60 * 1000;
+  cotaAte.set(model, Date.now() + Math.min(Math.max(ms, 60_000), 3600_000));
+}
+
 export class IAErro extends Error {
   constructor(msg, status = 502) {
     super(msg);
@@ -85,6 +98,10 @@ export async function gerarJSON({ system, texto, schema, temperatura = 0.4, tent
   let ultimo = "A IA não respondeu.";
   let sobrecarga = false;
   modelos: for (const model of cfg.models) {
+    if (cotaEsgotada(model)) {
+      ultimo = "A cota gratuita do Gemini acabou por hoje. Tente mais tarde ou ative o faturamento da chave no Google AI Studio.";
+      continue;
+    }
     // Até 2 tentativas por modelo quando o Google responde "sobrecarregado"; depois, o próximo.
     for (let tentativa = 1; tentativa <= 2; tentativa++) {
       const restante = deadline - Date.now();
@@ -110,7 +127,8 @@ export async function gerarJSON({ system, texto, schema, temperatura = 0.4, tent
           continue modelos;
         }
         if (response.status === 429) {
-          ultimo = "Limite de uso do Gemini atingido no momento. Tente de novo em alguns minutos.";
+          marcarCota(model, data);
+          if (!sobrecarga) ultimo = "A cota gratuita do Gemini acabou por hoje. Tente mais tarde ou ative o faturamento da chave no Google AI Studio.";
           continue modelos;
         }
         if (response.status === 404 || modeloIndisponivel(response.status, data)) {

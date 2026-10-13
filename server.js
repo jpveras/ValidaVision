@@ -1,3 +1,4 @@
+import { modeloIndisponivel, cotaEsgotada, marcarCota } from "./ia.js";
 import express from "express";
 import multer from "multer";
 import dotenv from "dotenv";
@@ -19,7 +20,7 @@ const app = express();
 // O valor do .env tem prioridade sobre variáveis do Windows.
 // ======================================================
 
-const DEFAULT_MODELS = ["gemini-3.6-flash", "gemini-3.8-flash", "gemini-3.7-flash", "gemini-3.5-flash"];
+const DEFAULT_MODELS = ["gemini-3.6-flash", "gemini-3.8-flash", "gemini-3.7-flash", "gemini-3.5-flash", "gemini-3.5-flash-lite", "gemini-3.1-flash-lite"];
 
 function cleanKey(raw) {
   return String(raw || "")
@@ -142,12 +143,6 @@ REGRAS:
 `;
 
 
-// Modelo descontinuado, inexistente ou não liberado para esta chave: vale tentar o próximo.
-function modeloIndisponivel(status, data) {
-  const msg = String(data?.error?.message || "");
-  return [400, 403, 404].includes(status) &&
-    /no longer available|not found|not supported|is not available|deprecated|unsupported model/i.test(msg);
-}
 
 // ======================================================
 // FORMATO DE RESPOSTA DA IA
@@ -360,8 +355,8 @@ function explainError(status, data, cfg) {
   }
   if (status === 429) {
     return (
-      "Limite de uso (cota) da Gemini atingido para esta chave/modelo. " +
-      "Aguarde um pouco, troque a chave ou troque o modelo no .env."
+      "A cota gratuita do Gemini para esta chave acabou por hoje (o plano gratuito do Google " +
+      "tem um limite diário de pedidos). Tente mais tarde ou ative o faturamento da chave no Google AI Studio."
     );
   }
   if (status === 503 || status === 500 || status === 504) {
@@ -561,12 +556,13 @@ app.post("/api/analyze", upload.single("screenshot"), async (req, res) => {
       },
     };
 
-    // Para cada modelo: tenta até 3 vezes se estiver sobrecarregado (503/500/504),
-    // com espera crescente. Se continuar falhando (ou 404/429), passa ao próximo modelo.
+    // Para cada modelo: tenta até 2 vezes se estiver sobrecarregado (503/500/504).
+    // Se continuar falhando (ou 404/429/modelo descontinuado), passa ao próximo modelo.
+    // Modelo com a cota gratuita esgotada é pulado sem nova chamada por um tempo.
     const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     const TRANSIENT = [500, 503, 504];
     const NEXT_MODEL = [404, 429, ...TRANSIENT];
-    const MAX_ATTEMPTS = 3;
+    const MAX_ATTEMPTS = 2; // cada tentativa conta na cota gratuita do Google
     // Tempo máximo: evita que um Gemini travado deixe a tela em "Analisando…" até o limite
     // de 5 min da Vercel. Cada tentativa tem até 100 s e a análise inteira até 210 s.
     const ATTEMPT_MS = Number(process.env.GEMINI_ATTEMPT_MS) || 100_000;
@@ -577,7 +573,12 @@ app.post("/api/analyze", upload.single("screenshot"), async (req, res) => {
     let usedModel = null;
     let googleData = null;
 
+    let houveSobrecarga = false;
     modelLoop: for (const model of cfg.models) {
+      if (cotaEsgotada(model)) {
+        if (!last) last = { status: 429, data: { error: { message: "quota (cota gratuita esgotada)" } } };
+        continue;
+      }
       for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
         const restante = deadline - Date.now();
         if (restante < MIN_RESTANTE) break modelLoop; // sem tempo para outra tentativa
@@ -613,10 +614,15 @@ app.post("/api/analyze", upload.single("screenshot"), async (req, res) => {
           response.status,
           data?.error?.message
         );
-        last = { status: response.status, data };
+        if (response.status === 429) marcarCota(model, data);
+        if (TRANSIENT.includes(response.status)) houveSobrecarga = true;
+        // Mostra a sobrecarga (o motivo de fundo) em vez de "cota" ou "modelo antigo" de um modelo reserva.
+        if (!(houveSobrecarga && last && TRANSIENT.includes(last.status) && !TRANSIENT.includes(response.status))) {
+          last = { status: response.status, data };
+        }
 
         if (TRANSIENT.includes(response.status) && attempt < MAX_ATTEMPTS) {
-          const espera = 1500 * attempt * attempt; // 1,5s, 6s
+          const espera = 2000; // 2 s antes da segunda tentativa
           if (deadline - Date.now() > espera + MIN_RESTANTE) {
             await sleep(espera);
             continue;
