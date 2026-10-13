@@ -464,6 +464,15 @@ function limitScenarios(result, max) {
   return { ...result, components };
 }
 
+const testesReserva = [];
+function testeReservaPermitido() {
+  const agora = Date.now();
+  while (testesReserva.length && agora - testesReserva[0] > 3600_000) testesReserva.shift();
+  if (testesReserva.length >= 10) return false;
+  testesReserva.push(agora);
+  return true;
+}
+
 // A IA reserva segue o formato pelo texto do pedido (não por schema obrigatório):
 // aqui garantimos campos e valores válidos antes de mostrar na tela.
 function normalizaAnalise(r) {
@@ -611,7 +620,9 @@ app.post("/api/analyze", upload.single("screenshot"), async (req, res) => {
     let googleData = null;
 
     let houveSobrecarga = false;
-    modelLoop: for (const model of cfg.models) {
+    // Teste da reserva: /api/analyze?reserva=1 pula o Gemini (limitado a 10 por hora).
+    const forcarReserva = req.query?.reserva === "1" && reserva.ativa && testeReservaPermitido();
+    modelLoop: for (const model of forcarReserva ? [] : cfg.models) {
       if (cotaEsgotada(model)) {
         if (!last) last = { status: 429, data: { error: { message: "quota (cota gratuita esgotada)" } } };
         continue;
@@ -703,7 +714,7 @@ app.post("/api/analyze", upload.single("screenshot"), async (req, res) => {
 
     let provider = "Gemini";
     if (!result && reserva.ativa) {
-      // Gemini falhou ou demorou: tenta a IA reserva (Mistral).
+      // Gemini falhou ou demorou: tenta a IA reserva (Cloudflare ou Mistral).
       console.error("Gemini sem resultado; usando a IA reserva.", erroGemini?.body?.error);
       try {
         const r = await gerarNaReserva({
@@ -719,7 +730,7 @@ app.post("/api/analyze", upload.single("screenshot"), async (req, res) => {
         usedModel = r.model;
       } catch (e) {
         console.error("IA reserva também falhou:", e?.message);
-        erroGemini.body.error += ` A IA reserva (Mistral) também não conseguiu: ${e?.message || "erro"}`;
+        erroGemini.body.error += ` A IA reserva (${reserva.provedor}) também não conseguiu: ${e?.message || "erro"}`;
       }
     }
 
