@@ -723,7 +723,7 @@ app.post("/api/analyze", upload.single("screenshot"), async (req, res) => {
           schema: responseSchema,
           imagem: { mime: req.file.mimetype, base64: req.file.buffer.toString("base64") },
           totalMs: 120_000,
-          tentativaMs: 70_000,
+          tentativaMs: 60_000,
         });
         result = normalizaAnalise(r.data);
         provider = r.provider;
