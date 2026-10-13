@@ -1,4 +1,4 @@
-# Valida Vision — v0.17
+# Valida Vision — v0.18
 
 ## Rodar
 
@@ -38,6 +38,15 @@ Os elogios ficam visíveis para quem abrir a página (é a ideia da dinâmica). 
 
 A chave fica só no `.env` e nunca vai para o browser. Não compartilhe o `.env`.
 Antes de enviar telas reais da empresa, valide as políticas internas de dados e PII.
+
+## Novidades da v0.18
+
+- **IA reserva gratuita: Cloudflare Workers AI.** O plano gratuito da Mistral não libera a API, então a
+  reserva passa a usar a Cloudflare (10.000 "Neurons"/dia grátis, sem cartão), com o modelo
+  `@cf/meta/llama-4-scout-17b-16e-instruct`, que lê imagens (reserva: `@cf/mistralai/mistral-small-3.1-24b-instruct`).
+  - Ative com `CLOUDFLARE_API_TOKEN` (token com permissão Workers AI). Opcionais: `CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_MODEL`.
+  - A Mistral continua aceita (`MISTRAL_API_KEY`), mas só com plano pago; se as duas existirem, vale a Cloudflare.
+  - Teste da reserva sem esperar o Gemini falhar: `POST /api/analyze?reserva=1` (até 10 por hora).
 
 ## Novidades da v0.17
 

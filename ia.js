@@ -82,7 +82,7 @@ export class IAErro extends Error {
  * Retorna { data, model }.
  */
 export async function gerarJSON(opts) {
-  // Gemini primeiro; se falhar ou demorar, a IA reserva (Mistral), quando configurada.
+  // Gemini primeiro; se falhar ou demorar, a IA reserva (Cloudflare ou Mistral), quando configurada.
   const reserva = reservaConfig();
   try {
     return await gerarGemini(reserva.ativa ? { ...opts, totalMs: Math.min(opts.totalMs || 150_000, reserva.aposMs) } : opts);
@@ -93,7 +93,7 @@ export async function gerarJSON(opts) {
       const r = await gerarNaReserva({ system: opts.system, texto: opts.texto, schema: opts.schema, totalMs: 70_000, tentativaMs: 45_000 });
       return { data: r.data, model: r.model, provider: r.provider };
     } catch (e2) {
-      throw new IAErro(`${e.message} A IA reserva (Mistral) também não conseguiu: ${e2?.message || "erro"}`, e.status);
+      throw new IAErro(`${e.message} A IA reserva (${reserva.provedor}) também não conseguiu: ${e2?.message || "erro"}`, e.status);
     }
   }
 }
