@@ -1,6 +1,7 @@
 // ======================================================
 // SENTIMENTO DA SEMANA
-// Cada pessoa da equipe informa uma palavra que define a sua semana.
+// Cada pessoa da equipe conta, em uma frase curta (até 100 caracteres), como foi a semana.
+// A nuvem é montada com as palavras mais citadas nas respostas; a IA lê as frases completas.
 // A equipe vê a nuvem da semana atual; a gestora tem um painel com senha
 // (SENTIMENTO_GESTORA_KEY) com histórico, ranking e remoção.
 //
@@ -22,11 +23,12 @@ import crypto from "node:crypto";
 import dotenv from "dotenv";
 import { fileURLToPath } from "node:url";
 import { gerarJSON, iaConfig, IAErro } from "./ia.js";
+import { contarTermos } from "./palavras.js";
 import { lerDoc, atualizarDoc, gravarDocDireto, apagarDocs, listarDocs, _colecao } from "./colecao.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PREFIX = "sentimentos/";
-const PALAVRA_MAX = 30;
+const TEXTO_MAX = 100;
 const TZ = "America/Sao_Paulo";
 
 function env() {
@@ -167,25 +169,26 @@ async function aposGravar(semana, itens) {
 
 // ---------------- Palavras ----------------
 
-const normaliza = (p) => p.toLocaleLowerCase("pt-BR").trim();
+// Respostas antigas guardavam só uma palavra (campo "palavra"); as novas, uma frase ("texto").
+export const textoDe = (r) => String(r?.texto ?? r?.palavra ?? "");
 
+// "semana" aparece em quase toda resposta ("semana puxada") e não diz nada sobre o clima.
+const IGNORAR = new Set(["semana", "semanas"]);
 function contar(respostas) {
-  const c = new Map();
-  for (const r of respostas) c.set(normaliza(r.palavra), (c.get(normaliza(r.palavra)) || 0) + 1);
-  return [...c.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], "pt-BR"));
+  return contarTermos(respostas.map(textoDe), { limite: 100, ignorar: () => IGNORAR });
 }
 
-// Aceita uma palavra (ou expressão curta de até 2 palavras, ex.: "bem puxada"), só letras.
-function validaPalavra(raw) {
-  const p = String(raw ?? "")
+// Uma frase curta: até TEXTO_MAX caracteres, com pelo menos uma letra.
+function validaTexto(raw) {
+  const t = String(raw ?? "")
     .replace(/[\u0000-\u001f\u007f]/g, " ")
     .replace(/\s+/g, " ")
     .trim();
-  if (!p) return { erro: "Escreva uma palavra." };
-  if (p.length > PALAVRA_MAX) return { erro: `Use no máximo ${PALAVRA_MAX} caracteres.` };
-  if (p.split(" ").length > 2) return { erro: "Use só uma palavra (ou duas, no máximo)." };
-  if (!/^[\p{L}]+(?:[-'\s][\p{L}]+)*$/u.test(p)) return { erro: "Use apenas letras, sem números ou símbolos." };
-  return { palavra: p };
+  if (!t) return { erro: "Escreva como foi a sua semana." };
+  if (t.length > TEXTO_MAX) return { erro: `Use no máximo ${TEXTO_MAX} caracteres.` };
+  if (!/\p{L}/u.test(t)) return { erro: "Escreva com palavras, por favor." };
+  if (/https?:\/\/|www\./i.test(t)) return { erro: "Não use links na resposta." };
+  return { texto: t };
 }
 
 // ---------------- Senha da gestora ----------------
@@ -289,22 +292,22 @@ sentimentosRouter.delete("/minha/:id", async (req, res) => {
     if (!chave || !id) return res.status(400).json({ error: "Pedido incompleto." });
     const semana = semanaDe();
     const item = (await respostasDa(semana, true)).find((r) => r.id === id);
-    if (!item) return res.status(404).json({ error: "Essa palavra já não está na semana atual." });
+    if (!item) return res.status(404).json({ error: "Essa resposta já não está na semana atual." });
     if (!item.chave || !mesmaChave(item.chave, hashChave(chave))) {
-      return res.status(403).json({ error: "Só quem enviou a palavra pode apagá-la." });
+      return res.status(403).json({ error: "Só quem enviou a resposta pode apagá-la." });
     }
     await aposGravar(semana, await store().remover(semana, id));
     res.json({ ok: true });
   } catch (e) {
     console.error("Erro ao apagar a própria palavra:", e);
-    res.status(500).json({ error: "Não consegui apagar a palavra agora. Tente de novo." });
+    res.status(500).json({ error: "Não consegui apagar a resposta agora. Tente de novo." });
   }
 });
 
 const ultimoEnvio = new Map(); // só em memória, para frear cliques repetidos; nunca é gravado
 sentimentosRouter.post("/", async (req, res) => {
   try {
-    const v = validaPalavra(req.body?.palavra);
+    const v = validaTexto(req.body?.texto ?? req.body?.palavra);
     if (v.erro) return res.status(400).json({ error: v.erro });
     const ip = String(req.get("x-forwarded-for") || req.ip || "").split(",")[0].trim();
     // Toda a equipe pode sair pelo mesmo IP da empresa: limite por minuto, folgado.
@@ -324,7 +327,7 @@ sentimentosRouter.post("/", async (req, res) => {
     const item = {
       id: crypto.randomUUID().slice(0, 8),
       semana,
-      palavra: v.palavra,
+      texto: v.texto,
       criadoEm: new Date().toISOString(),
       chave: hashChave(chave),
     };
@@ -332,7 +335,7 @@ sentimentosRouter.post("/", async (req, res) => {
     res.status(201).json({ ok: true, semana, rotulo: rotuloSemana(semana), id: item.id, chave });
   } catch (e) {
     console.error("Erro ao salvar sentimento:", e);
-    res.status(500).json({ error: "Não consegui registrar sua palavra. Tente de novo." });
+    res.status(500).json({ error: "Não consegui registrar sua resposta. Tente de novo." });
   }
 });
 
@@ -371,7 +374,7 @@ sentimentosRouter.get("/gestora/semana/:semana", async (req, res) => {
       ...resumo(semana, respostas),
       respostas: respostas
         .sort((a, b) => a.criadoEm.localeCompare(b.criadoEm))
-        .map(({ id, palavra, criadoEm }) => ({ id, palavra, criadoEm })),
+        .map((r) => ({ id: r.id, texto: textoDe(r), criadoEm: r.criadoEm })),
     });
   } catch (e) {
     console.error("Erro ao ler semana:", e);
@@ -403,7 +406,7 @@ sentimentosRouter.delete("/gestora/semana/:semana/:id", async (req, res) => {
     res.json({ ok: true });
   } catch (e) {
     console.error("Erro ao remover sentimento:", e);
-    res.status(500).json({ error: "Não consegui remover a palavra." });
+    res.status(500).json({ error: "Não consegui remover a resposta." });
   }
 });
 
@@ -482,33 +485,35 @@ async function apagarAnalise(semana) {
 
 const ANALISE_SYSTEM = `
 Você apoia uma gestora de equipe a cuidar do clima do time. Toda sexta-feira, cada pessoa
-da equipe escreve, de forma ANÔNIMA, uma palavra que define a própria semana. Você recebe
-apenas essas palavras agregadas (com quantas vezes cada uma apareceu), a participação e,
-quando houver, as palavras da semana anterior.
+da equipe escreve, de forma ANÔNIMA, uma frase curta (até 100 caracteres) sobre como foi a
+própria semana. Você recebe essas respostas (sem autor e em ordem aleatória), as palavras
+mais citadas, a quantidade de respostas e, quando houver, as respostas da semana anterior.
 
-Sua tarefa: fazer uma leitura cuidadosa e sugerir ações práticas para a gestora trabalhar
-com a equipe.
+Sua tarefa: entender o CONTEXTO das respostas (o que pesou, o que foi bom, causas citadas)
+e sugerir ações práticas para a gestora trabalhar com a equipe.
 
 REGRAS:
-- Baseie-se SOMENTE nas palavras recebidas. Não invente fatos, causas ou contexto que não
-  estejam evidentes; quando algo for hipótese, diga "pode indicar".
+- Baseie-se SOMENTE nas respostas recebidas. Não invente fatos, causas ou contexto que não
+  estejam escritos; quando algo for hipótese, diga "pode indicar".
+- Leia o sentido de cada frase (ex.: "cansativa, mas consegui entregar" é cansaço com entrega),
+  inclusive negação e ironia. Agrupe respostas parecidas em temas.
 - As respostas são anônimas: as ações devem ser COLETIVAS (reunião, dinâmica, ajuste de
-  demanda, reconhecimento, rituais). Nunca sugira descobrir quem escreveu cada palavra.
-- Considere o peso de cada palavra (quantas vezes apareceu) e o equilíbrio entre palavras
-  positivas, neutras e negativas.
-- Cada pessoa pode enviar mais de uma palavra por semana, então o total de palavras NÃO é o
-  número de pessoas. Poucas respostas (menos palavras do que pessoas na equipe) também é um
+  demanda, reconhecimento, rituais). Nunca sugira descobrir quem escreveu cada resposta.
+- Se uma resposta citar nomes de pessoas, NÃO repita os nomes na análise; fale do tema.
+- Não copie frases inteiras das respostas; resuma com suas palavras (no máximo trechos curtos).
+- Cada pessoa pode enviar mais de uma resposta por semana, então o total de respostas NÃO é o
+  número de pessoas. Poucas respostas (menos respostas do que pessoas na equipe) também é um
   sinal: comente quando ocorrer.
 - Se houver semana anterior, compare o tom e diga se melhorou, piorou ou se manteve.
-- Você NÃO faz diagnóstico de saúde mental. Se aparecerem palavras de esgotamento, tristeza
+- Você NÃO faz diagnóstico de saúde mental. Se aparecerem sinais de esgotamento, tristeza
   forte ou desmotivação (ex.: esgotado, exausto, desmotivado, sobrecarregado, ansioso),
   preencha "apoio" recomendando, com delicadeza, envolver o RH ou programas de bem-estar
   da empresa. Caso contrário, deixe "apoio" como string vazia.
-- Clima: "positivo" (predomínio de palavras boas), "neutro" (equilíbrio), "atencao"
+- Clima: "positivo" (predomínio de respostas boas), "neutro" (equilíbrio), "atencao"
   (predomínio de desgaste/pressão) ou "alerta" (sinais fortes de esgotamento ou piora
   importante).
 - Gere de 3 a 5 sugestões, da mais importante para a menos. Cada uma com título curto,
-  "porque" (ligado às palavras), "como" (passos concretos e simples) e "quando"
+  "porque" (ligado ao que foi escrito), "como" (passos concretos e simples) e "quando"
   (ex.: "esta semana", "na próxima reunião", "nas próximas semanas").
 - "perguntaAbertura": uma pergunta aberta e acolhedora para a gestora usar com a equipe.
 - "evitar": 1 a 3 cuidados (ex.: não tentar identificar autores; não minimizar o cansaço).
@@ -554,20 +559,34 @@ const ANALISE_DEMO = {
     { titulo: "Reconhecer o esforço", porque: "Exemplo de demonstração.", como: "Agradeça publicamente as entregas da semana.", quando: "esta semana" },
   ],
   perguntaAbertura: "O que mais pesou nesta semana e o que podemos ajustar juntos?",
-  evitar: ["Tentar descobrir quem escreveu cada palavra."],
+  evitar: ["Tentar descobrir quem escreveu cada resposta."],
   apoio: "",
+};
+
+// Embaralha para a ordem não sugerir quem respondeu primeiro.
+const embaralha = (l) => {
+  const a = [...l];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
 };
 
 function textoParaIA(semana, atual, anterior, equipe, maxEnvios = conf().maxEnvios) {
   const linhas = [
     `Semana: ${rotuloSemana(semana)}`,
-    `Respostas: ${atual.length} palavras enviadas (equipe de ${equipe} pessoas; cada pessoa pode enviar até ${maxEnvios})`,
-    `Palavras desta semana (palavra: vezes):`,
-    ...contar(atual).map(([p, n]) => `- ${p}: ${n}`),
+    `Respostas: ${atual.length} (equipe de ${equipe} pessoas; cada pessoa pode enviar até ${maxEnvios})`,
+    "",
+    "Respostas desta semana (anônimas, ordem aleatória):",
+    ...embaralha(atual.map(textoDe)).map((t) => `- "${t}"`),
+    "",
+    "Palavras mais citadas (palavra: vezes):",
+    ...contar(atual).slice(0, 25).map(([p, n]) => `- ${p}: ${n}`),
   ];
   if (anterior?.respostas?.length) {
     linhas.push("", `Semana anterior (${rotuloSemana(anterior.semana)}), ${anterior.respostas.length} respostas:`);
-    linhas.push(...contar(anterior.respostas).map(([p, n]) => `- ${p}: ${n}`));
+    linhas.push(...embaralha(anterior.respostas.map(textoDe)).map((t) => `- "${t}"`));
   } else {
     linhas.push("", "Não há semana anterior com respostas para comparar.");
   }
@@ -647,4 +666,4 @@ sentimentosRouter.post("/gestora/semana/:semana/analise", async (req, res) => {
 });
 
 // Usado nos testes
-export const _interno = { semanaDe, rotuloSemana, validaPalavra, contar, blobStore, setSdk: (m) => { _colecao.setSdk(m); cache.clear(); analiseCache.clear(); }, textoParaIA };
+export const _interno = { semanaDe, rotuloSemana, validaTexto, contar, blobStore, setSdk: (m) => { _colecao.setSdk(m); cache.clear(); analiseCache.clear(); }, textoParaIA };

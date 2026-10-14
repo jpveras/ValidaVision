@@ -1,4 +1,4 @@
-# Valida Vision — v0.19
+# Valida Vision — v0.20
 
 ## Rodar
 
@@ -38,6 +38,17 @@ Os elogios ficam visíveis para quem abrir a página (é a ideia da dinâmica). 
 
 A chave fica só no `.env` e nunca vai para o browser. Não compartilhe o `.env`.
 Antes de enviar telas reais da empresa, valide as políticas internas de dados e PII.
+
+## Novidades da v0.20
+
+- **Sentimento da Semana com frase curta**: em vez de uma palavra, a pessoa escreve como foi a
+  semana em até **100 caracteres** (campo de texto com contador, ajustado para PC e celular).
+  - A nuvem e o ranking passam a usar as palavras mais citadas nas respostas (palavras muito
+    comuns, como "de", "muito" e "semana", ficam de fora).
+  - A **Análise da semana** lê as respostas completas (anônimas, em ordem aleatória) para entender
+    o contexto, e não repete nomes que apareçam nos textos.
+  - O Painel da Gestora mostra cada resposta inteira, com o botão Remover; o resumo copiado inclui as respostas.
+  - Respostas antigas de uma palavra continuam funcionando.
 
 ## Novidades da v0.19
 
@@ -137,9 +148,9 @@ Antes de enviar telas reais da empresa, valide as políticas internas de dados e
 
 ## Novidades da v0.8
 
-- **🙂 Sentimento da Semana** (menu lateral): toda sexta, cada pessoa da equipe informa **uma palavra**
-  que define a sua semana. As respostas são **anônimas** (não guardamos nome, IP nem identificador).
-  - Depois da primeira palavra, a pessoa vê a nuvem da equipe naquela semana e quantas palavras já chegaram.
+- **🙂 Sentimento da Semana** (menu lateral): toda sexta, cada pessoa da equipe escreve **uma frase curta** (até 100 caracteres)
+  sobre como foi a semana. As respostas são **anônimas** (não guardamos nome, IP nem identificador).
+  - Depois da primeira resposta, a pessoa vê a nuvem da equipe naquela semana e quantas respostas já chegaram.
   - Cada navegador pode enviar até 3 palavras por semana (`SENTIMENTO_MAX_ENVIOS`; semana de segunda a
     domingo, horário de Brasília). O campo continua liberado até a pessoa usar todos os envios.
   - A pessoa pode **apagar** as próprias palavras da semana (botão Apagar, com confirmação).
