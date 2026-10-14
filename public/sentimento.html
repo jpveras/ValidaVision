@@ -26,12 +26,12 @@
 .minhas-h{font-size:13px;color:var(--muted);margin:0 0 8px}
 .minhas-h b{color:var(--ink)}
 .chips{display:flex;flex-wrap:wrap;gap:8px}
-.chip-minha{display:flex;align-items:center;gap:10px;width:100%;box-sizing:border-box;padding:6px 8px 6px 14px;border:1px solid var(--line);border-radius:999px;background:#fff;font-weight:700;color:var(--teal2)}
+.chip-minha{display:inline-flex;align-items:center;gap:8px;max-width:100%;box-sizing:border-box;padding:6px 8px 6px 14px;border:1px solid var(--line);border-radius:999px;background:#fff;font-weight:700;color:var(--teal2)}
 .chip-minha.sem{padding-right:14px}
-.chip-minha>span{overflow-wrap:anywhere;min-width:0;flex:1}
-.chips .chip-minha{border-radius:10px;padding:10px 10px 10px 14px;font-weight:500;line-height:1.4}
-.chips .chip-minha button{flex:none}
-.chips{flex-direction:column;align-items:flex-start}
+/* Como antes: etiquetas compactas lado a lado; texto longo quebra dentro da etiqueta. */
+.chip-minha>span{overflow-wrap:anywhere;min-width:0;line-height:1.35}
+.chip-minha button{flex:none}
+.chips .chip-minha{border-radius:18px}
 .chip-minha button{height:24px;padding:0 10px;border:1px solid #f0c7c4;background:#fff;color:#b3261e;border-radius:999px;font-size:10px;font-weight:700;letter-spacing:.6px}
 .chip-minha button:hover{background:#fdecea}
 .chip-minha button.confirmar{background:#b3261e;color:#fff;border-color:#b3261e}
