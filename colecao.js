@@ -24,7 +24,44 @@ const conflito = (e) =>
   /precondition|already exists|etag/i.test(String(e?.message));
 const espera = (ms) => new Promise((r) => setTimeout(r, ms));
 
+const semAspas = (t) => String(t || "").replace(/^W\//, "").replace(/"/g, "");
+
+// Leitura sempre da versão atual.
+// Em produção vimos o get devolver uma cópia antiga (cache), e aí a gravação com ifMatch
+// era recusada em todas as tentativas ("Precondition failed") — por isso apagar não funcionava.
+// Agora: o head (consulta direta à API, sem cache) diz qual é a versão atual (ETag);
+// o get pede o arquivo com essa versão na URL (endereço novo = sem cópia velha) e confere
+// se veio mesmo a versão certa. Head e get são operações "simples" no plano gratuito.
 async function lerBlob(pathname) {
+  const m = await sdk();
+  if (typeof m.head !== "function") return lerBlobDireto(pathname);
+  let h;
+  try {
+    h = await m.head(pathname);
+  } catch (e) {
+    if (e?.name === "BlobNotFoundError" || /not.?found/i.test(String(e?.message))) return { data: null, etag: null };
+    throw e;
+  }
+  const atual = semAspas(h.etag);
+  for (let i = 0; i < 5; i++) {
+    const u = new URL(h.url);
+    u.searchParams.set("v", atual || String(Date.now()));
+    if (i) u.searchParams.set("t", String(Date.now()));
+    let r;
+    try {
+      r = await lerBlobDireto(u.toString());
+    } catch (e) {
+      if (i === 4) throw e;
+      await espera(200 * (i + 1));
+      continue;
+    }
+    if (!atual || !r.etag || semAspas(r.etag) === atual) return { data: r.data, etag: r.etag || h.etag };
+    await espera(200 * (i + 1));
+  }
+  throw new Error("A Blob ainda está devolvendo uma versão antiga do arquivo. Tente de novo em alguns segundos.");
+}
+
+async function lerBlobDireto(pathname) {
   const { get } = await sdk();
   let ultimo;
   for (const access of ordemAcesso()) {
