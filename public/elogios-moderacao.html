@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Moderação dos elogios · Valida Vision</title>
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--top:#033a45;--teal:#109c8a;--teal2:#0b7f70;--teal-soft:#e6f5f2;--ink:#0b3b47;--text:#25343a;--muted:#6b7a80;--line:#dfe5e3;--page:#eef1f0;--red:#b42318;--amber:#b26b00;--amber-soft:#fff6e5}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--page);font-family:Roboto,"Segoe UI",Arial,sans-serif;color:var(--text);font-size:15px;min-height:100vh}
+[hidden]{display:none!important}
+.topbar{background:var(--top);color:#fff;display:flex;align-items:center;gap:10px;padding:10px 16px;position:sticky;top:0;z-index:5}
+.topbar img{width:34px;height:34px;border-radius:50%}
+.topbar b{font-size:18px}.topbar b span{font-weight:400;opacity:.85}
+.topbar .tag{margin-left:auto;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;background:rgba(255,255,255,.12);padding:5px 10px;border-radius:99px}
+main{width:100%;max-width:760px;margin:0 auto;padding:16px 16px 40px}
+h1{margin:4px 0 4px;font-size:24px;font-weight:500;color:var(--ink)}
+.sub{margin:0 0 16px;color:var(--muted);line-height:1.5;font-size:14px}
+.card{background:#fff;border:1px solid var(--line);border-radius:8px;margin-bottom:14px}
+.card-head{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--line);font-weight:500;color:var(--ink)}
+.card-head .n{margin-left:auto;font-size:12px;color:var(--muted);font-weight:400}
+.card-body{padding:14px 16px}
+.input{width:100%;border:1px solid #cfd8d6;border-radius:6px;padding:12px 14px;font:inherit;font-size:16px;background:#fff}
+.input:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px var(--teal-soft)}
+button{font:inherit;font-size:12px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;border-radius:6px;cursor:pointer;height:40px;padding:0 16px;border:1px solid transparent}
+.btn-primary{background:var(--teal);color:#fff}.btn-primary:hover{background:var(--teal2)}
+.btn-outline{background:#fff;border-color:#9aa6a9;color:var(--text)}
+.btn-ok{background:var(--teal);color:#fff;height:32px;padding:0 12px;font-size:11px;border-radius:99px}
+.btn-rm{background:#fff;border-color:#e3a5a5;color:var(--red);height:32px;padding:0 12px;font-size:11px;border-radius:99px}
+.btn-rm.armed{background:var(--red);border-color:var(--red);color:#fff}
+button:disabled{opacity:.5;cursor:not-allowed}
+.login-row{display:flex;gap:10px}
+.login-row .input{flex:1}
+.msg{min-height:18px;margin-top:8px;font-size:13px;color:var(--teal2)}
+.msg.erro{color:var(--red)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+.stat{background:#fff;border:1px solid var(--line);border-radius:8px;padding:12px}
+.stat small{display:block;font-size:10px;letter-spacing:.8px;text-transform:uppercase;color:var(--muted)}
+.stat b{font-size:24px;color:var(--ink)}
+.stat.pend b{color:var(--amber)}
+.toggle{display:flex;align-items:flex-start;gap:12px;cursor:pointer}
+.toggle input{position:absolute;opacity:0;pointer-events:none}
+.sw{flex:none;width:46px;height:26px;border-radius:99px;background:#c9d3d1;position:relative;transition:background .2s;margin-top:2px}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.toggle input:checked+.sw{background:var(--teal)}
+.toggle input:checked+.sw::after{left:23px}
+.toggle input:focus-visible+.sw{box-shadow:0 0 0 3px var(--teal-soft)}
+.toggle b{display:block;color:var(--ink)}
+.toggle span.d{display:block;font-size:13px;color:var(--muted);line-height:1.45;margin-top:2px}
+.item{display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-top:1px solid var(--line)}
+.item:first-child{border-top:0;padding-top:0}
+.item .t{flex:1;min-width:0}
+.item .t b{color:var(--ink)}
+.item .t p{margin:4px 0;line-height:1.45;overflow-wrap:anywhere}
+.item .t small{color:var(--muted);font-size:12px}
+.item .a{flex:none;display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.item.novo{animation:pisca 1.6s ease-out}
+@keyframes pisca{from{background:var(--teal-soft)}to{background:transparent}}
+.pend-card{border-color:#f0d19a}
+.pend-card .card-head{background:var(--amber-soft);color:var(--amber)}
+.vazio{color:var(--muted);font-size:14px}
+.barra{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+.barra a{color:var(--teal2);font-size:13px}
+.barra .sp{flex:1}
+.ao-vivo{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)}
+.ao-vivo i{width:8px;height:8px;border-radius:50%;background:#2fc28f;animation:pulsa 1.6s infinite}
+@keyframes pulsa{50%{opacity:.3}}
+@media(max-width:520px){.item{flex-direction:column}.item .a{justify-content:flex-start}.stats{grid-template-columns:repeat(3,1fr)}.stat b{font-size:20px}.login-row{flex-direction:column}}
+</style>
+</head>
+<body>
+<header class="topbar"><img src="/logo.png" alt=""><b>Valida <span>Vision</span></b><span class="tag">Moderação</span></header>
+<main>
+  <h1>Moderação dos elogios</h1>
+  <p class="sub">Abra esta tela no celular ou numa janela que <b>não</b> está sendo compartilhada. Aqui você vê os elogios chegando, com nome e texto, antes de todo mundo.</p>
+
+  <section class="card" id="loginCard">
+    <div class="card-head">Entrar</div>
+    <form class="card-body" id="loginForm" novalidate>
+      <div class="login-row">
+        <input class="input" id="senha" type="password" placeholder="Senha do moderador" autocomplete="current-password">
+        <button class="btn-primary" type="submit">Entrar</button>
+      </div>
+      <div class="msg" id="loginMsg"></div>
+    </form>
+  </section>
+
+  <div id="painel" hidden>
+    <div class="barra">
+      <span class="ao-vivo"><i></i> Atualiza sozinho a cada poucos segundos</span>
+      <span class="sp"></span>
+      <a href="/elogios.html" target="_blank" rel="noopener">Abrir a tela do Elogie</a>
+      <button class="btn-outline" id="sair" type="button" style="height:32px;padding:0 12px;font-size:11px">Sair</button>
+    </div>
+
+    <div class="stats">
+      <div class="stat"><small>No telão</small><b id="sAprov">0</b></div>
+      <div class="stat pend"><small>Aguardando</small><b id="sPend">0</b></div>
+      <div class="stat"><small>Meta</small><b id="sMeta">15</b></div>
+    </div>
+
+    <section class="card">
+      <div class="card-body">
+        <label class="toggle">
+          <input type="checkbox" id="aprovarAntes">
+          <span class="sw" aria-hidden="true"></span>
+          <span><b>Aprovar antes de mostrar no telão</b>
+          <span class="d" id="toggleDesc">Desligado: os elogios aparecem na hora; você remove o que for impróprio.</span></span>
+        </label>
+        <div class="msg" id="msg"></div>
+      </div>
+    </section>
+
+    <section class="card pend-card" id="pendCard" hidden>
+      <div class="card-head">⏳ Aguardando aprovação <span class="n" id="pendN"></span>
+        <button class="btn-ok" id="aprovarTodos" type="button" style="margin-left:8px">Aprovar todos</button></div>
+      <div class="card-body" id="pendentes"></div>
+    </section>
+
+    <section class="card">
+      <div class="card-head">💚 No telão <span class="n" id="aprovN"></span></div>
+      <div class="card-body" id="aprovados"><p class="vazio">Nenhum elogio ainda.</p></div>
+    </section>
+  </div>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+// A senha fica só neste navegador (mesma chave usada na tela do Elogie).
+const ls={get(k){try{return localStorage.getItem(k)}catch{return null}},set(k,v){try{v==null?localStorage.removeItem(k):localStorage.setItem(k,v)}catch{}}};
+let chave=ls.get('vv-moderador'),visto=new Set(),primeira=true,timer;
+const msg=(t,erro=false)=>{$('msg').textContent=t;$('msg').className='msg'+(erro?' erro':'')};
+async function api(url,opts={}){
+  const r=await fetch(url,{...opts,cache:'no-store',headers:{...(opts.body?{'Content-Type':'application/json'}:{}),'x-admin-key':chave||''}});
+  const d=await r.json().catch(()=>({}));
+  if(!r.ok)throw Object.assign(new Error(d.error||'Falhou.'),{status:r.status});
+  return d;
+}
+function quando(iso){const d=new Date(iso),s=(Date.now()-d)/1000;if(s<60)return'agora';if(s<3600)return`há ${Math.floor(s/60)} min`;return d.toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}
+const item=(e,pend)=>`<div class="item${!primeira&&!visto.has(e.id)?' novo':''}"><div class="t"><b>${esc(e.nome)}</b><p>${esc(e.texto)}</p><small>${quando(e.criadoEm)}</small></div><div class="a">${pend?`<button class="btn-ok" data-ok="${esc(e.id)}" type="button">Aprovar</button>`:''}<button class="btn-rm" data-rm="${esc(e.id)}" type="button">Remover</button></div></div>`;
+
+function render(d){
+  $('sAprov').textContent=d.aprovados.length;$('sPend').textContent=d.pendentes.length;$('sMeta').textContent=d.meta;
+  $('aprovarAntes').checked=!!d.config.aprovarAntes;
+  $('toggleDesc').textContent=d.config.aprovarAntes
+    ?'Ligado: elogios novos ficam aqui esperando e só entram na nuvem depois que você aprovar.'
+    :'Desligado: os elogios aparecem na hora; você remove o que for impróprio.';
+  $('pendCard').hidden=!d.pendentes.length&&!d.config.aprovarAntes;
+  $('pendN').textContent=d.pendentes.length?`(${d.pendentes.length})`:'';
+  $('aprovarTodos').hidden=!d.pendentes.length;
+  $('pendentes').innerHTML=d.pendentes.length?d.pendentes.map(e=>item(e,true)).join(''):'<p class="vazio">Nada esperando. Os próximos elogios aparecem aqui.</p>';
+  $('aprovN').textContent=d.aprovados.length?`(${d.aprovados.length})`:'';
+  $('aprovados').innerHTML=d.aprovados.length?d.aprovados.map(e=>item(e,false)).join(''):'<p class="vazio">Nenhum elogio no telão ainda.</p>';
+  [...d.pendentes,...d.aprovados].forEach(e=>visto.add(e.id));primeira=false;
+}
+async function carregar(){
+  try{const d=await api('/api/elogios/moderacao');render(d)}
+  catch(err){if(err.status===401)sair('Sua sessão expirou. Entre novamente.');else msg(err.message,true)}
+}
+function agendar(){clearTimeout(timer);timer=setTimeout(async()=>{if(!document.hidden&&chave)await carregar();agendar()},4000)}
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&chave)carregar()});
+
+function entrou(){$('loginCard').hidden=true;$('painel').hidden=false;carregar();agendar()}
+function sair(texto){chave=null;ls.set('vv-moderador',null);clearTimeout(timer);$('painel').hidden=true;$('loginCard').hidden=false;$('loginMsg').textContent=texto||'';$('loginMsg').className='msg'+(texto?' erro':'')}
+$('loginForm').addEventListener('submit',async e=>{
+  e.preventDefault();const k=$('senha').value.trim();if(!k)return;
+  chave=k;
+  try{await api('/api/elogios/moderador');ls.set('vv-moderador',k);$('senha').value='';entrou()}
+  catch(err){chave=null;$('loginMsg').textContent=err.status===401?'Senha incorreta.':err.message;$('loginMsg').className='msg erro'}
+});
+$('sair').onclick=()=>sair();
+
+$('aprovarAntes').addEventListener('change',async e=>{
+  const on=e.target.checked;e.target.disabled=true;
+  try{const r=await api('/api/elogios/config',{method:'PUT',body:JSON.stringify({aprovarAntes:on})});
+    msg(on?'Aprovação ligada: os próximos elogios esperam a sua aprovação.':r.aprovadosAgora?`Aprovação desligada. ${r.aprovadosAgora} ${r.aprovadosAgora===1?'elogio que esperava foi publicado':'elogios que esperavam foram publicados'}.`:'Aprovação desligada: os elogios aparecem na hora.');
+    await carregar()}
+  catch(err){e.target.checked=!on;msg(err.message,true)}
+  finally{e.target.disabled=false}
+});
+$('aprovarTodos').onclick=async()=>{
+  try{const r=await api('/api/elogios/aprovar-todos',{method:'POST'});msg(`${r.aprovados} ${r.aprovados===1?'elogio aprovado':'elogios aprovados'}.`);await carregar()}catch(err){msg(err.message,true)}
+};
+document.addEventListener('click',async e=>{
+  const ok=e.target.closest('[data-ok]'),rm=e.target.closest('[data-rm]');
+  if(ok){ok.disabled=true;try{await api('/api/elogios/'+encodeURIComponent(ok.dataset.ok)+'/aprovar',{method:'POST'});msg('Elogio aprovado: já está no telão.');await carregar()}catch(err){msg(err.message,true);ok.disabled=false}}
+  if(rm){
+    if(!rm.classList.contains('armed')){rm.classList.add('armed');rm.textContent='Confirmar';setTimeout(()=>{rm.classList.remove('armed');rm.textContent='Remover'},3000);return}
+    rm.disabled=true;try{await api('/api/elogios/'+encodeURIComponent(rm.dataset.rm),{method:'DELETE'});msg('Elogio removido.');await carregar()}catch(err){msg(err.message,true);rm.disabled=false}
+  }
+});
+
+// Senha já salva neste navegador: entra direto.
+(async()=>{if(!chave)return;try{await api('/api/elogios/moderador');entrou()}catch{sair()}})();
+</script>
+</body></html>
