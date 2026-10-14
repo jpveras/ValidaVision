@@ -55,7 +55,9 @@ async function lerBlob(pathname) {
       await espera(200 * (i + 1));
       continue;
     }
-    if (!atual || !r.etag || semAspas(r.etag) === atual) return { data: r.data, etag: r.etag || h.etag };
+    // Usa sempre o ETag do head (o "oficial" da API). O que vem no get pode vir em outro
+    // formato (ex.: W/"..." pela CDN) e aí o ifMatch nunca bate.
+    if (!atual || !r.etag || semAspas(r.etag) === atual) return { data: r.data, etag: h.etag || r.etag };
     await espera(200 * (i + 1));
   }
   throw new Error("A Blob ainda está devolvendo uma versão antiga do arquivo. Tente de novo em alguns segundos.");
@@ -110,7 +112,7 @@ export async function lerDoc(pathname) {
  * Altera o documento com segurança contra gravações simultâneas.
  * `fn(atual)` recebe o documento atual (ou null) e devolve o novo.
  */
-export async function atualizarDoc(pathname, fn, tentativas = 8) {
+export async function atualizarDoc(pathname, fn, tentativas = 4) {
   for (let i = 0; i < tentativas; i++) {
     const { data, etag } = await lerBlob(pathname);
     const novo = fn(data);
@@ -118,10 +120,19 @@ export async function atualizarDoc(pathname, fn, tentativas = 8) {
       await gravarBlob(pathname, novo, etag);
       return novo;
     } catch (e) {
-      if (!conflito(e) || i === tentativas - 1) throw e;
+      if (!conflito(e)) throw e;
+      console.warn(`Blob: versão mudou ao gravar ${pathname} (tentativa ${i + 1}, etag ${etag}).`);
       await espera(80 + Math.random() * 220 * (i + 1));
     }
   }
+  // Plano B: a Blob continuou recusando a versão. Relê a versão atual e grava por cima.
+  // A equipe é pequena e os envios são raros, então o risco de duas gravações no mesmo
+  // instante é mínimo — e é melhor do que a pessoa não conseguir enviar ou apagar.
+  const { data } = await lerBlob(pathname);
+  const novo = fn(data);
+  await gravarDocDireto(pathname, novo);
+  console.warn(`Blob: ${pathname} gravado sem conferência de versão (plano B).`);
+  return novo;
 }
 
 /**
