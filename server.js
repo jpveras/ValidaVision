@@ -83,6 +83,7 @@ app.use("/api/elogios", elogiosRouter);
 
 // Links curtos para o público (caso o QR Code não funcione)
 app.get(["/elogie", "/e"], (_req, res) => res.redirect(302, "/elogiar.html"));
+app.get(["/moderar", "/moderacao"], (_req, res) => res.redirect(302, "/elogios-moderacao.html"));
 
 // Sentimento da Semana (rotas próprias)
 app.use("/api/sentimentos", sentimentosRouter);

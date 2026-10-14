@@ -117,7 +117,7 @@ body.mod .mod-block.mod-only{display:flex!important}
 /* Modo apresentação */
 .qr-card{display:none}
 body.present{--side:0px}
-body.present .side,body.present #formCard,body.present .page-sub,body.present .divider,body.present .hide-present,body.present #modBar,body.present #modArea{display:none!important}
+body.present .side,body.present #formCard,body.present #listCard,body.present .page-sub,body.present .divider,body.present .hide-present,body.present #modBar,body.present #modArea{display:none!important}
 body.present .content{padding:16px}
 body.present .panel{padding:16px}
 body.present .wrap{max-width:1500px}
@@ -176,7 +176,7 @@ body.present .list{grid-template-columns:repeat(3,minmax(0,1fr))}
   <a class="logo" href="/">
     <img id="brandLogo" src="/logo.png" alt="" hidden onload="this.hidden=false;this.nextElementSibling.setAttribute('hidden','')">
     <svg width="28" height="24" viewBox="0 0 28 24" aria-hidden="true"><path d="M1 2h9l4 9 4-9h9L14 23z" fill="#2fc28f"/><path d="M10 2h8l-4 9z" fill="#1a8f6a"/></svg>
-    <b>Valida <span>Vision</span></b><span class="ver">v0.20</span>
+    <b>Valida <span>Vision</span></b><span class="ver">v0.21</span>
   </a>
   <div class="spacer"></div>
   <span class="env" id="envBadge">Protótipo local</span>
@@ -217,7 +217,7 @@ body.present .list{grid-template-columns:repeat(3,minmax(0,1fr))}
   <div class="divider"></div>
 
   <div class="modbar mod-block mod-only" id="modBar">
-    <span class="grow">🔒 <b>Você está como moderador.</b> Só você vê o modo apresentação e os botões de remover.</span>
+    <span class="grow">🔒 <b>Você está como moderador.</b> Só você vê o modo apresentação e os botões de remover. Para conferir os elogios durante a apresentação, abra a <a href="/elogios-moderacao.html" target="_blank" rel="noopener">moderação</a> no celular ou em outra janela.</span>
     <button class="btn-danger btn-sm" id="zerar" type="button">Apagar todos</button>
     <button class="btn-outline btn-sm" id="modSair" type="button">Sair do modo moderador</button>
   </div>
@@ -263,7 +263,7 @@ body.present .list{grid-template-columns:repeat(3,minmax(0,1fr))}
         </div>
       </section>
 
-      <section class="card">
+      <section class="card" id="listCard">
         <div class="card-head">
           <span>Últimos elogios <small class="counter" id="listCount"></small></span>
         </div>
@@ -337,7 +337,7 @@ form.addEventListener('submit',async e=>{
     const r=await fetch('/api/elogios',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nome:n,texto:t})});
     const d=await r.json().catch(()=>({}));
     if(!r.ok)throw new Error(d.error||'Não consegui enviar. Tente de novo.');
-    form.reset();status(`Elogio para ${n} enviado! 💚 Quer reconhecer mais alguém?`);
+    form.reset();status(d.pendente?`Elogio para ${n} enviado! 💚 Ele aparece depois que a moderação aprovar.`:`Elogio para ${n} enviado! 💚 Quer reconhecer mais alguém?`);
     await carregar(true);
   }catch(err){status(err.message,true)}finally{enviar.disabled=false}
 });
@@ -415,7 +415,8 @@ const linkCurto=location.origin+'/elogie';
 let toastTimer;
 function avisarNovo(novos){
   const t=$('toastNovo');
-  t.textContent=novos.length===1?`💚 Novo elogio para ${novos[0].nome}!`:`💚 ${novos.length} novos elogios!`;
+  // No telão não mostramos o nome: a moderação confere os elogios na tela própria dela.
+  t.textContent=novos.length===1?'💚 Novo elogio recebido!':`💚 ${novos.length} novos elogios!`;
   t.hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.hidden=true,4500);
 }
 function atualizaModo(){

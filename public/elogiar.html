@@ -90,7 +90,7 @@ $('form').addEventListener('submit',async e=>{
     const r=await fetch('/api/elogios',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nome:n,texto:t})});
     const d=await r.json().catch(()=>({}));
     if(!r.ok)throw new Error(d.error||'Não foi possível enviar. Tente novamente.');
-    $('doneMsg').textContent=`Seu elogio para ${n} já está a caminho do telão. Obrigado por reconhecer um colega!`;
+    $('doneMsg').textContent=d.pendente?`Seu elogio para ${n} foi recebido e aparece no telão assim que a moderação aprovar. Obrigado por reconhecer um colega!`:`Seu elogio para ${n} já está a caminho do telão. Obrigado por reconhecer um colega!`;
     $('formView').hidden=true;$('doneView').hidden=false;nome.value='';texto.value='';$('cnt').textContent='0/280';
     progresso();
   }catch(err){statusEl.textContent=err.message}finally{enviar.disabled=false}

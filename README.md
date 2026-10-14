@@ -1,4 +1,4 @@
-# Valida Vision — v0.20
+# Valida Vision — v0.21
 
 ## Rodar
 
@@ -38,6 +38,18 @@ Os elogios ficam visíveis para quem abrir a página (é a ideia da dinâmica). 
 
 A chave fica só no `.env` e nunca vai para o browser. Não compartilhe o `.env`.
 Antes de enviar telas reais da empresa, valide as políticas internas de dados e PII.
+
+## Novidades da v0.21
+
+- **Moderação dos elogios em tela separada** (`/elogios-moderacao.html`, senha do moderador):
+  feita para abrir no celular enquanto a tela do Elogie está compartilhada no telão.
+  - Mostra os elogios com nome e texto, os números (no telão, aguardando, meta) e atualiza sozinha.
+  - Botões **Aprovar**, **Aprovar todos** e **Remover**.
+  - Chave **"Aprovar antes de mostrar no telão"** (desligada por padrão): ligada, os elogios novos
+    ficam aguardando e só entram na contagem e na nuvem depois de aprovados. Ao desligar, os que
+    estavam aguardando são aprovados.
+- **Modo apresentação mais seguro**: a lista "Últimos elogios" some do telão e o aviso de novo
+  elogio não mostra mais o nome (só "💚 Novo elogio recebido!").
 
 ## Novidades da v0.20
 

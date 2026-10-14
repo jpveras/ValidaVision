@@ -7,6 +7,10 @@
 //   um único arquivo JSON (colecao.js), com gravação segura contra envios simultâneos.
 // - Rodando local (npm start): arquivo data/elogios.json.
 // - Na Vercel sem Blob: /tmp (temporário; a página avisa).
+//
+// Moderação (tela /elogios-moderacao.html, senha ELOGIOS_ADMIN_KEY):
+// - Opção "Aprovar antes de mostrar": elogios novos entram como "pendente" e só aparecem
+//   na nuvem/telão depois de aprovados. Desligada por padrão (tudo aparece na hora).
 // ======================================================
 
 import express from "express";
@@ -17,7 +21,7 @@ import crypto from "node:crypto";
 import { fileURLToPath } from "node:url";
 import dotenv from "dotenv";
 import { readFileSync } from "node:fs";
-import { lerDoc, atualizarDoc, listarDocs, apagarDocs, _colecao } from "./colecao.js";
+import { lerDoc, atualizarDoc, gravarDocDireto, listarDocs, apagarDocs, _colecao } from "./colecao.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PREFIX = "elogios/";
@@ -74,6 +78,11 @@ const fileStore = {
   async clear() {
     await this.save([]);
   },
+  async update(fn) {
+    const list = fn(await this.all());
+    await this.save(list);
+    return list;
+  },
 };
 
 // Vercel Blob: TODOS os elogios num único arquivo JSON (ver colecao.js).
@@ -124,6 +133,9 @@ const blobStore = {
   async clear() {
     return (await atualizarDoc(DOC, () => ({ itens: [] }))).itens;
   },
+  async update(fn) {
+    return (await atualizarDoc(DOC, (cur) => ({ itens: fn(cur?.itens || []) }))).itens;
+  },
 };
 
 const store = () => (process.env.BLOB_READ_WRITE_TOKEN ? blobStore : fileStore);
@@ -144,6 +156,39 @@ async function aposGravar(itens) {
   if (Array.isArray(itens)) readCache = { at: Date.now(), data: ordenar(itens) };
   else await lerTodos(true);
 }
+
+// ---------------- Configuração da moderação ----------------
+// Fica fora da "pasta" elogios/ (a migração antiga trata tudo lá dentro como elogio).
+const CONFIG_DOC = "elogios-config/_config.json";
+const configFile = () => path.join(process.env.VERCEL ? "/tmp" : path.join(__dirname, "data"), "elogios-config.json");
+let configCache = { at: 0, data: null };
+const CONFIG_PADRAO = { aprovarAntes: false };
+async function lerConfig(force = false) {
+  if (!force && configCache.data && Date.now() - configCache.at < READ_TTL) return configCache.data;
+  let c = null;
+  try {
+    c = process.env.BLOB_READ_WRITE_TOKEN ? await lerDoc(CONFIG_DOC) : JSON.parse(await fs.readFile(configFile(), "utf8"));
+  } catch {
+    c = null;
+  }
+  const data = { ...CONFIG_PADRAO, ...(c || {}) };
+  configCache = { at: Date.now(), data };
+  return data;
+}
+async function salvarConfig(c) {
+  const data = { ...CONFIG_PADRAO, ...c };
+  if (process.env.BLOB_READ_WRITE_TOKEN) await gravarDocDireto(CONFIG_DOC, data);
+  else {
+    await fs.mkdir(path.dirname(configFile()), { recursive: true });
+    await fs.writeFile(configFile(), JSON.stringify(data, null, 2));
+  }
+  configCache = { at: Date.now(), data };
+  return data;
+}
+
+// Elogios antigos não têm status: contam como aprovados.
+const pendente = (e) => e.status === "pendente";
+const publico = ({ id, nome, texto, criadoEm }) => ({ id, nome, texto, criadoEm });
 
 // ---------------- Nuvem de palavras ----------------
 
@@ -205,18 +250,18 @@ elogiosRouter.get("/moderador", (req, res) => {
 
 elogiosRouter.get("/", async (_req, res) => {
   try {
-    const todos = await lerTodos();
+    const lista = await lerTodos();
+    const todos = lista.filter((e) => !pendente(e)); // só aprovados aparecem
     const { meta } = conf();
+    const { aprovarAntes } = await lerConfig();
     res.set("Cache-Control", "no-store");
     res.json({
       meta,
       total: todos.length,
       liberada: todos.length >= meta,
+      aprovarAntes,
       palavras: contarPalavras(todos),
-      elogios: todos
-        .slice(-50)
-        .reverse()
-        .map(({ id, nome, texto, criadoEm }) => ({ id, nome, texto, criadoEm })),
+      elogios: todos.slice(-50).reverse().map(publico),
       armazenamento: store().kind(),
       adminConfigurado: !!conf().adminKey,
     });
@@ -245,12 +290,80 @@ elogiosRouter.post("/", async (req, res) => {
     ultimoEnvio.set(ip, janela);
     if (ultimoEnvio.size > 5000) ultimoEnvio.clear();
 
+    const { aprovarAntes } = await lerConfig(true); // sempre o valor atual: o elogio não pode escapar da moderação
     const item = { id: crypto.randomUUID().slice(0, 8), nome, texto, criadoEm: new Date().toISOString() };
+    if (aprovarAntes) item.status = "pendente";
     await aposGravar(await store().add(item));
-    res.status(201).json({ ok: true, id: item.id });
+    res.status(201).json({ ok: true, id: item.id, pendente: !!aprovarAntes });
   } catch (e) {
     console.error("Erro ao salvar elogio:", e);
     res.status(500).json({ error: "Não consegui salvar o elogio. Tente de novo." });
+  }
+});
+
+// ---- Moderação ----
+// Lista completa (inclusive pendentes) para a tela de moderação.
+elogiosRouter.get("/moderacao", async (req, res) => {
+  if (!exigeAdmin(req, res)) return;
+  try {
+    const lista = await lerTodos(true);
+    const config = await lerConfig(true);
+    res.set("Cache-Control", "no-store");
+    res.json({
+      config,
+      meta: conf().meta,
+      pendentes: lista.filter(pendente).reverse().map(publico),
+      aprovados: lista.filter((e) => !pendente(e)).reverse().map(publico),
+    });
+  } catch (e) {
+    console.error("Erro na moderação:", e);
+    res.status(500).json({ error: "Não consegui carregar a moderação agora." });
+  }
+});
+
+elogiosRouter.put("/config", async (req, res) => {
+  if (!exigeAdmin(req, res)) return;
+  try {
+    const aprovarAntes = !!req.body?.aprovarAntes;
+    const config = await salvarConfig({ aprovarAntes });
+    let aprovadosAgora = 0;
+    // Ao desligar a aprovação, quem estava esperando é publicado (senão ficaria escondido).
+    if (!aprovarAntes) {
+      const itens = await store().update((l) =>
+        l.map((e) => (pendente(e) ? (aprovadosAgora++, { ...e, status: "aprovado" }) : e))
+      );
+      await aposGravar(itens);
+    }
+    res.json({ ok: true, config, aprovadosAgora });
+  } catch (e) {
+    console.error("Erro ao salvar configuração:", e);
+    res.status(500).json({ error: "Não consegui salvar a configuração." });
+  }
+});
+
+elogiosRouter.post("/aprovar-todos", async (req, res) => {
+  if (!exigeAdmin(req, res)) return;
+  try {
+    let n = 0;
+    await aposGravar(await store().update((l) => l.map((e) => (pendente(e) ? (n++, { ...e, status: "aprovado" }) : e))));
+    res.json({ ok: true, aprovados: n });
+  } catch (e) {
+    console.error("Erro ao aprovar todos:", e);
+    res.status(500).json({ error: "Não consegui aprovar os elogios." });
+  }
+});
+
+elogiosRouter.post("/:id/aprovar", async (req, res) => {
+  if (!exigeAdmin(req, res)) return;
+  try {
+    const id = String(req.params.id);
+    let achou = false;
+    await aposGravar(await store().update((l) => l.map((e) => (e.id === id ? ((achou = true), { ...e, status: "aprovado" }) : e))));
+    if (!achou) return res.status(404).json({ error: "Esse elogio não existe mais." });
+    res.json({ ok: true });
+  } catch (e) {
+    console.error("Erro ao aprovar elogio:", e);
+    res.status(500).json({ error: "Não consegui aprovar o elogio." });
   }
 });
 
@@ -277,4 +390,4 @@ elogiosRouter.delete("/", async (req, res) => {
 });
 
 // Usado nos testes
-export const _interno = { contarPalavras, tokens, blobStore, setSdk: (m) => { _colecao.setSdk(m); migracaoFeita = false; readCache = { at: 0, data: null }; } };
+export const _interno = { contarPalavras, tokens, blobStore, setSdk: (m) => { _colecao.setSdk(m); migracaoFeita = false; readCache = { at: 0, data: null }; configCache = { at: 0, data: null }; } };
