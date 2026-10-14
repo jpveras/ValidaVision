@@ -9,6 +9,7 @@
 <link rel="stylesheet" href="/vv-base.css">
 <style>
 .texto-box{display:block;width:100%;box-sizing:border-box;min-height:96px;max-height:160px;resize:none;font:inherit;font-size:16px;line-height:1.45;padding:12px 14px;border:1px solid var(--line);border-radius:6px;background:#fff;color:var(--ink);overflow-wrap:anywhere}
+.vv-emojis{margin:8px 0 4px}
 .texto-box:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px var(--teal-soft)}
 .envio-acoes{display:flex;justify-content:flex-end;align-items:center;gap:12px;margin-top:12px}
 .envio-acoes .dica{margin-right:auto;font-size:12px;color:var(--muted)}
@@ -40,6 +41,9 @@
 .status.ok{color:var(--teal2)}
 @media(max-width:760px){.envio-acoes{flex-direction:column;align-items:stretch}.envio-acoes .dica{margin:0}.envio-acoes button{justify-content:center;width:100%}.texto-box{font-size:16px}}
 </style>
+<link rel="stylesheet" href="/vv-tema-auto.css?v=23">
+<link rel="stylesheet" href="/vv-tema.css?v=23">
+<script src="/vv-tema.js?v=23"></script>
 </head>
 <body>
 
@@ -47,7 +51,7 @@
   <a class="logo" href="/">
     <img id="brandLogo" src="/logo.png" alt="" hidden onload="this.hidden=false;this.nextElementSibling.setAttribute('hidden','')">
     <svg width="28" height="24" viewBox="0 0 28 24" aria-hidden="true"><path d="M1 2h9l4 9 4-9h9L14 23z" fill="#2fc28f"/><path d="M10 2h8l-4 9z" fill="#1a8f6a"/></svg>
-    <b>Valida <span>Vision</span></b><span class="ver">v0.22</span>
+    <b>Valida <span>Vision</span></b><span class="ver">v0.23</span>
   </a>
   <div class="spacer"></div>
   <span class="env" id="envBadge">Protótipo local</span>
@@ -140,10 +144,12 @@
 
 <script src="/vendor/wordcloud2.js"></script>
 <script src="/vv-nuvem.js"></script>
+<script src="/vv-emojis.js?v=22"></script>
 <script>
 const $=id=>document.getElementById(id);
 const local=/^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
 $('envBadge').textContent=local?'Protótipo local':'Demonstração';
+if(window.vvEmojis)vvEmojis($('palavra'));
 // Guardado só neste navegador: as respostas enviadas nesta semana (para a pessoa lembrar e poder apagar).
 const ls={get(k){try{return localStorage.getItem(k)}catch{return null}},set(k,v){try{localStorage.setItem(k,v)}catch{}}};
 let dados=null,assinatura='';
@@ -226,7 +232,7 @@ function render(){
   $('cloudWait').hidden=mostrar;
   if(resp&&!dados.palavras.length){$('waitTitle').textContent='Ainda não há respostas nesta semana';$('waitSub').textContent='';}
   $('destaque').hidden=!mostrar;$('topPalavra').textContent=dados.palavraDaSemana||'';
-  if(mostrar){const sig=JSON.stringify(dados.palavras)+$('cloudBox').clientWidth;if(sig!==assinatura){assinatura=sig;vvNuvem($('cloudBox'),$('cloud'),$('fallback'),dados.palavras)}}
+  if(mostrar){const sig=JSON.stringify(dados.palavras)+$('cloudBox').clientWidth+document.documentElement.dataset.tema;if(sig!==assinatura){assinatura=sig;vvNuvem($('cloudBox'),$('cloud'),$('fallback'),dados.palavras)}}
   else{$('cloud').hidden=true;$('fallback').hidden=true;assinatura=''}
 }
 
@@ -272,6 +278,7 @@ $('form').addEventListener('submit',async e=>{
   }catch(err){status(err.message,true)}finally{$('enviar').disabled=false}
 });
 
+addEventListener('vv-tema',()=>{if(dados)render()});
 let rz;addEventListener('resize',()=>{clearTimeout(rz);rz=setTimeout(()=>{assinatura='';render()},250)});
 carregar();
 setInterval(()=>{if(!document.hidden&&jaRespondeu())carregar()},15000);

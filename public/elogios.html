@@ -169,14 +169,17 @@ body.present .list{grid-template-columns:repeat(3,minmax(0,1fr))}
   .actions button svg{display:none}
 }
 @media(max-width:1000px){body.present .stage{grid-template-columns:1fr}}
-</style></head>
+</style><link rel="stylesheet" href="/vv-tema-auto.css?v=23">
+<link rel="stylesheet" href="/vv-tema.css?v=23">
+<script src="/vv-tema.js?v=23"></script>
+</head>
 <body>
 
 <header class="topbar">
   <a class="logo" href="/">
     <img id="brandLogo" src="/logo.png" alt="" hidden onload="this.hidden=false;this.nextElementSibling.setAttribute('hidden','')">
     <svg width="28" height="24" viewBox="0 0 28 24" aria-hidden="true"><path d="M1 2h9l4 9 4-9h9L14 23z" fill="#2fc28f"/><path d="M10 2h8l-4 9z" fill="#1a8f6a"/></svg>
-    <b>Valida <span>Vision</span></b><span class="ver">v0.22</span>
+    <b>Valida <span>Vision</span></b><span class="ver">v0.23</span>
   </a>
   <div class="spacer"></div>
   <span class="env" id="envBadge">Protótipo local</span>
@@ -383,14 +386,18 @@ function renderList(){
 }
 
 // ---------- Nuvem ----------
-const CORES=['#0b7f70','#109c8a','#033a45','#2fc28f','#c98a12','#0b3b47','#1a8f6a','#d0811b'];
+const CORES_CLARO=['#0b7f70','#109c8a','#033a45','#2fc28f','#c98a12','#0b3b47','#1a8f6a','#d0811b'];
+const CORES_ESCURO=['#3fd1b8','#2fc28f','#8fe0d2','#5ee0a6','#f0b54a','#cfe9e4','#46b8a6','#f39a4a'];
+let CORES=CORES_CLARO;
+addEventListener('vv-tema',()=>renderCloud(true));
 function renderCloud(force){
+  CORES=window.vvTema&&vvTema.escuro()?CORES_ESCURO:CORES_CLARO;
   const mostrar=state.total>=state.meta||previa||(presente()&&aoVivo);
   $('cloudWait').hidden=mostrar&&state.palavras.length>0;
   $('previa').hidden=!isMod||!presente()||aoVivo||state.total>=state.meta||!state.palavras.length;
   if(!mostrar||!state.palavras.length){$('cloud').hidden=true;$('fallback').hidden=true;lastCloudSig='';return}
   const box=$('cloudBox'),W=box.clientWidth,H=box.clientHeight;
-  const sig=JSON.stringify(state.palavras)+W+'x'+H;
+  const sig=JSON.stringify(state.palavras)+W+'x'+H+(CORES===CORES_ESCURO?'e':'c');
   if(sig===lastCloudSig&&!force)return;lastCloudSig=sig;
   const lista=state.palavras,max=lista[0][1],min=lista[lista.length-1][1];
   const maxPx=Math.max(34,Math.min(W,H)/(lista.length<6?3.2:4.6)),minPx=Math.max(13,maxPx/5.5);

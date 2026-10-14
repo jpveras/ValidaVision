@@ -1,0 +1,69 @@
+/* GERADO por tools/gerar-tema-escuro.py — não edite à mão. Ajustes finos: vv-tema.css */
+@media screen{
+html[data-tema="escuro"] .env{background:rgba(255,255,255,.12)}
+html[data-tema="escuro"] .side{background:#1c3134}
+html[data-tema="escuro"] .alert svg{stroke:#ebc973}
+html[data-tema="escuro"] .input{border:1px solid #3e4342;background:#1c3134}
+html[data-tema="escuro"] .btn-outline{background:#1c3134}
+html[data-tema="escuro"] .btn-danger{background:#1c3134;border:1px solid #483131;color:#ed857e}
+html[data-tema="escuro"] .bar{background:#1f2221}
+html[data-tema="escuro"] .cloud-box{background:linear-gradient(180deg,#212d27,#212926)}
+html[data-tema="escuro"][data-pagina="index"] .env{background:rgba(255,255,255,.12)}
+html[data-tema="escuro"][data-pagina="index"] .side{background:#1c3134}
+html[data-tema="escuro"][data-pagina="index"] .alert svg{stroke:#ebc973}
+html[data-tema="escuro"][data-pagina="index"] .drop{border:1px solid #3e4342;background:#1c3134}
+html[data-tema="escuro"][data-pagina="index"] kbd{border:1px solid #3e4342}
+html[data-tema="escuro"][data-pagina="index"] .btn-outline{background:#1c3134}
+html[data-tema="escuro"][data-pagina="index"] .summary{border:1px solid #374b47}
+html[data-tema="escuro"][data-pagina="index"] .tag{background:#212524;color:#b6c2c6}
+html[data-tema="escuro"][data-pagina="index"] .obs{color:#b2bcca}
+html[data-tema="escuro"][data-pagina="index"] .scenario ol{color:#b2bcca}
+html[data-tema="escuro"][data-pagina="index"] .priority{background:#212524}
+html[data-tema="escuro"][data-pagina="index"] .priority.high{background:#321717;color:#ed857e}
+html[data-tema="escuro"][data-pagina="index"] .priority.medium{background:#332a13;color:#efc590}
+html[data-tema="escuro"][data-pagina="index"] .priority.low{background:#1b2a23;color:#a8f3d3}
+html[data-tema="escuro"][data-pagina="index"] .gap{background:#372f15}
+html[data-tema="escuro"][data-pagina="index"] .qty input{border:1px solid #3e4342}
+html[data-tema="escuro"][data-pagina="index"] .chip{border:1px solid #3e4342;background:#1c3134}
+html[data-tema="escuro"][data-pagina="elogios"] .env{background:rgba(255,255,255,.12)}
+html[data-tema="escuro"][data-pagina="elogios"] .side{background:#1c3134}
+html[data-tema="escuro"][data-pagina="elogios"] .alert svg{stroke:#ebc973}
+html[data-tema="escuro"][data-pagina="elogios"] .input{border:1px solid #3e4342;background:#1c3134}
+html[data-tema="escuro"][data-pagina="elogios"] .btn-outline{background:#1c3134}
+html[data-tema="escuro"][data-pagina="elogios"] .btn-danger{background:#1c3134;border:1px solid #483131;color:#ed857e}
+html[data-tema="escuro"][data-pagina="elogios"] .bar{background:#1f2221}
+html[data-tema="escuro"][data-pagina="elogios"] .cloud-box{background:linear-gradient(180deg,#212d27,#212926)}
+html[data-tema="escuro"][data-pagina="elogios"] .elogio{background:#1c3134}
+html[data-tema="escuro"][data-pagina="elogios"] .modbar{background:#1c3134}
+html[data-tema="escuro"][data-pagina="elogios"] .seg button{background:#1c3134}
+html[data-tema="escuro"][data-pagina="elogiar"] .card{background:#1c3134}
+html[data-tema="escuro"][data-pagina="elogiar"] .input{border:1px solid #3e4342;background:#1c3134}
+html[data-tema="escuro"][data-pagina="elogiar"] .btn-outline{background:#1c3134}
+html[data-tema="escuro"][data-pagina="elogiar"] .btn-outline:hover{background:#232725}
+html[data-tema="escuro"][data-pagina="elogiar"] .bar{background:#1f2221}
+html[data-tema="escuro"][data-pagina="elogios-moderacao"] .topbar .tag{background:rgba(255,255,255,.12)}
+html[data-tema="escuro"][data-pagina="elogios-moderacao"] .card{background:#1c3134}
+html[data-tema="escuro"][data-pagina="elogios-moderacao"] .input{border:1px solid #3e4342;background:#1c3134}
+html[data-tema="escuro"][data-pagina="elogios-moderacao"] .btn-outline{background:#1c3134}
+html[data-tema="escuro"][data-pagina="elogios-moderacao"] .btn-rm{background:#1c3134;border-color:#483131}
+html[data-tema="escuro"][data-pagina="elogios-moderacao"] .stat{background:#1c3134}
+html[data-tema="escuro"][data-pagina="elogios-moderacao"] .sw{background:#181a1a}
+html[data-tema="escuro"][data-pagina="elogios-moderacao"] .sw::after{background:#1c3134}
+html[data-tema="escuro"][data-pagina="elogios-moderacao"] .pend-card{border-color:#4c412d}
+html[data-tema="escuro"][data-pagina="sentimento"] .texto-box{background:#1c3134}
+html[data-tema="escuro"][data-pagina="sentimento"] .counter.perto{color:#eec78b}
+html[data-tema="escuro"][data-pagina="sentimento"] .counter.limite{color:#ed857e}
+html[data-tema="escuro"][data-pagina="sentimento"] .chip-minha{background:#1c3134}
+html[data-tema="escuro"][data-pagina="sentimento"] .chip-minha button{border:1px solid #503634;background:#1c3134;color:#e9847e}
+html[data-tema="escuro"][data-pagina="sentimento"] .chip-minha button:hover{background:#321a17}
+html[data-tema="escuro"][data-pagina="sentimento-gestora"] .toolbar select{border:1px solid #3e4342;background:#1c3134}
+html[data-tema="escuro"][data-pagina="sentimento-gestora"] .tile{background:#1c3134}
+html[data-tema="escuro"][data-pagina="sentimento-gestora"] .resp{background:#1c3134}
+html[data-tema="escuro"][data-pagina="sentimento-gestora"] .guia{background:#1c3134}
+html[data-tema="escuro"][data-pagina="sentimento-gestora"] .guia kbd{border:1px solid #3e4342}
+html[data-tema="escuro"][data-pagina="sentimento-gestora"] .clima.positivo{background:#1b2a23;color:#a8f3d3}
+html[data-tema="escuro"][data-pagina="sentimento-gestora"] .clima.neutro{background:#212524;color:#bdcbd0}
+html[data-tema="escuro"][data-pagina="sentimento-gestora"] .clima.atencao{background:#332a13;color:#efc590}
+html[data-tema="escuro"][data-pagina="sentimento-gestora"] .clima.alerta{background:#321717;color:#ed857e}
+html[data-tema="escuro"][data-pagina="sentimento-gestora"] .sug li{background:#1c3134}
+}
