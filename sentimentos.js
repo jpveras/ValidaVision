@@ -174,8 +174,10 @@ export const textoDe = (r) => String(r?.texto ?? r?.palavra ?? "");
 
 // "semana" aparece em quase toda resposta ("semana puxada") e não diz nada sobre o clima.
 const IGNORAR = new Set(["semana", "semanas"]);
+// Comuns em outros textos, mas que no Sentimento dizem muito sobre a semana.
+const MANTER = new Set(["bem", "mal", "melhor", "pior", "boa", "bom", "ruim", "ótima", "ótimo", "tranquila", "tranquilo"]);
 function contar(respostas) {
-  return contarTermos(respostas.map(textoDe), { limite: 100, ignorar: () => IGNORAR });
+  return contarTermos(respostas.map(textoDe), { limite: 100, ignorar: () => IGNORAR, manter: MANTER, inteiraSeVazia: true });
 }
 
 // Uma frase curta: até TEXTO_MAX caracteres, com pelo menos uma letra.

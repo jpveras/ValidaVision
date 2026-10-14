@@ -20,15 +20,29 @@ export function tokens(txt) {
   return String(txt || "").match(/[\p{L}\p{N}]+(?:[-'][\p{L}]+)*/gu) || [];
 }
 
-/** Conta as palavras relevantes de uma lista de textos. `ignorar(texto)` → Set de palavras a pular. */
-export function contarTermos(textos, { limite = 80, ignorar } = {}) {
+/**
+ * Conta as palavras relevantes de uma lista de textos.
+ * - `ignorar(texto)` → Set de palavras a pular naquele texto.
+ * - `manter` → Set de palavras que contam mesmo estando na lista de comuns (ex.: "bem", "mal").
+ * - `inteiraSeVazia` → se um texto curto não sobrar nenhuma palavra, ele entra inteiro
+ *   (ex.: "muito bem"), para nenhuma resposta sumir da nuvem.
+ */
+export function contarTermos(textos, { limite = 80, ignorar, manter, inteiraSeVazia = false } = {}) {
   const cont = new Map();
+  const soma = (k) => cont.set(k, (cont.get(k) || 0) + 1);
   for (const t of textos) {
     const pular = ignorar ? ignorar(t) : null;
-    for (const tk of tokens(t.texto ?? t)) {
+    const todos = tokens(t.texto ?? t);
+    let usados = 0;
+    for (const tk of todos) {
       const k = tk.toLocaleLowerCase("pt-BR");
-      if (k.length < 3 || STOP.has(k) || pular?.has(k) || /^\d+$/.test(k)) continue;
-      cont.set(k, (cont.get(k) || 0) + 1);
+      const comum = (k.length < 3 || STOP.has(k)) && !manter?.has(k);
+      if (comum || pular?.has(k) || /^\d+$/.test(k)) continue;
+      soma(k);
+      usados++;
+    }
+    if (!usados && inteiraSeVazia && todos.length && todos.length <= 4) {
+      soma(todos.join(" ").toLocaleLowerCase("pt-BR"));
     }
   }
   return [...cont.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], "pt-BR")).slice(0, limite);
