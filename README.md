@@ -51,6 +51,10 @@ Antes de enviar telas reais da empresa, valide as políticas internas de dados e
 - **Modo apresentação mais seguro**: a lista "Últimos elogios" some do telão e o aviso de novo
   elogio não mostra mais o nome (só "💚 Novo elogio recebido!").
 
+- **Correção (14/10)**: apagar respostas do Sentimento (pela pessoa ou pela gestora) falhava em
+  produção com "Precondition failed": a leitura da Blob vinha de uma cópia antiga em cache. Agora a
+  leitura confere a versão atual (head + get com a versão na URL) antes de alterar o arquivo.
+
 ## Novidades da v0.20
 
 - **Sentimento da Semana com frase curta**: em vez de uma palavra, a pessoa escreve como foi a
