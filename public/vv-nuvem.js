@@ -1,7 +1,10 @@
 // Nuvem de palavras compartilhada pelas telas do Sentimento da Semana.
 // palavras: [[palavra, quantidade], ...] já ordenado do maior para o menor.
 (function () {
-  const CORES = ['#0b7f70', '#109c8a', '#033a45', '#2fc28f', '#c98a12', '#0b3b47', '#1a8f6a', '#d0811b'];
+  const CLARO = ['#0b7f70', '#109c8a', '#033a45', '#2fc28f', '#c98a12', '#0b3b47', '#1a8f6a', '#d0811b'];
+  // No modo escuro, as mesmas famílias de cor, mais claras (as escuras sumiriam no fundo).
+  const ESCURO = ['#3fd1b8','#2fc28f','#8fe0d2','#5ee0a6','#f0b54a','#cfe9e4','#46b8a6','#f39a4a'];
+  const paleta = () => (window.vvTema && vvTema.escuro() ? ESCURO : CLARO);
   const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m]));
   window.vvNuvem = function (box, canvas, fallback, palavras) {
     if (!palavras || !palavras.length) { canvas.hidden = true; fallback.hidden = true; return; }
@@ -13,6 +16,7 @@
     const estreita = W < 520;
     const maxPx = Math.max(30, Math.min(W, H) / (palavras.length < 6 ? 3 : estreita ? 5.6 : 4.4)), minPx = Math.max(estreita ? 12 : 14, maxPx / 5);
     const tam = (c) => (max === min ? maxPx * 0.75 : minPx + ((c - min) / (max - min)) * (maxPx - minPx));
+    const CORES = paleta();
     const cor = (w, c) => CORES[(w.length + c) % CORES.length];
     if (window.WordCloud && WordCloud.isSupported) {
       const dpr = Math.min(2, window.devicePixelRatio || 1);

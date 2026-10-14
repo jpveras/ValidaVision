@@ -1,0 +1,60 @@
+/* Modo escuro — ajustes à mão. As cores fixas de cada página ficam em vv-tema-auto.css (gerado). */
+@media screen {
+  html[data-tema="escuro"] {
+    color-scheme: dark;
+    --top: #062a31;
+    --teal: #1fb39d;
+    --teal2: #14a08c;
+    --teal-soft: #12362f;
+    --ink: #e4efed;
+    --text: #cbd8d6;
+    --muted: #93a5a8;
+    --line: #2a3d40;
+    --page: #0f1a1c;
+    --panel: #142225;
+    --card: #182a2d;
+    --red: #f07a72;
+    --amber: #e0a63a;
+    --amber-soft: #2e2412;
+    --warn-bg: #2b2410;
+    --warn-line: #5c4a14;
+    --warn-ink: #f0d27a;
+    --info-bg: #10302c;
+    --info-line: #1f5a52;
+    --info-ink: #8fe0d2;
+  }
+  html[data-tema="escuro"] body { background: var(--page); color: var(--text); }
+  html[data-tema="escuro"] ::placeholder { color: #6f8386; }
+  html[data-tema="escuro"] input, html[data-tema="escuro"] textarea, html[data-tema="escuro"] select { color: var(--ink); }
+  html[data-tema="escuro"] img[src*="logo"] { filter: none; }
+  /* Botões verdes continuam com texto branco */
+  html[data-tema="escuro"] .btn-primary, html[data-tema="escuro"] .btn-ok { color: #fff; }
+  /* Emojis */
+  html[data-tema="escuro"] .vv-emojis button { background: var(--card); border-color: var(--line); }
+  html[data-tema="escuro"] .vv-emojis button:hover { background: var(--teal-soft); border-color: var(--teal); }
+  /* Rolagem */
+  html[data-tema="escuro"] ::-webkit-scrollbar-thumb { background: #2f4649; border-radius: 8px; }
+  html[data-tema="escuro"] ::-webkit-scrollbar-track { background: transparent; }
+  /* Links no meio do texto */
+  html[data-tema="escuro"] p a:not([class]), html[data-tema="escuro"] span a:not([class]), html[data-tema="escuro"] li a:not([class]) { color: var(--teal); }
+  /* Nuvem: fundo neutro (o degradê claro original ficava esverdeado/oliva no escuro) */
+  html[data-tema="escuro"] .cloud-box { background: var(--panel) !important; }
+  /* Chave liga/desliga da moderação */
+  html[data-tema="escuro"] .sw { background: #3b5155 !important; }
+  html[data-tema="escuro"] .sw::after { background: #fff !important; }
+  html[data-tema="escuro"] .toggle input:checked + .sw { background: var(--teal) !important; }
+
+}
+
+/* Botão de alternar (na barra superior) */
+.vv-tema-btn {
+  width: 34px; height: 34px; flex: none; border-radius: 50%; border: 1px solid rgba(255,255,255,.22);
+  background: rgba(255,255,255,.08); color: #fff; display: inline-grid; place-items: center; cursor: pointer; padding: 0;
+  transition: background .15s, transform .15s;
+}
+.vv-tema-btn:hover { background: rgba(255,255,255,.18); }
+.vv-tema-btn:active { transform: scale(.92); }
+.vv-tema-btn:focus-visible { outline: 2px solid #2fc28f; outline-offset: 2px; }
+.vv-tema-btn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+html.vv-tema-anim, html.vv-tema-anim * { transition: background-color .25s, color .25s, border-color .25s !important; }
+@media print { .vv-tema-btn { display: none !important; } }

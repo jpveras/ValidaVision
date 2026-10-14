@@ -1,4 +1,4 @@
-# Valida Vision — v0.22
+# Valida Vision — v0.23
 
 ## Rodar
 
@@ -38,6 +38,17 @@ Os elogios ficam visíveis para quem abrir a página (é a ideia da dinâmica). 
 
 A chave fica só no `.env` e nunca vai para o browser. Não compartilhe o `.env`.
 Antes de enviar telas reais da empresa, valide as políticas internas de dados e PII.
+
+## Novidades da v0.23
+
+- **Modo escuro em todas as telas**: botão ☀/🌙 na barra superior. Por padrão segue o tema do
+  celular/computador; a escolha manual fica salva no navegador e vale para todas as telas.
+  - `public/vv-tema.js` (carregado no `<head>`, sem piscar branco), `public/vv-tema.css` (cores do
+    tema e ajustes finos) e `public/vv-tema-auto.css`, **gerado** por `tools/gerar-tema-escuro.py`
+    a partir das cores de cada página — rode de novo se mudar cores no CSS.
+  - Nuvens de palavras trocam para cores claras no escuro; QR Code continua branco; PDF/impressão
+    sempre no tema claro.
+- **Emojis também no Sentimento da Semana** (mesma fileira do Elogie, respeitando os 100 caracteres).
 
 ## Novidades da v0.22
 
