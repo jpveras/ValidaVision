@@ -27,9 +27,10 @@
 .rank td.n{width:80px;text-align:right;font-variant-numeric:tabular-nums}
 .rank .barcell{width:40%}
 .rank .mini{height:8px;border-radius:99px;background:linear-gradient(90deg,var(--teal),#2fc28f)}
-.respostas{display:flex;flex-wrap:wrap;gap:8px}
-.resp{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:99px;padding:6px 6px 6px 12px;background:#fff;font-size:14px}
-.resp .rm{height:26px;padding:0 10px;font-size:10px;border-radius:99px}
+.respostas{display:flex;flex-direction:column;gap:8px}
+.resp{display:flex;align-items:flex-start;gap:10px;border:1px solid var(--line);border-radius:8px;padding:10px 10px 10px 14px;background:#fff;font-size:14px;line-height:1.45}
+.resp .txt{flex:1;min-width:0;overflow-wrap:anywhere}
+.resp .rm{flex:none;height:26px;padding:0 10px;font-size:10px;border-radius:99px}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:24px}
 .print-head{display:none}
 /* Guia "Como usar este painel" */
@@ -103,7 +104,7 @@
   <a class="logo" href="/">
     <img id="brandLogo" src="/logo.png" alt="" hidden onload="this.hidden=false;this.nextElementSibling.setAttribute('hidden','')">
     <svg width="28" height="24" viewBox="0 0 28 24" aria-hidden="true"><path d="M1 2h9l4 9 4-9h9L14 23z" fill="#2fc28f"/><path d="M10 2h8l-4 9z" fill="#1a8f6a"/></svg>
-    <b>Valida <span>Vision</span></b><span class="ver">v0.19</span>
+    <b>Valida <span>Vision</span></b><span class="ver">v0.20</span>
   </a>
   <div class="spacer"></div>
   <span class="env">Painel da gestora</span>
@@ -140,7 +141,7 @@
   <section class="card login" id="loginCard">
     <div class="card-head">Acesso da gestora</div>
     <form class="card-body" id="loginForm" novalidate>
-      <p class="login-sobre">Este painel mostra, toda semana, a palavra que cada pessoa da equipe escolheu para descrever a própria semana — de forma anônima. Use a senha que recebeu para entrar.</p>
+      <p class="login-sobre">Este painel mostra, toda semana, a frase curta que cada pessoa da equipe escreveu sobre a própria semana — de forma anônima. Use a senha que recebeu para entrar.</p>
       <label class="label" for="senha"><span>Senha do painel</span></label>
       <div class="row">
         <input class="input" id="senha" type="password" autocomplete="current-password" placeholder="Senha">
@@ -156,22 +157,22 @@
     <details class="guia" id="guia" open>
       <summary>📘 Como usar este painel <span class="seta"><span class="fechar">Recolher ▲</span><span class="abrir">Mostrar ▼</span></span></summary>
       <div class="corpo">
-        <p><b>Para que serve:</b> toda sexta-feira, cada pessoa da equipe responde, em uma palavra, como foi a própria semana. Aqui você vê o conjunto dessas respostas para entender o clima da equipe e decidir, com a coordenação, se é preciso algum plano de ação. <b>As respostas são anônimas</b>: o sistema não guarda nome nem nada que identifique quem respondeu.</p>
+        <p><b>Para que serve:</b> toda sexta-feira, cada pessoa da equipe responde, em uma frase curta (até 100 caracteres), como foi a própria semana. Aqui você vê o conjunto dessas respostas para entender o clima da equipe e decidir, com a coordenação, se é preciso algum plano de ação. <b>As respostas são anônimas</b>: o sistema não guarda nome nem nada que identifique quem respondeu.</p>
 
         <h3>Passo a passo</h3>
         <ol class="passos">
           <li><b>Escolha a semana</b> no seletor logo abaixo. A semana atual já vem marcada com “(atual)”; as anteriores ficam no histórico.</li>
-          <li><b>Leia os quatro cartões</b>: a <b>palavra da semana</b> (a mais citada), as <b>respostas</b> (quantas palavras a equipe enviou; cada pessoa pode mandar até 3), quantas <b>palavras diferentes</b> apareceram e a palavra da <b>semana anterior</b>, para comparar.</li>
-          <li><b>Observe a nuvem</b>: quanto maior a palavra, mais pessoas a escolheram. Palavras de mesmo tom (ex.: “cansado”, “puxada”, “corrida”) juntas indicam um padrão.</li>
-          <li><b>Confira o ranking</b> para ver os números exatos de cada palavra.</li>
+          <li><b>Leia os quatro cartões</b>: a <b>palavra da semana</b> (a mais citada nas respostas), as <b>respostas</b> (quantas a equipe enviou; cada pessoa pode mandar até 3), quantas <b>palavras diferentes</b> apareceram e a palavra da <b>semana anterior</b>, para comparar.</li>
+          <li><b>Observe a nuvem</b>: quanto maior a palavra, mais vezes ela apareceu nas respostas (palavras muito comuns, como "de" ou "muito", ficam de fora). Palavras de mesmo tom (ex.: “cansado”, “puxada”, “corrida”) juntas indicam um padrão.</li>
+          <li><b>Confira o ranking</b> para ver os números exatos de cada palavra e <b>leia as respostas</b>: o contexto (o que pesou, o que foi bom) está nas frases.</li>
           <li><b>Compartilhe</b>: <kbd>Baixar PDF</kbd> gera uma página pronta para encaminhar; <kbd>Copiar resumo</kbd> copia um texto para colar no e-mail ou no Teams.</li>
-          <li><b>Gere a análise da semana</b>: no card <kbd>💡 Análise da semana</kbd>, clique em <kbd>Gerar análise</kbd>. A IA lê as palavras (sem nomes) e sugere o clima, temas, ações para a equipe e uma pergunta para abrir a conversa. Ela fica salva; use <kbd>Gerar novamente</kbd> se chegarem novas respostas ou <kbd>Apagar análise</kbd> para removê-la.</li>
+          <li><b>Gere a análise da semana</b>: no card <kbd>💡 Análise da semana</kbd>, clique em <kbd>Gerar análise</kbd>. A IA lê as respostas completas (anônimas) e sugere o clima, temas, ações para a equipe e uma pergunta para abrir a conversa. Ela fica salva; use <kbd>Gerar novamente</kbd> se chegarem novas respostas ou <kbd>Apagar análise</kbd> para removê-la.</li>
           <li><b>Se aparecer algo impróprio</b>, em “Respostas da semana” clique em <kbd>Remover</kbd> e depois em <kbd>Confirmar</kbd>. Ao terminar, clique em <kbd>Sair</kbd>, principalmente em computador compartilhado.</li>
         </ol>
 
         <h3>Dicas para analisar</h3>
         <ul class="dicas">
-          <li><b>Poucas respostas</b> (menos palavras do que pessoas na equipe) também é um sinal: pode valer lembrar a equipe ou entender o motivo.</li>
+          <li><b>Poucas respostas</b> (menos respostas do que pessoas na equipe) também é um sinal: pode valer lembrar a equipe ou entender o motivo.</li>
           <li><b>Compare com a semana anterior</b>: a mudança de tom de uma semana para outra costuma dizer mais do que uma semana isolada.</li>
           <li><b>Palavras negativas repetidas por várias semanas</b> merecem conversa e plano de ação; uma semana puxada isolada pode ser só pico de demanda.</li>
           <li>Leve <b>o padrão</b>, e não respostas isoladas, para a conversa com a equipe — e preserve o anonimato: não tente descobrir quem escreveu o quê.</li>
@@ -212,7 +213,7 @@
         <div class="card-body" style="padding:8px 16px 16px"><table class="rank"><thead><tr><th>Palavra</th><th class="barcell"></th><th class="n">Vezes</th></tr></thead><tbody id="rank"></tbody></table></div>
       </section>
       <section class="card no-print">
-        <div class="card-head"><span>Respostas da semana</span><span class="counter">Remova apenas palavras impróprias</span></div>
+        <div class="card-head"><span>Respostas da semana</span><span class="counter">Remova apenas respostas impróprias</span></div>
         <div class="card-body" style="padding:16px"><div class="respostas" id="respostas"></div></div>
       </section>
     </div>
@@ -284,14 +285,14 @@ $('semanaSel').onchange=e=>carregarSemana(e.target.value);
 
 function render(anterior){
   const d=dados,top=d.palavras[0];
-  $('chip').textContent=d.rotulo;$('printRotulo').textContent=`${d.rotulo} · ${d.total} ${d.total===1?'palavra enviada':'palavras enviadas'}`;
+  $('chip').textContent=d.rotulo;$('printRotulo').textContent=`${d.rotulo} · ${d.total} ${d.total===1?'resposta':'respostas'}`;
   $('tPalavra').textContent=top?top[0]:'—';$('tPalavraN').textContent=top?`citada ${top[1]} ${top[1]===1?'vez':'vezes'}`:'sem respostas';
-  $('tPart').textContent=String(d.total);$('tPartPct').textContent=`${d.total===1?'palavra enviada':'palavras enviadas'} · até ${d.maxEnvios||3} por pessoa`;
+  $('tPart').textContent=String(d.total);$('tPartPct').textContent=`${d.total===1?'resposta enviada':'respostas enviadas'} · até ${d.maxEnvios||3} por pessoa`;
   $('tDif').textContent=d.palavras.length;
   $('tAnt').textContent=anterior?.palavraDaSemana||'—';$('tAntSub').textContent=anterior?`${anterior.total} ${anterior.total===1?'resposta':'respostas'}`:'sem semana anterior';
   const max=top?top[1]:1;
   $('rank').innerHTML=d.palavras.length?d.palavras.map(([p,n])=>`<tr><td>${esc(p)}</td><td class="barcell"><div class="mini" style="width:${(n/max*100).toFixed(0)}%"></div></td><td class="n">${n}</td></tr>`).join(''):'<tr><td colspan="3" class="empty">Sem respostas nesta semana.</td></tr>';
-  $('respostas').innerHTML=d.respostas.length?d.respostas.map(r=>`<span class="resp">${esc(r.palavra)}<button class="btn-danger rm" type="button" data-id="${esc(r.id)}">Remover</button></span>`).join(''):'<span class="empty">Nenhuma resposta.</span>';
+  $('respostas').innerHTML=d.respostas.length?d.respostas.map(r=>`<div class="resp"><span class="txt">${esc(r.texto??r.palavra??'')}</span><button class="btn-danger rm" type="button" data-id="${esc(r.id)}">Remover</button></div>`).join(''):'<span class="empty">Nenhuma resposta.</span>';
   $('cloudWait').hidden=!!d.palavras.length;
   vvNuvem($('cloudBox'),$('cloud'),$('fallback'),d.palavras);
 }
@@ -314,7 +315,7 @@ function renderAnalise(){
     const falta=Math.max(0,minimoAnalise-d.total);
     corpo.innerHTML=falta
       ?`<div class="an-vazio"><p>A análise fica disponível a partir de <b>${minimoAnalise} respostas</b> na semana. ${d.total?`Esta semana tem ${d.total}; ${falta===1?'falta 1':`faltam ${falta}`}.`:'Esta semana ainda não tem respostas.'}</p></div>`
-      :`<div class="an-vazio"><p>A IA lê as palavras desta semana (sem nomes), compara com a semana anterior e sugere ações para você trabalhar com a equipe.</p><button class="btn-primary btn-sm" type="button" id="anPrimeira">Gerar análise</button></div>`;
+      :`<div class="an-vazio"><p>A IA lê as respostas desta semana (anônimas), entende o contexto, compara com a semana anterior e sugere ações para você trabalhar com a equipe.</p><button class="btn-primary btn-sm" type="button" id="anPrimeira">Gerar análise</button></div>`;
     const b=document.getElementById('anPrimeira');if(b)b.onclick=gerarAnalise;
     return;
   }
@@ -335,7 +336,7 @@ function renderAnalise(){
     <div class="pergunta">“${esc(a.perguntaAbertura)}”</div>
     ${a.evitar?.length?`<div class="an-h">Evite</div><ul class="evitar">${a.evitar.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:''}
     ${a.apoio?`<div class="apoio">🤝 <b>Apoio:</b> ${esc(a.apoio)}</div>`:''}
-    <p class="an-aviso">Sugestões geradas por IA a partir das palavras anônimas da equipe. Use como apoio à sua leitura — a decisão é sua. Não é um diagnóstico.</p>`;
+    <p class="an-aviso">Sugestões geradas por IA a partir das respostas anônimas da equipe. Use como apoio à sua leitura — a decisão é sua. Não é um diagnóstico.</p>`;
 }
 async function gerarAnalise(){
   if(gerando)return;gerando=true;renderAnalise();const semana=atual;
@@ -357,14 +358,14 @@ $('anApagar').onclick=async()=>{
 $('respostas').addEventListener('click',async e=>{
   const b=e.target.closest('.rm');if(!b)return;
   if(!b.classList.contains('armed')){b.classList.add('armed');b.textContent='Confirmar';setTimeout(()=>{b.classList.remove('armed');b.textContent='Remover'},3000);return}
-  try{await api(`/api/sentimentos/gestora/semana/${atual}/${encodeURIComponent(b.dataset.id)}`,{method:'DELETE'});await abrirPainel();msg('Palavra removida.')}catch(err){msg(err.message,true)}
+  try{await api(`/api/sentimentos/gestora/semana/${atual}/${encodeURIComponent(b.dataset.id)}`,{method:'DELETE'});await abrirPainel();msg('Resposta removida.')}catch(err){msg(err.message,true)}
 });
 
 $('pdf').onclick=()=>{const t=document.title;document.title=`sentimento-equipe-${atual}`;window.print();document.title=t};
 $('copiar').onclick=async()=>{
   const d=dados;if(!d)return;
-  const linhas=[`Sentimento da equipe — ${d.rotulo}`,`Respostas: ${d.total} ${d.total===1?'palavra enviada':'palavras enviadas'} (até ${d.maxEnvios||3} por pessoa; equipe de ${d.equipe})`,d.palavras[0]?`Palavra da semana: ${d.palavras[0][0]}`:'Sem respostas nesta semana.','',...d.palavras.map(([p,n])=>`• ${p} — ${n}`)];
-  if(analise){const a=analise.analise;linhas.push('','ANÁLISE DA SEMANA',`Clima geral: ${(CLIMA[a.clima]||CLIMA.neutro)[1].replace(/^\S+\s/,'')}`,a.leitura,`Tendência: ${a.tendencia}`,'','Sugestões de ação:',...(a.sugestoes||[]).map((s,i)=>`${i+1}. ${s.titulo} (${s.quando}) — ${s.como}`),'',`Pergunta para a equipe: "${a.perguntaAbertura}"`);if(a.apoio)linhas.push('',`Apoio: ${a.apoio}`);linhas.push('','(Sugestões geradas por IA a partir das palavras anônimas.)')}
+  const linhas=[`Sentimento da equipe — ${d.rotulo}`,`Respostas: ${d.total} (até ${d.maxEnvios||3} por pessoa; equipe de ${d.equipe})`,d.palavras[0]?`Palavra mais citada: ${d.palavras[0][0]}`:'Sem respostas nesta semana.','','Palavras mais citadas:',...d.palavras.slice(0,15).map(([p,n])=>`• ${p} — ${n}`),...(d.respostas?.length?['','Respostas (anônimas):',...d.respostas.map(r=>`• ${r.texto??r.palavra??''}`)]:[])];
+  if(analise){const a=analise.analise;linhas.push('','ANÁLISE DA SEMANA',`Clima geral: ${(CLIMA[a.clima]||CLIMA.neutro)[1].replace(/^\S+\s/,'')}`,a.leitura,`Tendência: ${a.tendencia}`,'','Sugestões de ação:',...(a.sugestoes||[]).map((s,i)=>`${i+1}. ${s.titulo} (${s.quando}) — ${s.como}`),'',`Pergunta para a equipe: "${a.perguntaAbertura}"`);if(a.apoio)linhas.push('',`Apoio: ${a.apoio}`);linhas.push('','(Sugestões geradas por IA a partir das respostas anônimas.)')}
   try{await navigator.clipboard.writeText(linhas.join('\n'));msg('Resumo copiado. É só colar no e-mail ou no Teams.')}catch{msg('Não consegui copiar automaticamente.',true)}
 };
 

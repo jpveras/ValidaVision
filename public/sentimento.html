@@ -8,9 +8,11 @@
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/vv-base.css">
 <style>
-.palavra-row{display:flex;gap:12px;align-items:stretch}
-.palavra-row .input{font-size:18px}
-.palavra-row button{flex:none}
+.texto-box{display:block;width:100%;box-sizing:border-box;min-height:96px;max-height:160px;resize:none;font:inherit;font-size:16px;line-height:1.45;padding:12px 14px;border:1px solid var(--line);border-radius:6px;background:#fff;color:var(--ink);overflow-wrap:anywhere}
+.texto-box:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px var(--teal-soft)}
+.envio-acoes{display:flex;justify-content:flex-end;align-items:center;gap:12px;margin-top:12px}
+.envio-acoes .dica{margin-right:auto;font-size:12px;color:var(--muted)}
+.counter.perto{color:#b26b00}.counter.limite{color:#b42318;font-weight:700}
 .sugestoes{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;font-size:12px;color:var(--muted);align-items:center}
 .done{display:flex;gap:16px;align-items:center}
 .done .ok{width:56px;height:56px;border-radius:50%;background:var(--teal-soft);display:grid;place-items:center;flex:none}
@@ -24,15 +26,19 @@
 .minhas-h{font-size:13px;color:var(--muted);margin:0 0 8px}
 .minhas-h b{color:var(--ink)}
 .chips{display:flex;flex-wrap:wrap;gap:8px}
-.chip-minha{display:inline-flex;align-items:center;gap:8px;padding:6px 8px 6px 14px;border:1px solid var(--line);border-radius:999px;background:#fff;font-weight:700;color:var(--teal2)}
+.chip-minha{display:flex;align-items:center;gap:10px;width:100%;box-sizing:border-box;padding:6px 8px 6px 14px;border:1px solid var(--line);border-radius:999px;background:#fff;font-weight:700;color:var(--teal2)}
 .chip-minha.sem{padding-right:14px}
+.chip-minha>span{overflow-wrap:anywhere;min-width:0;flex:1}
+.chips .chip-minha{border-radius:10px;padding:10px 10px 10px 14px;font-weight:500;line-height:1.4}
+.chips .chip-minha button{flex:none}
+.chips{flex-direction:column;align-items:flex-start}
 .chip-minha button{height:24px;padding:0 10px;border:1px solid #f0c7c4;background:#fff;color:#b3261e;border-radius:999px;font-size:10px;font-weight:700;letter-spacing:.6px}
 .chip-minha button:hover{background:#fdecea}
 .chip-minha button.confirmar{background:#b3261e;color:#fff;border-color:#b3261e}
 .chip-minha button:disabled{opacity:.6;cursor:default}
 .minhas-nota{font-size:12px;color:var(--muted);margin:8px 0 0}
 .status.ok{color:var(--teal2)}
-@media(max-width:760px){.palavra-row{flex-direction:column}.palavra-row button{justify-content:center}}
+@media(max-width:760px){.envio-acoes{flex-direction:column;align-items:stretch}.envio-acoes .dica{margin:0}.envio-acoes button{justify-content:center;width:100%}.texto-box{font-size:16px}}
 </style>
 </head>
 <body>
@@ -41,7 +47,7 @@
   <a class="logo" href="/">
     <img id="brandLogo" src="/logo.png" alt="" hidden onload="this.hidden=false;this.nextElementSibling.setAttribute('hidden','')">
     <svg width="28" height="24" viewBox="0 0 28 24" aria-hidden="true"><path d="M1 2h9l4 9 4-9h9L14 23z" fill="#2fc28f"/><path d="M10 2h8l-4 9z" fill="#1a8f6a"/></svg>
-    <b>Valida <span>Vision</span></b><span class="ver">v0.19</span>
+    <b>Valida <span>Vision</span></b><span class="ver">v0.20</span>
   </a>
   <div class="spacer"></div>
   <span class="env" id="envBadge">Protótipo local</span>
@@ -78,16 +84,17 @@
     <h1 class="grow">Sentimento da Semana</h1>
     <span class="chip-semana" id="semanaChip">…</span>
   </div>
-  <p class="page-sub">Toda sexta-feira, conte em <b>uma palavra</b> como foi a sua semana — pode mandar até <b id="maxTxt">3</b> palavras. As respostas são anônimas e viram uma nuvem que ajuda a coordenação a entender e cuidar da equipe.</p>
+  <p class="page-sub">Toda sexta-feira, conte em <b>uma frase curta</b> como foi a sua semana — pode mandar até <b id="maxTxt">3</b> respostas. Elas são anônimas: as palavras mais citadas viram uma nuvem e ajudam a coordenação a entender e cuidar da equipe.</p>
   <div class="divider"></div>
 
   <section class="card">
-    <div class="card-head">Sua palavra desta semana</div>
+    <div class="card-head">Sua resposta desta semana</div>
     <div class="card-body">
       <form id="form" novalidate>
-        <label class="label" for="palavra"><span>Em uma palavra, como foi a sua semana?</span><span class="counter" id="cnt">0/30</span></label>
-        <div class="palavra-row">
-          <input class="input" id="palavra" maxlength="30" autocomplete="off" autocapitalize="off" placeholder="Ex.: produtiva, puxada, tranquila…">
+        <label class="label" for="palavra"><span>Como foi a sua semana?</span><span class="counter" id="cnt">0/100</span></label>
+        <textarea class="texto-box" id="palavra" maxlength="100" rows="3" autocomplete="off" placeholder="Ex.: Semana produtiva, mas bem puxada com as entregas."></textarea>
+        <div class="envio-acoes">
+          <span class="dica">Até 100 caracteres · não precisa se identificar</span>
           <button class="btn-primary" type="submit" id="enviar"><svg viewBox="0 0 24 24"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>Enviar</button>
         </div>
         <div class="status" id="status" role="status"></div>
@@ -96,16 +103,16 @@
         <div class="ok"><svg viewBox="0 0 24 24"><path d="M5 12.5 10 17 19 7"/></svg></div>
         <div>
           <h2>Obrigado por compartilhar! 💚</h2>
-          <p>Você já enviou as <span id="maxTxt2">3</span> palavras desta semana. Quer trocar alguma? Apague abaixo e envie outra.</p>
+          <p>Você já enviou as <span id="maxTxt2">3</span> respostas desta semana. Quer trocar alguma? Apague abaixo e envie outra.</p>
         </div>
       </div>
       <div class="minhas" id="minhas" hidden>
         <p class="minhas-h" id="minhasH"></p>
         <div class="chips" id="chips"></div>
-        <p class="minhas-nota" id="minhasNota" hidden>Palavras enviadas antes desta atualização não podem ser apagadas por aqui.</p>
+        <p class="minhas-nota" id="minhasNota" hidden>Respostas enviadas antes desta atualização não podem ser apagadas por aqui.</p>
         <div class="status" id="statusApagar" role="status"></div>
       </div>
-      <div class="privacy">🔒 <span><b>Sua resposta é anônima.</b> Não guardamos seu nome, e-mail ou qualquer dado que identifique você — só a palavra e a semana.</span></div>
+      <div class="privacy">🔒 <span><b>Sua resposta é anônima.</b> Não guardamos seu nome, e-mail ou qualquer dado que identifique você — só o texto e a semana. Evite citar nomes de colegas.</span></div>
     </div>
   </section>
 
@@ -120,7 +127,7 @@
         <div id="fallback" class="fallback-cloud" hidden></div>
         <div class="cloud-wait" id="cloudWait">
           <strong id="waitTitle">Responda para ver a nuvem da equipe</strong>
-          <span id="waitSub">Assim a sua palavra não é influenciada pelas respostas dos colegas.</span>
+          <span id="waitSub">Assim a sua resposta não é influenciada pelas dos colegas.</span>
         </div>
       </div>
       <p class="destaque" id="destaque" hidden>Palavra mais citada até agora: <b id="topPalavra"></b></p>
@@ -137,7 +144,7 @@
 const $=id=>document.getElementById(id);
 const local=/^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
 $('envBadge').textContent=local?'Protótipo local':'Demonstração';
-// Guardado só neste navegador: as palavras enviadas nesta semana (para a pessoa lembrar e poder apagar).
+// Guardado só neste navegador: as respostas enviadas nesta semana (para a pessoa lembrar e poder apagar).
 const ls={get(k){try{return localStorage.getItem(k)}catch{return null}},set(k,v){try{localStorage.setItem(k,v)}catch{}}};
 let dados=null,assinatura='';
 const statusEl=$('status'),status=(t,tipo='')=>{statusEl.textContent=t;statusEl.className='status'+(tipo===true?' error':tipo?' '+tipo:'')};
@@ -169,13 +176,13 @@ function renderMinhas(){
   $('minhas').hidden=!meus.length;
   if(!meus.length){$('chips').textContent='';return}
   const resta=maxEnvios()-meus.length;
-  $('minhasH').innerHTML=`<b>Suas palavras desta semana</b> · ${meus.length} de ${maxEnvios()}`+(resta>0?` · pode enviar mais ${resta}`:'');
+  $('minhasH').innerHTML=`<b>Suas respostas desta semana</b> · ${meus.length} de ${maxEnvios()}`+(resta>0?` · pode enviar mais ${resta}`:'');
   const box=$('chips');box.textContent='';
   meus.forEach((m,i)=>{
     const c=document.createElement('span');c.className='chip-minha'+(m.id&&m.chave?'':' sem');
     const t=document.createElement('span');t.textContent=m.palavra||'(sem texto)';c.append(t);
     if(m.id&&m.chave){
-      const b=document.createElement('button');b.type='button';b.textContent='Apagar';b.setAttribute('aria-label',`Apagar a palavra ${m.palavra}`);
+      const b=document.createElement('button');b.type='button';b.textContent='Apagar';b.setAttribute('aria-label',`Apagar a resposta ${m.palavra}`);
       let timer;
       b.onclick=()=>{
         if(!b.classList.contains('confirmar')){b.classList.add('confirmar');b.textContent='Confirmar';clearTimeout(timer);timer=setTimeout(()=>{b.classList.remove('confirmar');b.textContent='Apagar'},4000);return}
@@ -196,11 +203,14 @@ async function apagar(m,btn){
     if(!r.ok&&r.status!==404)throw new Error(d.error||'Não consegui apagar. Tente de novo.');
     const semana=dados.semana;salvarEnvios(semana,meusEnvios().filter(x=>x.id!==m.id));status('');
     await carregar();
-    statusApagar(`“${m.palavra}” foi apagada.`+(esgotou()?'':' Você pode enviar outra palavra.'));
+    statusApagar('Resposta apagada.'+(esgotou()?'':' Você pode enviar outra.'));
   }catch(e){statusApagar(e.message,true);btn.disabled=false;btn.classList.remove('confirmar');btn.textContent='Apagar'}
 }
 
-$('palavra').addEventListener('input',e=>$('cnt').textContent=`${e.target.value.length}/30`);
+const contador=()=>{const n=$('palavra').value.length,c=$('cnt');c.textContent=`${n}/100`;c.className='counter'+(n>=100?' limite':n>=85?' perto':'')};
+$('palavra').addEventListener('input',contador);
+// Enter envia; Shift+Enter não quebra linha (a resposta é uma frase só).
+$('palavra').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();if(!e.shiftKey)$('form').requestSubmit()}});
 
 function render(){
   if(!dados)return;
@@ -211,7 +221,7 @@ function render(){
   $('form').hidden=fim;$('done').hidden=!fim;
   renderMinhas();
   $('bar').style.width=Math.min(100,dados.total/dados.equipe*100)+'%';
-  $('progTxt').textContent=`${dados.total} ${dados.total===1?'palavra enviada':'palavras enviadas'} pela equipe`;
+  $('progTxt').textContent=`${dados.total} ${dados.total===1?'resposta enviada':'respostas enviadas'} pela equipe`;
   const mostrar=resp&&dados.palavras.length>0;
   $('cloudWait').hidden=mostrar;
   if(resp&&!dados.palavras.length){$('waitTitle').textContent='Ainda não há respostas nesta semana';$('waitSub').textContent='';}
@@ -246,18 +256,18 @@ async function carregar(){
 
 $('form').addEventListener('submit',async e=>{
   e.preventDefault();
-  const p=$('palavra').value.trim();
-  if(!p){status('Escreva uma palavra.',true);return $('palavra').focus()}
-  if(esgotou()){status(`Você já enviou as ${maxEnvios()} palavras desta semana.`,true);return}
+  const p=$('palavra').value.replace(/\s+/g,' ').trim();
+  if(!p){status('Escreva como foi a sua semana.',true);return $('palavra').focus()}
+  if(esgotou()){status(`Você já enviou as ${maxEnvios()} respostas desta semana.`,true);return}
   $('enviar').disabled=true;status('Enviando…');
   try{
-    const r=await fetch('/api/sentimentos',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({palavra:p})});
+    const r=await fetch('/api/sentimentos',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({texto:p})});
     const d=await r.json().catch(()=>({}));
     if(!r.ok)throw new Error(d.error||'Não consegui enviar. Tente de novo.');
     guardarEnvio(d.semana,{palavra:p,id:d.id,chave:d.chave});statusApagar('');
-    $('palavra').value='';$('cnt').textContent='0/30';await carregar();
+    $('palavra').value='';contador();await carregar();
     const resta=maxEnvios()-meusEnvios().length;
-    status(resta>0?`Palavra enviada! 💚 Se quiser, mande mais ${resta===1?'uma':resta}.`:'Palavra enviada! 💚','ok');
+    status(resta>0?`Resposta enviada! 💚 Se quiser, mande mais ${resta===1?'uma':resta}.`:'Resposta enviada! 💚','ok');
     if(resta>0)$('palavra').focus();
   }catch(err){status(err.message,true)}finally{$('enviar').disabled=false}
 });
