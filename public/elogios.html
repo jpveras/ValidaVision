@@ -176,7 +176,7 @@ body.present .list{grid-template-columns:repeat(3,minmax(0,1fr))}
   <a class="logo" href="/">
     <img id="brandLogo" src="/logo.png" alt="" hidden onload="this.hidden=false;this.nextElementSibling.setAttribute('hidden','')">
     <svg width="28" height="24" viewBox="0 0 28 24" aria-hidden="true"><path d="M1 2h9l4 9 4-9h9L14 23z" fill="#2fc28f"/><path d="M10 2h8l-4 9z" fill="#1a8f6a"/></svg>
-    <b>Valida <span>Vision</span></b><span class="ver">v0.21</span>
+    <b>Valida <span>Vision</span></b><span class="ver">v0.22</span>
   </a>
   <div class="spacer"></div>
   <span class="env" id="envBadge">Protótipo local</span>
@@ -308,6 +308,7 @@ body.present .list{grid-template-columns:repeat(3,minmax(0,1fr))}
 
 <script src="/vendor/wordcloud2.js"></script>
 <script src="/vendor/qrcode.js"></script>
+<script src="/vv-emojis.js"></script>
 <script>
 const $=id=>document.getElementById(id);
 const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
@@ -323,6 +324,7 @@ const presente=()=>document.body.classList.contains('present');
 
 // ---------- Formulário ----------
 const form=$('form'),nome=$('nome'),texto=$('texto'),statusEl=$('status'),enviar=$('enviar');
+if(window.vvEmojis)vvEmojis(texto);
 const status=(t,e=false)=>{statusEl.textContent=t;statusEl.className='status'+(e?' error':'')};
 texto.addEventListener('input',()=>$('cnt').textContent=`${texto.value.length}/280`);
 form.addEventListener('reset',()=>setTimeout(()=>$('cnt').textContent='0/280'));
