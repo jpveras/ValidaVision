@@ -1,4 +1,4 @@
-# Valida Vision — v0.21
+# Valida Vision — v0.22
 
 ## Rodar
 
@@ -38,6 +38,12 @@ Os elogios ficam visíveis para quem abrir a página (é a ideia da dinâmica). 
 
 A chave fica só no `.env` e nunca vai para o browser. Não compartilhe o `.env`.
 Antes de enviar telas reais da empresa, valide as políticas internas de dados e PII.
+
+## Novidades da v0.22
+
+- **Emojis no elogio**: fileira com 16 emojis comuns (💚 ❤️ 👏 🙌 🚀 ⭐ 🏆 💪 🎉 😊 🙏 🤝 💡 🔥 ✨ 👍) abaixo
+  do campo, na tela do QR Code (`/elogiar.html`) e no formulário do Elogie. Um toque insere onde está o
+  cursor, respeitando o limite de 280 caracteres. Os emojis aparecem no elogio, mas não entram na nuvem.
 
 ## Novidades da v0.21
 
