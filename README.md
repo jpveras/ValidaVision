@@ -41,6 +41,10 @@ Antes de enviar telas reais da empresa, valide as políticas internas de dados e
 
 ## Novidades da v0.23
 
+- **Rótulos dos campos em Comic Sans MS** (v0.23.1, pedido do João): "Print da tela", "Quantidade de
+  cenários", "Upload local" e os demais rótulos. Nos celulares sem Comic Sans entra a Comic Neue
+  (Google Fonts), quase idêntica. Regra no fim de `public/vv-tema.css`.
+
 - **Modo escuro em todas as telas**: botão ☀/🌙 na barra superior. Por padrão segue o tema do
   celular/computador; a escolha manual fica salva no navegador e vale para todas as telas.
   - `public/vv-tema.js` (carregado no `<head>`, sem piscar branco), `public/vv-tema.css` (cores do
