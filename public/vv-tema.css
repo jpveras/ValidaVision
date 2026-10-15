@@ -58,3 +58,10 @@
 .vv-tema-btn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 html.vv-tema-anim, html.vv-tema-anim * { transition: background-color .25s, color .25s, border-color .25s !important; }
 @media print { .vv-tema-btn { display: none !important; } }
+
+/* Fonte dos rótulos dos campos (ex.: "Print da tela", "Quantidade de cenários", "Upload local").
+   Comic Sans MS no Windows/Mac; nos celulares (que não têm Comic Sans) a Comic Neue, quase idêntica. */
+.label, .drop-main, .drop-main .fmt {
+  font-family: "Comic Sans MS", "Comic Neue", "Chalkboard SE", cursive !important;
+  font-weight: 700 !important;
+}
