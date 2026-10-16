@@ -76,12 +76,11 @@ const upload = multer({
   },
 });
 
-// Análise de Tela OCULTA (16/10/2026): na empresa já existe uma frente sobre isso.
-// A tela continua no projeto (public/analise.html) e a API /api/analyze segue funcionando;
-// só sai do menu e deixa de ser a página inicial. Para voltar a mostrar:
-//   1) defina ANALISE_TELA_VISIVEL=true (na Vercel ou no .env) — a página inicial volta a ser a análise;
-//   2) apague a regra [data-recurso="analise"] no fim de public/vv-tema.css — o item volta ao menu.
-const analiseVisivel = () => /^(1|true|sim)$/i.test(String(process.env.ANALISE_TELA_VISIVEL || "").trim());
+// Análise de Tela: VISÍVEL (ficou oculta só em 16/10/2026, das 16h45 às 18h13).
+// Para ocultar de novo sem apagar nada:
+//   1) defina ANALISE_TELA_VISIVEL=false (na Vercel ou no .env) — a página inicial passa a ser o Elogie;
+//   2) descomente a regra [data-recurso="analise"] no fim de public/vv-tema.css — o item sai do menu.
+const analiseVisivel = () => !/^(0|false|nao|não)$/i.test(String(process.env.ANALISE_TELA_VISIVEL || "").trim());
 app.get(["/", "/index.html"], (_req, res) => res.redirect(302, analiseVisivel() ? "/analise.html" : "/elogios.html"));
 
 app.use(express.static(path.join(__dirname, "public")));
