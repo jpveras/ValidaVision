@@ -66,6 +66,6 @@ html.vv-tema-anim, html.vv-tema-anim * { transition: background-color .25s, colo
   font-weight: 700 !important;
 }
 
-/* Análise de Tela OCULTA no menu (16/10/2026). Para voltar a mostrar, apague esta regra
-   (e defina ANALISE_TELA_VISIVEL=true para ela voltar a ser a página inicial; ver server.js). */
-[data-recurso="analise"] { display: none !important; }
+/* Para OCULTAR a Análise de Tela do menu, descomente a linha abaixo
+   (e defina ANALISE_TELA_VISIVEL=false para a página inicial virar o Elogie; ver server.js). */
+/* [data-recurso="analise"] { display: none !important; } */
