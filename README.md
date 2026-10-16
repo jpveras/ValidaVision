@@ -1,4 +1,4 @@
-# Valida Vision — v0.23
+# Valida Vision — v0.24
 
 ## Rodar
 
@@ -38,6 +38,16 @@ Os elogios ficam visíveis para quem abrir a página (é a ideia da dinâmica). 
 
 A chave fica só no `.env` e nunca vai para o browser. Não compartilhe o `.env`.
 Antes de enviar telas reais da empresa, valide as políticas internas de dados e PII.
+
+## Novidades da v0.24
+
+- **Análise de Tela oculta** (16/10/2026 — na empresa já existe uma frente sobre isso). Nada foi apagado:
+  - a tela foi para `public/analise.html` (antes `index.html`) e continua abrindo por esse endereço;
+    a API `/api/analyze` e a IA seguem iguais;
+  - o item sumiu do menu (regra `[data-recurso="analise"]` no fim de `public/vv-tema.css`);
+  - a página inicial `/` agora leva ao **Elogie um Colega**.
+  - **Para voltar a mostrar:** defina `ANALISE_TELA_VISIVEL=true` (página inicial volta a ser a análise)
+    e apague a regra do menu em `vv-tema.css`.
 
 ## Novidades da v0.23
 

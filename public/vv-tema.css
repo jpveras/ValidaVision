@@ -65,3 +65,7 @@ html.vv-tema-anim, html.vv-tema-anim * { transition: background-color .25s, colo
   font-family: "Comic Sans MS", "Comic Neue", "Chalkboard SE", cursive !important;
   font-weight: 700 !important;
 }
+
+/* Análise de Tela OCULTA no menu (16/10/2026). Para voltar a mostrar, apague esta regra
+   (e defina ANALISE_TELA_VISIVEL=true para ela voltar a ser a página inicial; ver server.js). */
+[data-recurso="analise"] { display: none !important; }
