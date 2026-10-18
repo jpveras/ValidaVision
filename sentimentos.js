@@ -196,7 +196,7 @@ function validaTexto(raw) {
 // ---------------- Senha da gestora ----------------
 
 const tentativas = new Map();
-function exigeGestora(req, res) {
+export function exigeGestora(req, res) {
   const { gestoraKey } = conf();
   if (!gestoraKey) {
     res.status(403).json({ error: "Defina SENTIMENTO_GESTORA_KEY (no .env ou na Vercel) para liberar o painel da gestora." });
@@ -412,6 +412,109 @@ sentimentosRouter.delete("/gestora/semana/:semana/:id", async (req, res) => {
   }
 });
 
+
+// ======================================================
+// EVOLUÇÃO DO SENTIMENTO — só para a gestora
+// Semana a semana: participação, palavra da semana, palavras em alta/baixa e
+// "sinais de cansaço" (respostas com palavras como cansado, puxada, corrida…).
+// Só números e palavras agregadas: nada que identifique quem respondeu.
+// ======================================================
+
+// Palavras que, repetidas por semanas seguidas, merecem atenção da coordenação.
+const SINAIS = new Set([
+  "cansado", "cansada", "cansativa", "cansativo", "cansaço", "cansei", "exausto", "exausta", "exaustiva", "exaustivo",
+  "puxada", "puxado", "corrida", "corrido", "corrida", "pesada", "pesado", "difícil", "dificil", "complicada", "complicado",
+  "estressante", "estresse", "estressada", "estressado", "stress", "tensa", "tenso", "ansiosa", "ansioso", "ansiedade",
+  "sobrecarga", "sobrecarregada", "sobrecarregado", "desgastante", "desgaste", "caótica", "caotica", "caos", "frustrante",
+  "frustrada", "frustrado", "desmotivada", "desmotivado", "triste", "sufocante", "intensa", "intenso", "atropelada", "atropelado",
+]);
+const normaliza = (t) => String(t || "").toLocaleLowerCase("pt-BR");
+const temSinal = (texto) => (normaliza(texto).match(/[\p{L}]+/gu) || []).some((w) => SINAIS.has(w));
+
+// "2026-W42" → "2026-W41" (vale na virada do ano também).
+function semanaAnterior(semana) {
+  const [ano, w] = semana.split("-W").map(Number);
+  const jan4 = new Date(Date.UTC(ano, 0, 4));
+  const seg = new Date(jan4);
+  seg.setUTCDate(jan4.getUTCDate() - ((jan4.getUTCDay() || 7) - 1) + (w - 1) * 7);
+  seg.setUTCDate(seg.getUTCDate() - 7);
+  seg.setUTCHours(15); // meio da tarde em São Paulo, longe da virada do dia
+  return semanaDe(seg);
+}
+
+export function evolucaoDe(semanasComDados, ate, equipe, n = 8) {
+  // semanasComDados: { "2026-W41": [respostas], ... }
+  const lista = [];
+  let s = ate;
+  const primeira = Object.keys(semanasComDados).sort()[0] || ate;
+  for (let i = 0; i < n && s >= primeira; i++) {
+    lista.unshift(s);
+    s = semanaAnterior(s);
+  }
+  const semanas = lista.map((semana) => {
+    const respostas = semanasComDados[semana] || [];
+    const palavras = contar(respostas);
+    const comSinal = respostas.filter((r) => temSinal(textoDe(r))).length;
+    return {
+      semana,
+      rotulo: rotuloSemana(semana),
+      numero: Number(semana.split("-W")[1]),
+      total: respostas.length,
+      participacao: equipe ? Math.round((Math.min(respostas.length, equipe) / equipe) * 100) : null,
+      palavraDaSemana: palavras[0]?.[0] || null,
+      top: palavras.slice(0, 5),
+      comSinal,
+      pctSinal: respostas.length ? Math.round((comSinal / respostas.length) * 100) : 0,
+      sinais: palavras.filter(([w]) => SINAIS.has(normaliza(w))).slice(0, 5),
+    };
+  });
+
+  // Em alta / em baixa: semana escolhida x a anterior com respostas.
+  const atual = semanas.at(-1);
+  const anterior = [...semanas].reverse().slice(1).find((x) => x.total > 0) || null;
+  let emAlta = [], emBaixa = [];
+  if (atual && anterior) {
+    const a = new Map(contar(semanasComDados[atual.semana] || []));
+    const b = new Map(contar(semanasComDados[anterior.semana] || []));
+    const todas = new Set([...a.keys(), ...b.keys()]);
+    const dif = [...todas].map((w) => [w, (a.get(w) || 0) - (b.get(w) || 0), a.get(w) || 0, b.get(w) || 0]);
+    emAlta = dif.filter((d) => d[1] > 0).sort((x, y) => y[1] - x[1] || y[2] - x[2]).slice(0, 5).map(([w, , agora, antes]) => ({ palavra: w, agora, antes }));
+    emBaixa = dif.filter((d) => d[1] < 0).sort((x, y) => x[1] - y[1] || y[3] - x[3]).slice(0, 5).map(([w, , agora, antes]) => ({ palavra: w, agora, antes }));
+  }
+
+  // Alerta: sinais de cansaço em semanas seguidas (contando a escolhida para trás, só semanas com respostas).
+  let seguidas = 0;
+  for (const x of [...semanas].reverse()) {
+    if (!x.total) continue;
+    if (x.comSinal > 0 && x.pctSinal >= 20) seguidas++;
+    else break;
+  }
+  const palavrasSinal = [...new Set(semanas.slice(-Math.max(seguidas, 1)).flatMap((x) => x.sinais.map(([w]) => w)))].slice(0, 6);
+  const alerta =
+    seguidas >= 2
+      ? { nivel: seguidas >= 3 ? "alto" : "medio", semanas: seguidas, palavras: palavrasSinal,
+          texto: `Sinais de cansaço em ${seguidas} semanas seguidas (${palavrasSinal.map((w) => `"${w}"`).join(", ")}). Vale uma conversa com a equipe.` }
+      : null;
+
+  const comDados = semanas.filter((x) => x.total);
+  const mediaParticipacao = comDados.length ? Math.round(comDados.reduce((t, x) => t + (x.participacao || 0), 0) / comDados.length) : null;
+  return { ate, equipe, semanas, emAlta, emBaixa, anterior: anterior?.semana || null, alerta, mediaParticipacao };
+}
+
+sentimentosRouter.get("/gestora/evolucao", async (req, res) => {
+  if (!exigeGestora(req, res)) return;
+  const ate = SEMANA_RE.test(String(req.query.ate || "")) ? String(req.query.ate) : semanaDe();
+  const n = Math.min(12, Math.max(2, Number.parseInt(req.query.n, 10) || 8));
+  try {
+    const existentes = Object.keys(await store().semanas()).filter((s) => s <= ate).sort().slice(-n);
+    const dados = {};
+    await Promise.all(existentes.map(async (s) => (dados[s] = await respostasDa(s))));
+    res.json(evolucaoDe(dados, ate, conf().equipe, n));
+  } catch (e) {
+    console.error("Erro na evolução:", e);
+    res.status(500).json({ error: "Não consegui montar a evolução agora." });
+  }
+});
 
 // ======================================================
 // ANÁLISE DA SEMANA (IA) — só para a gestora
@@ -668,4 +771,4 @@ sentimentosRouter.post("/gestora/semana/:semana/analise", async (req, res) => {
 });
 
 // Usado nos testes
-export const _interno = { semanaDe, rotuloSemana, validaTexto, contar, blobStore, setSdk: (m) => { _colecao.setSdk(m); cache.clear(); analiseCache.clear(); }, textoParaIA };
+export const _interno = { semanaAnterior, evolucaoDe, semanaDe, rotuloSemana, validaTexto, contar, blobStore, setSdk: (m) => { _colecao.setSdk(m); cache.clear(); analiseCache.clear(); }, textoParaIA };

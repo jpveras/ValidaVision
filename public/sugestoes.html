@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Caixa de sugestões · Valida Vision</title>
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/vv-base.css">
+<style>
+.texto-box{display:block;width:100%;box-sizing:border-box;min-height:110px;max-height:220px;resize:vertical;font:inherit;font-size:16px;line-height:1.45;padding:12px 14px;border:1px solid var(--line);border-radius:6px;background:#fff;color:var(--ink);overflow-wrap:anywhere}
+.texto-box:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px var(--teal-soft)}
+.vv-emojis{margin:8px 0 4px}
+.envio-acoes{display:flex;justify-content:flex-end;align-items:center;gap:12px;margin-top:12px}
+.envio-acoes .dica{margin-right:auto;font-size:12px;color:var(--muted)}
+.counter.perto{color:#b26b00}.counter.limite{color:#b42318;font-weight:700}
+.status.ok{color:var(--teal2)}
+.numeros{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px}
+.numero{background:#fff;border:1px solid var(--line);border-radius:6px;padding:14px 16px}
+.numero small{display:block;font-size:11px;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.numero b{font-size:26px;color:var(--ink);font-weight:700}
+.lista{display:flex;flex-direction:column;gap:12px}
+.sug{border:1px solid var(--line);border-radius:8px;padding:14px 16px;background:#fff}
+.sug .q{font-size:15px;color:var(--ink);line-height:1.45;white-space:pre-wrap;overflow-wrap:anywhere}
+.sug .meta{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px;font-size:12px;color:var(--muted)}
+.sug .resp{margin-top:10px;border-left:3px solid var(--teal);background:var(--teal-soft);border-radius:0 6px 6px 0;padding:10px 12px;font-size:14px;line-height:1.45;color:var(--text);white-space:pre-wrap;overflow-wrap:anywhere}
+.sug .resp b{display:block;font-size:11px;letter-spacing:.8px;text-transform:uppercase;color:var(--teal2);margin-bottom:4px}
+.st{display:inline-flex;align-items:center;gap:5px;border-radius:99px;padding:3px 10px;font-size:11px;font-weight:700;letter-spacing:.4px}
+.st.nova{background:#eef2f1;color:#475467}
+.st.analise{background:#fff6e0;color:#8a5a00}
+.st.feito{background:#e6f6ee;color:#067647}
+.st.nao{background:#fdecec;color:#a8281e}
+.vazio{font-size:14px;color:var(--muted);margin:0}
+.minhas-nota{font-size:12px;color:var(--muted);margin:10px 0 0}
+@media(max-width:760px){.envio-acoes{flex-direction:column;align-items:stretch}.envio-acoes .dica{margin:0}.envio-acoes button{justify-content:center;width:100%}.numeros{grid-template-columns:1fr 1fr 1fr;gap:8px}.numero{padding:10px}.numero b{font-size:20px}}
+@media screen{
+html[data-tema="escuro"] .texto-box,html[data-tema="escuro"] .numero,html[data-tema="escuro"] .sug{background:var(--card);border-color:var(--line)}
+html[data-tema="escuro"] .st.nova{background:#24383b;color:#c9d6d4}
+html[data-tema="escuro"] .st.analise{background:#3a2e12;color:#f0d27a}
+html[data-tema="escuro"] .st.feito{background:#123a2c;color:#7fe0b0}
+html[data-tema="escuro"] .st.nao{background:#3a1a18;color:#f5b3ad}
+}
+</style>
+<link rel="stylesheet" href="/vv-tema-auto.css?v=28">
+<link rel="stylesheet" href="/vv-tema.css?v=28">
+<script src="/vv-tema.js?v=23"></script>
+</head>
+<body>
+
+<header class="topbar">
+  <a class="logo" href="/">
+    <img id="brandLogo" src="/logo.png" alt="" hidden onload="this.hidden=false;this.nextElementSibling.setAttribute('hidden','')">
+    <svg width="28" height="24" viewBox="0 0 28 24" aria-hidden="true"><path d="M1 2h9l4 9 4-9h9L14 23z" fill="#2fc28f"/><path d="M10 2h8l-4 9z" fill="#1a8f6a"/></svg>
+    <b>Valida <span>Vision</span></b><span class="ver">v0.27</span>
+  </a>
+  <div class="spacer"></div>
+  <span class="env" id="envBadge">Protótipo local</span>
+</header>
+
+<nav class="side" aria-label="Menu">
+  <a class="nav" href="/analise.html" data-recurso="analise">
+    <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4"/><circle cx="12" cy="10.5" r="2.5"/></svg>
+    <span>Análise de Tela</span>
+  </a>
+  <a class="nav" href="/elogios.html">
+    <svg viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.5 1-1.1a5.5 5.5 0 0 0 0-7.8z"/></svg>
+    <span>Elogie um Colega</span>
+  </a>
+  <a class="nav" href="/sentimento.html">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 14.5s1.5 2 4 2 4-2 4-2"/><path d="M9 9.5h.01M15 9.5h.01"/></svg>
+    <span>Sentimento da Semana</span>
+  </a>
+  <a class="nav active" href="/sugestoes.html" aria-current="page">
+    <svg viewBox="0 0 24 24"><path d="M4 7h16v11a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M4 7l2.5-3h11L20 7"/><path d="M9 12h6"/></svg>
+    <span>Caixa de sugestões</span>
+  </a>
+  <a class="nav" href="/api/health" target="_blank" rel="noopener">
+    <svg viewBox="0 0 24 24"><path d="M3 12h4l3-7 4 14 3-7h4"/></svg>
+    <span>Status da IA</span>
+  </a>
+</nav>
+
+<main class="content"><div class="panel"><div class="wrap">
+
+  <div id="storageWarn" class="alert" hidden>
+    <svg viewBox="0 0 24 24"><path d="M12 3 2 20h20L12 3z"/><path d="M12 10v4M12 17v.5"/></svg>
+    <div><b>Armazenamento temporário</b>O Vercel Blob não está conectado. As sugestões podem se perder.</div>
+  </div>
+
+  <div class="page-head">
+    <div class="page-icon"><svg viewBox="0 0 24 24"><path d="M4 7h16v11a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M4 7l2.5-3h11L20 7"/><path d="M9 12h6"/></svg></div>
+    <h1 class="grow">Caixa de sugestões</h1>
+  </div>
+  <p class="page-sub">Tem uma ideia para melhorar o dia a dia da equipe, um processo ou uma ferramenta? Mande aqui, <b>sem se identificar</b>. A coordenação lê todas, responde e mostra o que virou ação.</p>
+  <div class="divider"></div>
+
+  <div class="numeros">
+    <div class="numero"><small>Recebidas</small><b id="nRec">—</b></div>
+    <div class="numero"><small>Respondidas</small><b id="nResp">—</b></div>
+    <div class="numero"><small>Feitas</small><b id="nFeitas">—</b></div>
+  </div>
+
+  <section class="card">
+    <div class="card-head">Sua sugestão</div>
+    <div class="card-body">
+      <form id="form" novalidate>
+        <label class="label" for="texto"><span>O que podemos melhorar?</span><span class="counter" id="cnt">0/300</span></label>
+        <textarea class="texto-box" id="texto" maxlength="300" rows="4" autocomplete="off" placeholder="Ex.: Que tal reservar 30 minutos na sexta para revisar os testes da sprint juntos?"></textarea>
+        <div class="envio-acoes">
+          <span class="dica">Até 300 caracteres · anônima</span>
+          <button class="btn-primary" type="submit" id="enviar"><svg viewBox="0 0 24 24"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>Enviar sugestão</button>
+        </div>
+        <div class="status" id="status" role="status"></div>
+      </form>
+      <div class="privacy">🔒 <span><b>Sua sugestão é anônima.</b> Não guardamos seu nome, e-mail ou qualquer dado que identifique você. Só este navegador lembra o que você enviou, para você acompanhar a resposta. Evite citar nomes de colegas.</span></div>
+    </div>
+  </section>
+
+  <section class="card" id="minhasCard" hidden>
+    <div class="card-head">Suas sugestões</div>
+    <div class="card-body"><div class="lista" id="minhas"></div><p class="minhas-nota">Aparecem só neste navegador. Se a coordenação responder, a resposta aparece aqui.</p></div>
+  </section>
+
+  <section class="card">
+    <div class="card-head"><span>💬 Ouvimos você</span><span class="counter">Respostas da coordenação</span></div>
+    <div class="card-body"><div class="lista" id="mural"><p class="vazio">Carregando…</p></div></div>
+  </section>
+
+  <div class="foot-link"><a href="/sentimento-gestora.html#sugestoes">Painel da gestora</a></div>
+
+</div></div></main>
+
+<script src="/vv-emojis.js?v=22"></script>
+<script>
+const $=id=>document.getElementById(id);
+const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+const local=/^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
+$('envBadge').textContent=local?'Protótipo local':'Demonstração';
+if(window.vvEmojis)vvEmojis($('texto'));
+const ls={get(k){try{return localStorage.getItem(k)}catch{return null}},set(k,v){try{localStorage.setItem(k,v)}catch{}}};
+const K='vv-sugestoes';
+const minhasSalvas=()=>{try{return JSON.parse(ls.get(K)||'[]')}catch{return[]}};
+const ST={nova:['nova','Nova'],analise:['analise','Em análise'],feito:['feito','✓ Feito'],nao:['nao','Não vamos fazer']};
+const stChip=s=>{const [c,t]=ST[s]||ST.nova;return `<span class="st ${c}">${t}</span>`};
+const data=iso=>iso?new Date(iso).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric'}):'';
+const statusEl=$('status'),status=(t,tipo='')=>{statusEl.textContent=t;statusEl.className='status'+(tipo===true?' error':tipo?' '+tipo:'')};
+const texto=$('texto');
+texto.addEventListener('input',()=>{const n=texto.value.length,c=$('cnt');c.textContent=`${n}/300`;c.className='counter'+(n>=300?' limite':n>=255?' perto':'')});
+
+function cartao(s,mostrarStatus=true){
+  return `<div class="sug"><div class="q">${esc(s.texto)}</div><div class="meta">${mostrarStatus?stChip(s.status):''}<span>Enviada em ${data(s.criadoEm)}</span></div>${s.resposta?`<div class="resp"><b>Resposta da coordenação${s.respondidaEm?' · '+data(s.respondidaEm):''}</b>${esc(s.resposta)}</div>`:''}</div>`;
+}
+async function carregarMural(){
+  try{
+    const r=await fetch('/api/sugestoes',{cache:'no-store'});const d=await r.json();if(!r.ok)throw new Error(d.error);
+    $('nRec').textContent=d.recebidas;$('nResp').textContent=d.respondidas;$('nFeitas').textContent=d.feitas;
+    $('storageWarn').hidden=d.armazenamento!=='temporario';
+    $('mural').innerHTML=d.mural.length?d.mural.map(s=>cartao(s)).join(''):'<p class="vazio">Ainda não há respostas publicadas. Quando a coordenação responder a uma sugestão, ela aparece aqui.</p>';
+  }catch(e){$('mural').innerHTML=`<p class="vazio">${esc(e.message||'Não consegui carregar.')}</p>`}
+}
+async function carregarMinhas(){
+  const salvas=minhasSalvas();if(!salvas.length){$('minhasCard').hidden=true;return}
+  try{
+    const r=await fetch('/api/sugestoes/minhas',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({itens:salvas})});
+    const d=await r.json();if(!r.ok)throw new Error(d.error);
+    // Sugestões removidas pela coordenação somem daqui também.
+    const ids=new Set(d.itens.map(x=>x.id));ls.set(K,JSON.stringify(salvas.filter(x=>ids.has(x.id))));
+    $('minhasCard').hidden=!d.itens.length;
+    $('minhas').innerHTML=d.itens.slice().reverse().map(s=>cartao(s)).join('');
+  }catch{}
+}
+$('form').addEventListener('submit',async e=>{
+  e.preventDefault();const t=texto.value.trim();
+  if(t.length<5){status('Escreva a sua sugestão (pelo menos 5 caracteres).',true);return texto.focus()}
+  $('enviar').disabled=true;status('Enviando…');
+  try{
+    const r=await fetch('/api/sugestoes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({texto:t})});
+    const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error||'Não consegui enviar.');
+    const l=minhasSalvas();l.push({id:d.id,chave:d.chave});ls.set(K,JSON.stringify(l.slice(-30)));
+    texto.value='';texto.dispatchEvent(new Event('input'));
+    status('Sugestão enviada! 💚 Obrigado. Você acompanha a resposta logo abaixo.','ok');
+    await Promise.all([carregarMinhas(),carregarMural()]);
+  }catch(err){status(err.message,true)}finally{$('enviar').disabled=false}
+});
+carregarMural();carregarMinhas();
+setInterval(()=>{if(!document.hidden){carregarMural();carregarMinhas()}},30000);
+</script>
+</body>
+</html>

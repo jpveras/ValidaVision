@@ -8,6 +8,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { elogiosRouter } from "./elogios.js";
 import { sentimentosRouter } from "./sentimentos.js";
+import { sugestoesRouter } from "./sugestoes.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ENV_PATH = path.join(__dirname, ".env");
@@ -94,6 +95,10 @@ app.get(["/moderar", "/moderacao"], (_req, res) => res.redirect(302, "/elogios-m
 
 // Sentimento da Semana (rotas próprias)
 app.use("/api/sentimentos", sentimentosRouter);
+
+// Caixa de sugestões (anônima; a gestora responde com a senha do painel do Sentimento)
+app.use("/api/sugestoes", sugestoesRouter);
+app.get(["/sugestoes", "/sugestao", "/sugira"], (_req, res) => res.redirect(302, "/sugestoes.html"));
 
 
 // ======================================================

@@ -9,6 +9,53 @@
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/vv-base.css">
 <style>
+/* Caixa de sugestões (gestora) */
+.sg-filtros{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.sg-filtros button{height:30px;padding:0 12px;border-radius:99px;border:1px solid var(--line);background:#fff;color:var(--text);font:inherit;font-size:12px;cursor:pointer}
+.sg-filtros button.on{background:var(--teal);border-color:var(--teal);color:#fff}
+.sg{border:1px solid var(--line);border-radius:8px;padding:14px;background:#fff;margin-bottom:12px}
+.sg .q{font-size:15px;line-height:1.45;color:var(--ink);white-space:pre-wrap;overflow-wrap:anywhere}
+.sg .meta{font-size:12px;color:var(--muted);margin:6px 0 10px}
+.sg .linha{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:8px}
+.sg select{height:34px;border:1px solid #cfd8d6;border-radius:4px;padding:0 8px;font:inherit;font-size:13px;background:#fff;color:var(--text)}
+.sg textarea{width:100%;box-sizing:border-box;min-height:64px;resize:vertical;border:1px solid #cfd8d6;border-radius:6px;padding:8px 10px;font:inherit;font-size:14px;line-height:1.4;background:#fff;color:var(--ink)}
+.sg label.pub{display:flex;gap:6px;align-items:center;font-size:13px;color:var(--text);cursor:pointer}
+.sg .grow{flex:1}
+.sg .ok{font-size:12px;color:var(--teal2)}
+.sg .err{font-size:12px;color:#b42318}
+.sg-aviso{margin:0 0 12px;padding:8px 12px;border-radius:6px;background:var(--teal-soft);color:var(--teal2);font-size:13px}
+.sg-badge{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding:0 6px;border-radius:99px;background:#c27f0e;color:#fff;font-size:11px;font-weight:700;margin-left:6px}
+/* Evolução do Sentimento */
+:root{--ev-ok:#0f8f7d;--ev-sinal:#c27f0e}
+.ev-alerta{display:flex;gap:10px;align-items:flex-start;border-radius:8px;padding:12px 14px;margin-bottom:16px;font-size:14px;line-height:1.45;background:#fff6e5;border:1px solid #f0d19a;color:#7a4f00}
+.ev-alerta.alto{background:#fdecec;border-color:#f0b5b5;color:#8a1f17}
+.ev-alerta b{display:block;margin-bottom:2px}
+.ev-ok{border-radius:8px;padding:10px 14px;margin-bottom:16px;font-size:14px;background:var(--teal-soft);color:var(--teal2)}
+.ev-leg{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin:4px 0 6px}
+.ev-leg i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.ev-chart{position:relative}
+.ev-chart svg{display:block;width:100%;height:auto;overflow:visible}
+.ev-chart .eixo{font-size:11px;fill:var(--muted)}
+.ev-chart .eixo.sel{fill:var(--ink);font-weight:700}
+.ev-chart .val{font-size:11px;fill:var(--text);font-weight:600}
+.ev-chart .grid{stroke:var(--line);stroke-width:1}
+.ev-chart .hit{fill:transparent;cursor:default}
+.ev-tip{position:absolute;pointer-events:none;background:var(--ink);color:#fff;font-size:12px;line-height:1.4;border-radius:6px;padding:8px 10px;min-width:150px;box-shadow:0 4px 14px rgba(0,0,0,.18);z-index:3}
+html[data-tema="escuro"] .ev-tip{background:#e4efed;color:#0f1a1c}
+.ev-cols{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:18px}
+.ev-cols h4{margin:0 0 8px;font-size:11px;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);font-weight:500}
+.ev-cols ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.ev-cols li{display:flex;justify-content:space-between;gap:10px;font-size:14px;border:1px solid var(--line);border-radius:6px;padding:7px 10px;background:#fff}
+.ev-cols li span{color:var(--muted);font-size:12px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.ev-cols .vazio{font-size:13px;color:var(--muted)}
+.ev-tab{width:100%;border-collapse:collapse;font-size:13px;margin-top:18px}
+.ev-tab th,.ev-tab td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line)}
+.ev-tab th{font-size:11px;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);font-weight:500}
+.ev-tab td.n{text-align:right;font-variant-numeric:tabular-nums}
+.ev-tab tr.sel td{font-weight:700;color:var(--ink)}
+.ev-nota{font-size:12px;color:var(--muted);margin-top:12px}
+@media(max-width:760px){.ev-cols{grid-template-columns:1fr}.ev-tab .opc{display:none}.ev-tab{font-size:12px}.ev-tab th,.ev-tab td{padding:6px 4px}.ev-tab th{font-size:10px;letter-spacing:.4px}}
+.ev-tabwrap{overflow-x:auto}
 .login{max-width:440px;margin:0 auto}
 .login .row{display:flex;gap:10px}
 .login .row .input{flex:1}
@@ -97,8 +144,8 @@
   .sug li{break-inside:avoid}
 }
 </style>
-<link rel="stylesheet" href="/vv-tema-auto.css?v=25">
-<link rel="stylesheet" href="/vv-tema.css?v=27">
+<link rel="stylesheet" href="/vv-tema-auto.css?v=28">
+<link rel="stylesheet" href="/vv-tema.css?v=28">
 <script src="/vv-tema.js?v=23"></script>
 </head>
 <body>
@@ -107,7 +154,7 @@
   <a class="logo" href="/">
     <img id="brandLogo" src="/logo.png" alt="" hidden onload="this.hidden=false;this.nextElementSibling.setAttribute('hidden','')">
     <svg width="28" height="24" viewBox="0 0 28 24" aria-hidden="true"><path d="M1 2h9l4 9 4-9h9L14 23z" fill="#2fc28f"/><path d="M10 2h8l-4 9z" fill="#1a8f6a"/></svg>
-    <b>Valida <span>Vision</span></b><span class="ver">v0.26</span>
+    <b>Valida <span>Vision</span></b><span class="ver">v0.27</span>
   </a>
   <div class="spacer"></div>
   <span class="env">Painel da gestora</span>
@@ -125,6 +172,10 @@
   <a class="nav active" href="/sentimento.html">
     <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 14.5s1.5 2 4 2 4-2 4-2"/><path d="M9 9.5h.01M15 9.5h.01"/></svg>
     <span>Sentimento da Semana</span>
+  </a>
+  <a class="nav" href="/sugestoes.html">
+    <svg viewBox="0 0 24 24"><path d="M4 7h16v11a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M4 7l2.5-3h11L20 7"/><path d="M9 12h6"/></svg>
+    <span>Caixa de sugestões</span>
   </a>
   <a class="nav" href="/api/health" target="_blank" rel="noopener">
     <svg viewBox="0 0 24 24"><path d="M3 12h4l3-7 4 14 3-7h4"/></svg>
@@ -170,6 +221,8 @@
           <li><b>Confira o ranking</b> para ver os números exatos de cada palavra e <b>leia as respostas</b>: o contexto (o que pesou, o que foi bom) está nas frases.</li>
           <li><b>Compartilhe</b>: <kbd>Baixar PDF</kbd> gera uma página pronta para encaminhar; <kbd>Copiar resumo</kbd> copia um texto para colar no e-mail ou no Teams.</li>
           <li><b>Gere a análise da semana</b>: no card <kbd>💡 Análise da semana</kbd>, clique em <kbd>Gerar análise</kbd>. A IA lê as respostas completas (anônimas) e sugere o clima, temas, ações para a equipe e uma pergunta para abrir a conversa. Ela fica salva; use <kbd>Gerar novamente</kbd> se chegarem novas respostas ou <kbd>Apagar análise</kbd> para removê-la.</li>
+          <li><b>Acompanhe a evolução</b>: no card <kbd>📈 Evolução do Sentimento</kbd> você vê as últimas semanas lado a lado — quantas respostas chegaram, quantas tinham <b>sinais de cansaço</b> (palavras como “cansado”, “puxada”, “corrida”), a palavra de cada semana e as palavras que subiram ou caíram. Se os sinais aparecem por 2 semanas seguidas ou mais, o painel avisa.</li>
+          <li><b>Responda às sugestões</b>: no card <kbd>📮 Caixa de sugestões</kbd> ficam as ideias que a equipe mandou (anônimas). Mude o status, escreva uma resposta e marque <b>“Mostrar para a equipe”</b> para ela aparecer no mural “Ouvimos você”.</li>
           <li><b>Se aparecer algo impróprio</b>, em “Respostas da semana” clique em <kbd>Remover</kbd> e depois em <kbd>Confirmar</kbd>. Ao terminar, clique em <kbd>Sair</kbd>, principalmente em computador compartilhado.</li>
         </ol>
 
@@ -228,6 +281,14 @@
       </div>
       <div class="card-body" id="anCorpo"><div class="an-vazio"><span class="carregando"></span></div></div>
     </section>
+    <section class="card" id="evCard">
+      <div class="card-head"><span>📈 Evolução do Sentimento</span><span class="counter" id="evSub">últimas semanas</span></div>
+      <div class="card-body" id="evCorpo"><div class="an-vazio"><span class="carregando"></span></div></div>
+    </section>
+    <section class="card no-print" id="sugestoes">
+      <div class="card-head"><span>📮 Caixa de sugestões<span class="sg-badge" id="sgBadge" hidden></span></span><span class="counter"><a href="/sugestoes.html" target="_blank" rel="noopener">Ver como a equipe vê ↗</a></span></div>
+      <div class="card-body" id="sgCorpo"><div class="an-vazio"><span class="carregando"></span></div></div>
+    </section>
   </div>
 
   <div class="foot-link no-print"><a href="/sentimento.html">Voltar para o Sentimento da Semana</a></div>
@@ -271,6 +332,7 @@ async function abrirPainel(){
   semanas=d.semanas;
   $('semanaSel').innerHTML=semanas.map(s=>`<option value="${s.semana}">${esc(s.rotulo)}${s.semana===d.atual?' (atual)':''} — ${s.total} ${s.total===1?'resposta':'respostas'}</option>`).join('');
   $('loginCard').hidden=true;$('painel').hidden=false;
+  carregarSugestoes();
   await carregarSemana(atual&&semanas.some(s=>s.semana===atual)?atual:d.atual);
 }
 
@@ -282,6 +344,7 @@ async function carregarSemana(semana){
     let anterior=null;if(ant){try{anterior=await api('/api/sentimentos/gestora/semana/'+ant.semana)}catch{}}
     render(anterior);
     carregarAnalise(semana);
+    carregarEvolucao(semana);
   }catch(err){if(err.status===401){chave=null;ls.set('vv-gestora',null);return mostrarLogin('Sua sessão expirou. Entre novamente.',true)}msg(err.message,true)}
 }
 $('semanaSel').onchange=e=>carregarSemana(e.target.value);
@@ -300,6 +363,122 @@ function render(anterior){
   vvNuvem($('cloudBox'),$('cloud'),$('fallback'),d.palavras);
 }
 
+
+// ---------- Caixa de sugestões ----------
+let sugestoes=[],sgFiltro='abertas';
+const SG_ST={nova:'Nova',analise:'Em análise',feito:'Feito',nao:'Não vamos fazer'};
+async function carregarSugestoes(){
+  try{const d=await api('/api/sugestoes/gestora');sugestoes=d.itens;renderSugestoes()}
+  catch(e){$('sgCorpo').innerHTML=`<div class="an-vazio"><p>${esc(e.message)}</p></div>`}
+}
+function renderSugestoes(aviso=''){
+  const novas=sugestoes.filter(s=>s.status==='nova').length;
+  $('sgBadge').hidden=!novas;$('sgBadge').textContent=novas;$('sgBadge').title=`${novas} ${novas===1?'nova':'novas'}`;
+  if(!sugestoes.length){$('sgCorpo').innerHTML='<div class="an-vazio"><p>Nenhuma sugestão ainda. Divulgue o link <b>'+esc(location.host)+'/sugestoes</b> para a equipe.</p></div>';return}
+  const filtros={abertas:['Abertas',s=>s.status==='nova'||s.status==='analise'],todas:['Todas',()=>true],respondidas:['Respondidas',s=>!!s.resposta],feito:['Feitas',s=>s.status==='feito']};
+  const lista=sugestoes.filter(filtros[sgFiltro][1]);
+  let h=aviso?`<p class="sg-aviso" role="status">${esc(aviso)}</p>`:'';
+  h+=`<div class="sg-filtros">${Object.entries(filtros).map(([k,[t,f]])=>`<button type="button" data-f="${k}" class="${k===sgFiltro?'on':''}">${t} (${sugestoes.filter(f).length})</button>`).join('')}</div>`;
+  h+=lista.length?lista.map(s=>`<div class="sg" data-id="${esc(s.id)}">
+    <div class="q">${esc(s.texto)}</div>
+    <div class="meta">Recebida em ${new Date(s.criadoEm).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'})}${s.respondidaEm?` · respondida em ${new Date(s.respondidaEm).toLocaleDateString('pt-BR')}`:''}</div>
+    <textarea maxlength="500" placeholder="Resposta para a equipe (opcional). Ex.: Boa ideia! Vamos testar a partir da próxima sprint.">${esc(s.resposta)}</textarea>
+    <div class="linha">
+      <select aria-label="Status">${Object.entries(SG_ST).map(([k,t])=>`<option value="${k}"${k===s.status?' selected':''}>${t}</option>`).join('')}</select>
+      <label class="pub"><input type="checkbox"${s.publica?' checked':''}> Mostrar para a equipe</label>
+      <span class="grow"></span><span class="msgsg"></span>
+      <button class="btn-primary btn-sm salvar" type="button">Salvar</button>
+      <button class="btn-danger btn-sm remover" type="button">Remover</button>
+    </div></div>`).join(''):'<p class="ev-nota">Nada neste filtro.</p>';
+  $('sgCorpo').innerHTML=h;
+}
+$('sgCorpo').addEventListener('click',async e=>{
+  const f=e.target.closest('[data-f]');if(f){sgFiltro=f.dataset.f;return renderSugestoes()}
+  const card=e.target.closest('.sg');if(!card)return;const id=card.dataset.id,m=card.querySelector('.msgsg');
+  if(e.target.closest('.salvar')){
+    const b=e.target.closest('.salvar');b.disabled=true;m.className='msgsg';m.textContent='Salvando…';
+    const resposta=card.querySelector('textarea').value.trim(),publica=card.querySelector('input[type=checkbox]').checked;
+    try{
+      const d=await api('/api/sugestoes/gestora/'+id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({status:card.querySelector('select').value,resposta,publica})});
+      const i=sugestoes.findIndex(x=>x.id===id);sugestoes[i]={...sugestoes[i],...d.item};
+      const curto=sugestoes[i].texto.length>50?sugestoes[i].texto.slice(0,50)+'…':sugestoes[i].texto;
+      let aviso=publica&&!resposta?'Salvo. Escreva uma resposta para ela aparecer no mural.':publica?'Salvo e publicado no mural “Ouvimos você” ✓':'Salvo ✓';
+      if(sgFiltro==='abertas'&&!['nova','analise'].includes(sugestoes[i].status))aviso+=` — “${curto}” saiu de Abertas (veja em Todas).`;
+      renderSugestoes(aviso);
+    }catch(err){m.className='msgsg err';m.textContent=err.message;b.disabled=false}
+  }
+  const rm=e.target.closest('.remover');
+  if(rm){
+    if(!rm.classList.contains('armed')){rm.classList.add('armed');rm.textContent='Confirmar';setTimeout(()=>{rm.classList.remove('armed');rm.textContent='Remover'},3000);return}
+    rm.disabled=true;
+    try{await api('/api/sugestoes/gestora/'+id,{method:'DELETE'});sugestoes=sugestoes.filter(x=>x.id!==id);renderSugestoes()}
+    catch(err){m.className='msgsg err';m.textContent=err.message;rm.disabled=false}
+  }
+});
+
+// ---------- Evolução do Sentimento ----------
+let evolucao=null;
+async function carregarEvolucao(semana){
+  $('evCorpo').innerHTML='<div class="an-vazio"><span class="carregando"></span></div>';
+  try{const r=await api('/api/sentimentos/gestora/evolucao?ate='+semana+'&n=8');if(semana!==atual)return;evolucao=r;renderEvolucao()}
+  catch(e){$('evCorpo').innerHTML=`<div class="an-vazio"><p>${esc(e.message)}</p></div>`}
+}
+function renderEvolucao(){
+  const ev=evolucao;if(!ev)return;
+  const S=ev.semanas;
+  $('evSub').textContent=S.length>1?`Semanas ${S[0].numero} a ${S.at(-1).numero}`:`Semana ${S[0]?.numero??''}`;
+  const comDados=S.filter(x=>x.total);
+  if(comDados.length<2){
+    $('evCorpo').innerHTML=`<div class="an-vazio"><p>A evolução aparece quando houver respostas em pelo menos <b>2 semanas</b>. ${comDados.length?'Por enquanto só esta semana tem respostas.':''}</p></div>`;return;
+  }
+  let h='';
+  if(ev.alerta)h+=`<div class="ev-alerta ${ev.alerta.nivel==='alto'?'alto':''}" role="status"><span aria-hidden="true">${ev.alerta.nivel==='alto'?'🔴':'🟠'}</span><div><b>Atenção: ${ev.alerta.semanas} semanas seguidas com sinais de cansaço</b>Palavras como ${ev.alerta.palavras.map(w=>`“${esc(w)}”`).join(', ')} se repetem. Vale uma conversa com a equipe sobre a carga de trabalho.</div></div>`;
+  else h+=`<div class="ev-ok">🟢 Sem sinais de cansaço repetidos nas últimas semanas.</div>`;
+  h+=`<div class="ev-leg"><span><i style="background:var(--ev-ok)"></i>Respostas</span><span><i style="background:var(--ev-sinal)"></i>Com sinais de cansaço</span></div>`;
+  h+=`<div class="ev-chart" id="evChart">${graficoEv(S,ev.ate)}<div class="ev-tip" id="evTip" hidden></div></div>`;
+  const li=(l,seta)=>l.length?`<ul>${l.map(x=>`<li><b>${seta} ${esc(x.palavra)}</b><span>${x.antes} → ${x.agora}</span></li>`).join('')}</ul>`:'<p class="vazio">Nenhuma.</p>';
+  const antNum=ev.anterior?Number(ev.anterior.split('-W')[1]):null;
+  h+=`<div class="ev-cols"><div><h4>Em alta ${antNum?`(vs. semana ${antNum})`:''}</h4>${li(ev.emAlta,'↑')}</div><div><h4>Em baixa ${antNum?`(vs. semana ${antNum})`:''}</h4>${li(ev.emBaixa,'↓')}</div></div>`;
+  h+=`<div class="ev-tabwrap"><table class="ev-tab"><thead><tr><th>Semana</th><th>Palavra da semana</th><th class="n">Respostas</th><th class="n opc">Participação</th><th class="n">Sinais de cansaço</th></tr></thead><tbody>${[...S].reverse().map(x=>`<tr class="${x.semana===ev.ate?'sel':''}"><td>Semana ${x.numero}</td><td>${x.palavraDaSemana?esc(x.palavraDaSemana):'—'}</td><td class="n">${x.total}</td><td class="n opc">${x.total?x.participacao+'%':'—'}</td><td class="n">${x.total?`${x.comSinal} (${x.pctSinal}%)`:'—'}</td></tr>`).join('')}</tbody></table></div>`;
+  h+=`<p class="ev-nota">Participação = respostas ÷ ${ev.equipe} pessoas na equipe (cada pessoa pode mandar até 3, então é uma estimativa). “Sinais de cansaço” conta respostas com palavras como cansado, puxada, corrida, estressante ou sobrecarga — é um indicador para puxar conversa, não um diagnóstico.</p>`;
+  $('evCorpo').innerHTML=h;
+  ligarTooltipEv(S);
+}
+function graficoEv(S,ate){
+  const W=640,H=200,top=22,bot=26,l=8,r=8,ph=H-top-bot;
+  const max=Math.max(3,...S.map(x=>x.total));
+  const step=(W-l-r)/S.length,bw=Math.min(46,step*0.58);
+  const y=v=>top+ph-(v/max)*ph;
+  let g=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Respostas por semana, com a parte que tem sinais de cansaço">`;
+  g+=`<line class="grid" x1="${l}" x2="${W-r}" y1="${top+ph}" y2="${top+ph}"/>`;
+  S.forEach((x,i)=>{
+    const cx=l+step*i+step/2,x0=cx-bw/2,sel=x.semana===ate;
+    const hS=(x.comSinal/max)*ph,hT=(x.total/max)*ph,hO=hT-hS;
+    // Barra empilhada: base laranja (com sinais), topo verde (demais); 2px de folga entre as partes; ponta arredondada.
+    const rad=4;
+    const barra=(yy,hh,cor,arred)=>hh<=0?'':arred&&hh>rad?`<path d="M${x0},${yy+hh} V${yy+rad} Q${x0},${yy} ${x0+rad},${yy} H${x0+bw-rad} Q${x0+bw},${yy} ${x0+bw},${yy+rad} V${yy+hh} Z" fill="${cor}"/>`:`<rect x="${x0}" y="${yy}" width="${bw}" height="${hh}" fill="${cor}"/>`;
+    const gap=hS>0&&hO>0?2:0;
+    if(hS>0)g+=barra(top+ph-hS,hS,'var(--ev-sinal)',hO<=0);
+    if(hO>0)g+=barra(top+ph-hT,hO-gap,'var(--ev-ok)',true);
+    if(x.total)g+=`<text class="val" x="${cx}" y="${y(x.total)-6}" text-anchor="middle">${x.total}</text>`;
+    g+=`<text class="eixo${sel?' sel':''}" x="${cx}" y="${H-8}" text-anchor="middle">S${x.numero}${sel?' ●':''}</text>`;
+    g+=`<rect class="hit" data-i="${i}" x="${l+step*i}" y="${top-14}" width="${step}" height="${ph+14}"/>`;
+  });
+  return g+'</svg>';
+}
+function ligarTooltipEv(S){
+  const box=$('evChart'),tip=$('evTip');if(!box)return;
+  box.querySelectorAll('.hit').forEach(el=>{
+    const mostrar=()=>{const x=S[+el.dataset.i];
+      tip.innerHTML=`<b>${esc(x.rotulo)}</b><br>${x.total} ${x.total===1?'resposta':'respostas'}${x.total?` · ${x.participacao}% da equipe`:''}<br>Sinais de cansaço: ${x.comSinal}${x.total?` (${x.pctSinal}%)`:''}${x.palavraDaSemana?`<br>Palavra: “${esc(x.palavraDaSemana)}”`:''}`;
+      tip.hidden=false;
+      const br=box.getBoundingClientRect(),er=el.getBoundingClientRect();
+      let left=er.left-br.left+er.width/2-tip.offsetWidth/2;left=Math.max(0,Math.min(left,br.width-tip.offsetWidth));
+      tip.style.left=left+'px';tip.style.top=Math.max(0,er.top-br.top-tip.offsetHeight+4)+'px';};
+    el.addEventListener('mouseenter',mostrar);el.addEventListener('click',mostrar);
+    el.addEventListener('mouseleave',()=>tip.hidden=true);
+  });
+}
 
 // ---------- Análise da semana (IA) ----------
 const CLIMA={positivo:['positivo','🟢 Positivo'],neutro:['neutro','⚪ Neutro'],atencao:['atencao','🟠 Atenção'],alerta:['alerta','🔴 Alerta']};
