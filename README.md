@@ -1,4 +1,4 @@
-# Valida Vision — v0.26
+# Valida Vision — v0.27
 
 ## Rodar
 
@@ -38,6 +38,20 @@ Os elogios ficam visíveis para quem abrir a página (é a ideia da dinâmica). 
 
 A chave fica só no `.env` e nunca vai para o browser. Não compartilhe o `.env`.
 Antes de enviar telas reais da empresa, valide as políticas internas de dados e PII.
+
+## Novidades da v0.27
+
+- **📈 Evolução do Sentimento** (painel da gestora): as últimas 8 semanas lado a lado.
+  - Gráfico de respostas por semana, com a parte que tem **sinais de cansaço** (cansado, puxada,
+    corrida, estressante, sobrecarga…) destacada; tooltip ao passar o mouse.
+  - **Alerta** quando os sinais aparecem em 2 semanas seguidas ou mais (≥ 20% das respostas).
+  - Palavras **em alta / em baixa** em relação à semana anterior e tabela com palavra da semana,
+    respostas, participação e sinais. Rota `GET /api/sentimentos/gestora/evolucao?ate=&n=`.
+- **📮 Caixa de sugestões** (`/sugestoes.html`, atalho `/sugestoes`): sugestões anônimas (até 300
+  caracteres, com emojis). Quem enviou acompanha status e resposta no próprio navegador.
+  - A gestora gerencia no painel do Sentimento (mesma senha): status (nova, em análise, feito,
+    não vamos fazer), resposta e "Mostrar para a equipe" → mural **"Ouvimos você"**.
+  - Blob: `sugestoes/_dados.json`. Rotas em `sugestoes.js` (`/api/sugestoes`).
 
 ## Novidades da v0.26
 

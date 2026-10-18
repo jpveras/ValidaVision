@@ -69,3 +69,17 @@ html.vv-tema-anim, html.vv-tema-anim * { transition: background-color .25s, colo
 /* Análise de Tela OCULTA no menu (16/10/2026). Para MOSTRAR, comente a linha abaixo
    (e defina ANALISE_TELA_VISIVEL=true para ela voltar a ser a página inicial; ver server.js). */
 [data-recurso="analise"] { display: none !important; }
+
+/* Evolução do Sentimento (painel da gestora): cores do gráfico no escuro, validadas contra o fundo do card */
+@media screen {
+  html[data-tema="escuro"] { --ev-ok: #14a08c; --ev-sinal: #b8820f; }
+  html[data-tema="escuro"] .ev-alerta { background: #2b2410; border-color: #5c4a14; color: #f0d27a; }
+  html[data-tema="escuro"] .ev-alerta.alto { background: #3a1a18; border-color: #6b2b26; color: #f5b3ad; }
+  html[data-tema="escuro"] .ev-cols li { background: var(--card); }
+}
+
+/* Caixa de sugestões (painel da gestora) no escuro */
+@media screen {
+  html[data-tema="escuro"] .sg, html[data-tema="escuro"] .sg select, html[data-tema="escuro"] .sg textarea,
+  html[data-tema="escuro"] .sg-filtros button:not(.on) { background: var(--card); border-color: var(--line); color: var(--ink); }
+}
