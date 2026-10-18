@@ -14,7 +14,7 @@ Regras:
 import colorsys, pathlib, re, tinycss2
 
 RAIZ = pathlib.Path(__file__).resolve().parent.parent / "public"
-PAGINAS = ["analise", "elogios", "elogiar", "elogios-moderacao", "sentimento", "sentimento-gestora", "sugestoes", "pergunta"]
+PAGINAS = ["analise", "elogios", "elogiar", "elogios-moderacao", "sentimento", "sentimento-gestora", "sugestoes", "pergunta", "album"]
 TEXTO = {"color", "fill", "stroke", "caret-color", "-webkit-text-fill-color", "text-decoration-color"}
 BORDA = re.compile(r"^(border|outline)")
 FUNDO = re.compile(r"^(background|box-shadow)")

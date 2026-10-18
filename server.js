@@ -11,6 +11,7 @@ import { sentimentosRouter } from "./sentimentos.js";
 import { sugestoesRouter } from "./sugestoes.js";
 import { perguntasRouter } from "./perguntas.js";
 import { lembretesRouter } from "./lembretes.js";
+import { albumRouter } from "./album.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ENV_PATH = path.join(__dirname, ".env");
@@ -108,6 +109,10 @@ app.get(["/pergunta", "/responda"], (_req, res) => res.redirect(302, "/pergunta.
 
 // Lembrete de sexta (notificações do app; envio pelo Vercel Cron, ver vercel.json)
 app.use("/api/lembretes", lembretesRouter);
+
+// Álbum do time (a gestora publica fotos; a equipe curte e comenta)
+app.use("/api/album", albumRouter);
+app.get(["/album", "/fotos"], (_req, res) => res.redirect(302, "/album.html"));
 
 
 // ======================================================
@@ -789,7 +794,7 @@ const ON_VERCEL = !!process.env.VERCEL;
 // No computador (npm start), continua escutando só em 127.0.0.1, como antes.
 if (!ON_VERCEL) app.listen(startCfg.port, "127.0.0.1", async () => {
   console.log("");
-  console.log(`Valida Vision rodando em http://localhost:${startCfg.port}`);
+  console.log(`Toca dos Bug Hunters rodando em http://localhost:${startCfg.port}`);
   console.log(`Modelos: ${startCfg.models.join(" -> ")}`);
   console.log(`DEMO_MODE: ${startCfg.demoMode}`);
   console.log(`Chave: ${maskKey(startCfg.apiKey)}`);

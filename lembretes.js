@@ -1,7 +1,7 @@
 // ======================================================
 // LEMBRETE DE SEXTA (notificação no celular/computador)
 //
-// Quem instala o Valida Vision como app (ou permite notificações no navegador) recebe,
+// Quem instala o Toca dos Bug Hunters como app (ou permite notificações no navegador) recebe,
 // toda sexta de manhã, um lembrete para responder o Sentimento da Semana (e a Pergunta da
 // semana, quando houver uma aberta).
 //

@@ -1,0 +1,377 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Álbum do time · Toca dos Bug Hunters</title>
+<link rel="icon" type="image/png" href="/favicon.png?v=3">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/vv-base.css">
+<style>
+.filtros{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 16px}
+.filtros button{height:32px;padding:0 14px;border-radius:99px;border:1px solid var(--line);background:#fff;color:var(--text);font:inherit;font-size:13px;cursor:pointer;text-transform:none;letter-spacing:normal;font-weight:500}
+.filtros button.on{background:var(--teal);border-color:var(--teal);color:#fff}
+.grade{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+.foto{position:relative;display:block;width:100%;height:auto;min-height:0;aspect-ratio:1/1;border:0;padding:0;border-radius:10px;overflow:hidden;background:var(--panel);cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.foto img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .25s}
+.foto:hover img{transform:scale(1.04)}
+.foto:focus-visible{outline:3px solid var(--teal);outline-offset:2px}
+.foto .info{position:absolute;left:0;right:0;bottom:0;display:flex;gap:10px;align-items:center;padding:22px 10px 8px;background:linear-gradient(transparent,rgba(0,0,0,.6));color:#fff;font-size:13px;font-weight:700;text-align:left}
+.foto .info .leg{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:500}
+.vazio-album{text-align:center;padding:40px 16px;color:var(--muted)}
+.vazio-album b{display:block;font-size:18px;color:var(--ink);font-weight:500;margin-bottom:6px}
+/* Visualizador */
+.lb{position:fixed;inset:0;z-index:60;background:rgba(5,15,18,.92);display:flex;align-items:stretch;justify-content:center}
+.lb[hidden]{display:none}
+.lb-caixa{display:grid;grid-template-columns:minmax(0,1fr) 360px;width:min(1200px,100%);max-height:100vh}
+.lb-img{position:relative;display:flex;align-items:center;justify-content:center;min-height:0;padding:16px}
+.lb-img img{max-width:100%;max-height:calc(100vh - 32px);object-fit:contain;border-radius:6px;background:#111}
+.lb-lado{background:var(--card,#fff);display:flex;flex-direction:column;min-height:0;max-height:100vh}
+.lb-topo{padding:16px 16px 10px;border-bottom:1px solid var(--line)}
+.lb-topo .leg{font-size:16px;color:var(--ink);line-height:1.4;margin:0 0 4px;overflow-wrap:anywhere}
+.lb-topo .meta{font-size:12px;color:var(--muted)}
+.lb-acoes{display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap}
+.curtir{display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 14px;border-radius:99px;border:1px solid var(--line);background:#fff;color:var(--ink);font:inherit;font-size:14px;font-weight:700;cursor:pointer;text-transform:none;letter-spacing:normal}
+.curtir.on{background:#fdecec;border-color:#f3b2ac;color:#c0362c}
+.curtir .cor{font-size:18px;line-height:1}
+.lb-coms{flex:1;overflow:auto;padding:12px 16px;display:flex;flex-direction:column;gap:10px;min-height:120px}
+.com{font-size:14px;line-height:1.45;overflow-wrap:anywhere}
+.com b{color:var(--ink)}
+.com .q{color:var(--muted);font-size:11px;margin-left:6px}
+.com .apagar{border:0;background:none;color:#b42318;font:inherit;font-size:11px;cursor:pointer;padding:0;margin-left:6px;text-transform:none;letter-spacing:normal;height:auto}
+.lb-form{border-top:1px solid var(--line);padding:12px 16px;display:flex;flex-direction:column;gap:8px}
+.lb-form input,.lb-form textarea{width:100%;box-sizing:border-box;border:1px solid var(--line);border-radius:6px;padding:8px 10px;font:inherit;font-size:15px;background:#fff;color:var(--ink)}
+.lb-form textarea{min-height:56px;max-height:120px;resize:vertical}
+.lb-form .linha{display:flex;gap:8px;align-items:center}
+.lb-form .linha .status{flex:1;margin:0;font-size:12px}
+.lb-fechar,.lb-nav{position:absolute;z-index:2;width:44px;height:44px;border-radius:50%;border:0;background:rgba(255,255,255,.14);color:#fff;font-size:22px;cursor:pointer;display:grid;place-items:center;padding:0}
+.lb-fechar:hover,.lb-nav:hover{background:rgba(255,255,255,.26)}
+.lb-fechar{top:12px;left:12px}
+.lb-nav.ant{left:12px;top:50%;transform:translateY(-50%)}
+.lb-nav.prox{right:12px;top:50%;transform:translateY(-50%)}
+.lb-gest{margin-top:10px;padding-top:10px;border-top:1px dashed var(--line);display:flex;flex-direction:column;gap:6px}
+.lb-gest input{width:100%;box-sizing:border-box;border:1px solid var(--line);border-radius:6px;padding:6px 8px;font:inherit;font-size:13px;background:#fff;color:var(--ink)}
+.lb-gest .linha{display:flex;gap:6px;flex-wrap:wrap}
+@media(max-width:860px){
+  .lb{overflow:auto;align-items:flex-start}
+  .lb-caixa{grid-template-columns:1fr;max-height:none}
+  .lb-img{padding:56px 8px 8px}
+  .lb-img img{max-height:70vh}
+  .lb-lado{max-height:none}
+  .lb-coms{max-height:none;overflow:visible}
+  .lb-nav{top:auto;bottom:auto}
+  .lb-nav.ant,.lb-nav.prox{top:calc(56px + 35vh)}
+  .grade{grid-template-columns:repeat(2,1fr);gap:8px}
+  .foto .info .leg{display:none}
+  .foto .info{justify-content:flex-end}
+}
+/* Área da gestora */
+.gest-card .card-body{display:flex;flex-direction:column;gap:12px}
+.gest-login{display:flex;gap:8px;flex-wrap:wrap}
+.gest-login .input{flex:1;min-width:180px}
+.prevs{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.prev{border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#fff;display:flex;flex-direction:column}
+.prev img{width:100%;aspect-ratio:1/1;object-fit:cover;display:block}
+.prev input{border:0;border-top:1px solid var(--line);padding:8px;font:inherit;font-size:13px;background:transparent;color:var(--ink);min-width:0}
+.prev .tira{border:0;background:none;color:#b42318;font:inherit;font-size:11px;cursor:pointer;padding:4px 8px 8px;text-align:left;text-transform:none;letter-spacing:normal;height:auto}
+.escolher{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;border:2px dashed var(--line);border-radius:10px;padding:22px;cursor:pointer;color:var(--muted);text-align:center}
+.escolher:hover{border-color:var(--teal);color:var(--teal2)}
+.escolher b{color:var(--ink);font-weight:600}
+.status.ok{color:var(--teal2)}
+@media screen{
+html[data-tema="escuro"] .filtros button:not(.on),html[data-tema="escuro"] .curtir:not(.on),html[data-tema="escuro"] .lb-form input,html[data-tema="escuro"] .lb-form textarea,html[data-tema="escuro"] .lb-gest input,html[data-tema="escuro"] .prev{background:var(--card);border-color:var(--line);color:var(--ink)}
+html[data-tema="escuro"] .curtir.on{background:#3a1a18;border-color:#6b2b26;color:#f5b3ad}
+}
+</style>
+
+<link rel="stylesheet" href="/vv-tema-auto.css?v=31">
+<link rel="stylesheet" href="/vv-tema.css?v=32">
+<script src="/vv-tema.js?v=23"></script>
+<link rel="manifest" href="/manifest.webmanifest?v=3">
+<meta name="theme-color" content="#033a45">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=3">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Bug Hunters">
+<script src="/vv-app.js?v=1" defer></script>
+
+</head>
+<body>
+
+<header class="topbar">
+  <a class="logo" href="/">
+    <img id="brandLogo" src="/logo.png" alt="" hidden onload="this.hidden=false;this.nextElementSibling.setAttribute('hidden','')">
+    <svg width="28" height="24" viewBox="0 0 28 24" aria-hidden="true"><path d="M1 2h9l4 9 4-9h9L14 23z" fill="#2fc28f"/><path d="M10 2h8l-4 9z" fill="#1a8f6a"/></svg>
+    <b>Toca dos <span>Bug Hunters</span></b><span class="ver">v0.29</span>
+  </a>
+  <div class="spacer"></div>
+  <span class="env" id="envBadge">Protótipo local</span>
+</header>
+
+<nav class="side" aria-label="Menu">
+  <a class="nav" href="/analise.html" data-recurso="analise">
+    <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4"/><circle cx="12" cy="10.5" r="2.5"/></svg>
+    <span>Análise de Tela</span>
+  </a>
+  <a class="nav" href="/elogios.html">
+    <svg viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.5 1-1.1a5.5 5.5 0 0 0 0-7.8z"/></svg>
+    <span>Elogie um Colega</span>
+  </a>
+  <a class="nav" href="/sentimento.html">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 14.5s1.5 2 4 2 4-2 4-2"/><path d="M9 9.5h.01M15 9.5h.01"/></svg>
+    <span>Sentimento da Semana</span>
+  </a>
+  <a class="nav" href="/pergunta.html">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.3a2.6 2.6 0 0 1 5 .9c0 1.7-2.5 2.2-2.5 3.8"/><path d="M12 17h.01"/></svg>
+    <span>Pergunta da semana</span>
+  </a>
+  <a class="nav active" href="/album.html" aria-current="page">
+    <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="15" rx="2"/><circle cx="9" cy="10.5" r="1.8"/><path d="M21 16l-5-5-8 8"/></svg>
+    <span>Álbum do time</span>
+  </a>
+  <a class="nav" href="/sugestoes.html">
+    <svg viewBox="0 0 24 24"><path d="M4 7h16v11a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M4 7l2.5-3h11L20 7"/><path d="M9 12h6"/></svg>
+    <span>Caixa de sugestões</span>
+  </a>
+  <a class="nav" href="/api/health" target="_blank" rel="noopener">
+    <svg viewBox="0 0 24 24"><path d="M3 12h4l3-7 4 14 3-7h4"/></svg>
+    <span>Status da IA</span>
+  </a>
+</nav>
+
+<main class="content"><div class="panel"><div class="wrap">
+
+  <div id="storageWarn" class="alert" hidden>
+    <svg viewBox="0 0 24 24"><path d="M12 3 2 20h20L12 3z"/><path d="M12 10v4M12 17v.5"/></svg>
+    <div><b>Armazenamento temporário</b>O Vercel Blob não está conectado. As fotos podem se perder.</div>
+  </div>
+
+  <div class="page-head">
+    <div class="page-icon"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="15" rx="2"/><circle cx="9" cy="10.5" r="1.8"/><path d="M21 16l-5-5-8 8"/></svg></div>
+    <h1 class="grow">Álbum do time</h1>
+  </div>
+  <p class="page-sub">Os momentos dos Bug Hunters 🐞 — curta e comente as fotos! Quem publica as fotos é a gestora.</p>
+  <div class="divider"></div>
+
+  <div class="filtros" id="filtros"></div>
+  <div class="grade" id="grade"><p class="vazio-album">Carregando…</p></div>
+
+  <section class="card gest-card" id="gestCard" style="margin-top:28px">
+    <div class="card-head"><span>🔒 Área da gestora</span><span class="counter" id="gestSub">publicar fotos</span></div>
+    <div class="card-body" id="gestCorpo"></div>
+  </section>
+
+</div></div></main>
+
+<div class="lb" id="lb" hidden role="dialog" aria-modal="true" aria-label="Foto do álbum">
+  <div class="lb-caixa">
+    <div class="lb-img">
+      <button class="lb-fechar" type="button" id="lbFechar" aria-label="Fechar">✕</button>
+      <button class="lb-nav ant" type="button" id="lbAnt" aria-label="Foto anterior">‹</button>
+      <img id="lbImg" alt="">
+      <button class="lb-nav prox" type="button" id="lbProx" aria-label="Próxima foto">›</button>
+    </div>
+    <div class="lb-lado">
+      <div class="lb-topo">
+        <p class="leg" id="lbLeg"></p>
+        <div class="meta" id="lbMeta"></div>
+        <div class="lb-acoes"><button class="curtir" type="button" id="lbCurtir"><span class="cor">🤍</span><span id="lbCurtidas">0</span></button><span class="meta" id="lbComN"></span></div>
+        <div class="lb-gest" id="lbGest" hidden></div>
+      </div>
+      <div class="lb-coms" id="lbComs"></div>
+      <form class="lb-form" id="lbForm" novalidate>
+        <input id="cNome" maxlength="40" autocomplete="name" placeholder="Seu nome">
+        <textarea id="cTexto" maxlength="300" placeholder="Escreva um comentário…"></textarea>
+        <div class="linha"><span class="status" id="cStatus" role="status"></span><button class="btn-primary btn-sm" type="submit" id="cEnviar">Comentar</button></div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script src="/vv-emojis.js?v=22"></script>
+<script>
+const $=id=>document.getElementById(id);
+const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+const local=/^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
+$('envBadge').textContent=local?'Protótipo local':'Demonstração';
+const ls={get(k){try{return localStorage.getItem(k)}catch{return null}},set(k,v){try{v==null?localStorage.removeItem(k):localStorage.setItem(k,v)}catch{}}};
+// Identificador aleatório deste navegador (só para lembrar quais fotos você curtiu).
+let leitor=ls.get('vv-leitor');if(!leitor||!/^[a-f0-9]{32}$/.test(leitor)){leitor=[...crypto.getRandomValues(new Uint8Array(16))].map(b=>b.toString(16).padStart(2,'0')).join('');ls.set('vv-leitor',leitor)}
+const chavesCom=()=>{try{return JSON.parse(ls.get('vv-album-coment')||'{}')}catch{return{}}};
+let chaveG=ls.get('vv-gestora'),souGestora=false;
+let dados={fotos:[],albuns:[]},filtro='',atual=-1;
+const dataBR=iso=>new Date(iso).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric'});
+const quando=iso=>{const s=(Date.now()-new Date(iso))/1000;if(s<60)return'agora';if(s<3600)return`há ${Math.floor(s/60)} min`;if(s<86400)return`há ${Math.floor(s/3600)} h`;return dataBR(iso)};
+const lista=()=>dados.fotos.filter(f=>!filtro||f.album===filtro);
+const urlFoto=(f,t)=>`/api/album/foto/${f.id}${t==='p'?'?t=p':''}`;
+
+async function carregar(){
+  try{
+    const r=await fetch('/api/album',{cache:'no-store',headers:{'x-leitor':leitor}});const d=await r.json();if(!r.ok)throw new Error(d.error);
+    dados=d;$('storageWarn').hidden=d.armazenamento!=='temporario';
+    if(filtro&&!d.albuns.some(a=>a.nome===filtro))filtro='';
+    renderGrade();if(!$('lb').hidden){const f=dados.fotos.find(x=>x.id===$('lb').dataset.id);if(f)renderLb(f);else fecharLb()}
+  }catch(e){$('grade').innerHTML=`<p class="vazio-album">${esc(e.message||'Não consegui carregar.')}</p>`}
+}
+function renderGrade(){
+  $('filtros').innerHTML=dados.albuns.length?[`<button type="button" data-a="" class="${!filtro?'on':''}">Todas (${dados.fotos.length})</button>`,...dados.albuns.map(a=>`<button type="button" data-a="${esc(a.nome)}" class="${a.nome===filtro?'on':''}">${esc(a.nome)} (${a.total})</button>`)].join(''):'';
+  const l=lista();
+  $('grade').innerHTML=l.length?l.map((f,i)=>`<button type="button" class="foto" data-i="${i}" aria-label="${esc(f.legenda||'Foto do time')}"><img src="${urlFoto(f,'p')}" alt="" loading="lazy" decoding="async"><span class="info"><span class="leg">${esc(f.legenda)}</span><span>${f.curti?'❤️':'🤍'} ${f.curtidas}</span><span>💬 ${f.comentarios.length}</span></span></button>`).join('')
+    :`<div class="vazio-album" style="grid-column:1/-1"><b>O álbum ainda está vazio 📷</b>Assim que a gestora publicar as primeiras fotos do time, elas aparecem aqui.</div>`;
+}
+$('filtros').addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(!b)return;filtro=b.dataset.a;renderGrade()});
+$('grade').addEventListener('click',e=>{const b=e.target.closest('.foto');if(b)abrirLb(+b.dataset.i)});
+
+// ---------- Visualizador ----------
+function abrirLb(i){const l=lista();if(!l[i])return;atual=i;$('lb').hidden=false;document.body.style.overflow='hidden';renderLb(l[i]);$('lbFechar').focus()}
+function fecharLb(){$('lb').hidden=true;document.body.style.overflow='';atual=-1}
+function renderLb(f){
+  $('lb').dataset.id=f.id;
+  if($('lbImg').dataset.id!==f.id){$('lbImg').src=urlFoto(f,'g');$('lbImg').dataset.id=f.id}
+  $('lbImg').alt=f.legenda||'Foto do time';
+  $('lbLeg').textContent=f.legenda||'';$('lbLeg').hidden=!f.legenda;
+  $('lbMeta').textContent=[f.album,dataBR(f.criadaEm)].filter(Boolean).join(' · ');
+  $('lbCurtir').classList.toggle('on',f.curti);$('lbCurtir').querySelector('.cor').textContent=f.curti?'❤️':'🤍';$('lbCurtidas').textContent=f.curtidas;
+  $('lbCurtir').setAttribute('aria-pressed',String(f.curti));$('lbCurtir').setAttribute('aria-label',f.curti?'Descurtir':'Curtir');
+  $('lbComN').textContent=f.comentarios.length?`${f.comentarios.length} ${f.comentarios.length===1?'comentário':'comentários'}`:'';
+  const minhas=chavesCom();
+  $('lbComs').innerHTML=f.comentarios.length?f.comentarios.map(c=>`<div class="com"><b>${esc(c.nome)}</b><span class="q">${quando(c.criadoEm)}</span>${minhas[c.id]||souGestora?`<button type="button" class="apagar" data-c="${esc(c.id)}">${minhas[c.id]?'apagar':'remover'}</button>`:''}<br>${esc(c.texto)}</div>`).join(''):'<p class="meta" style="margin:0;color:var(--muted);font-size:13px">Seja a primeira pessoa a comentar 💬</p>';
+  const l=lista();$('lbAnt').hidden=atual<=0;$('lbProx').hidden=atual>=l.length-1;
+  $('lbGest').hidden=!souGestora;
+  if(souGestora)$('lbGest').innerHTML=`<input id="gLeg" maxlength="200" value="${esc(f.legenda)}" placeholder="Legenda"><input id="gAlb" maxlength="60" value="${esc(f.album)}" placeholder="Álbum" list="albunsLista"><div class="linha"><button class="btn-outline btn-sm" type="button" id="gSalvar">Salvar legenda</button><button class="btn-danger btn-sm" type="button" id="gApagar">Apagar foto</button></div><span class="status" id="gMsg"></span>`;
+}
+$('lbFechar').onclick=fecharLb;
+$('lb').addEventListener('click',e=>{if(e.target===$('lb')||e.target.classList.contains('lb-img'))fecharLb()});
+$('lbAnt').onclick=()=>abrirLb(atual-1);$('lbProx').onclick=()=>abrirLb(atual+1);
+document.addEventListener('keydown',e=>{if($('lb').hidden)return;if(e.key==='Escape')fecharLb();if(e.target.matches('input,textarea'))return;if(e.key==='ArrowLeft'&&atual>0)abrirLb(atual-1);if(e.key==='ArrowRight'&&atual<lista().length-1)abrirLb(atual+1)});
+let tx0=null;$('lbImg').addEventListener('touchstart',e=>{tx0=e.touches[0].clientX},{passive:true});
+$('lbImg').addEventListener('touchend',e=>{if(tx0==null)return;const dx=e.changedTouches[0].clientX-tx0;tx0=null;if(Math.abs(dx)<50)return;if(dx<0&&atual<lista().length-1)abrirLb(atual+1);if(dx>0&&atual>0)abrirLb(atual-1)});
+$('lbImg').addEventListener('dblclick',()=>{const f=lista()[atual];if(f&&!f.curti)curtir()});
+
+async function curtir(){
+  const f=lista()[atual];if(!f)return;
+  f.curti=!f.curti;f.curtidas+=f.curti?1:-1;renderLb(f);renderGrade();
+  try{const r=await fetch(`/api/album/${f.id}/curtir`,{method:'POST',headers:{'x-leitor':leitor}});const d=await r.json();if(!r.ok)throw new Error(d.error);f.curti=d.curti;f.curtidas=d.curtidas}
+  catch(e){f.curti=!f.curti;f.curtidas+=f.curti?1:-1;$('cStatus').className='status error';$('cStatus').textContent=e.message}
+  renderLb(f);renderGrade();
+}
+$('lbCurtir').onclick=curtir;
+
+$('cNome').value=ls.get('vv-album-nome')||'';
+$('lbForm').addEventListener('submit',async e=>{
+  e.preventDefault();const f=lista()[atual];if(!f)return;
+  const nome=$('cNome').value.trim(),texto=$('cTexto').value.trim(),st=$('cStatus');
+  if(nome.length<2){st.className='status error';st.textContent='Escreva o seu nome.';return $('cNome').focus()}
+  if(!texto){st.className='status error';st.textContent='Escreva o comentário.';return $('cTexto').focus()}
+  $('cEnviar').disabled=true;st.className='status';st.textContent='Enviando…';
+  try{
+    const r=await fetch(`/api/album/${f.id}/comentar`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nome,texto})});
+    const d=await r.json();if(!r.ok)throw new Error(d.error);
+    ls.set('vv-album-nome',nome);const m=chavesCom();m[d.comentario.id]=d.chave;ls.set('vv-album-coment',JSON.stringify(m));
+    f.comentarios.push(d.comentario);$('cTexto').value='';st.className='status ok';st.textContent='Comentário publicado 💚';renderLb(f);renderGrade();
+    $('lbComs').scrollTop=$('lbComs').scrollHeight;
+  }catch(err){st.className='status error';st.textContent=err.message}finally{$('cEnviar').disabled=false}
+});
+$('lbComs').addEventListener('click',async e=>{
+  const b=e.target.closest('.apagar');if(!b)return;const f=lista()[atual],cid=b.dataset.c,m=chavesCom();
+  if(!b.classList.contains('armed')){b.classList.add('armed');b.textContent='confirmar';setTimeout(()=>{b.classList.remove('armed');b.textContent=m[cid]?'apagar':'remover'},3000);return}
+  try{
+    const r=m[cid]?await fetch(`/api/album/${f.id}/comentario/${cid}`,{method:'DELETE',headers:{'x-comentario-chave':m[cid]}})
+      :await fetch(`/api/album/gestora/fotos/${f.id}/comentario/${cid}`,{method:'DELETE',headers:{'x-gestora-key':chaveG||''}});
+    if(!r.ok&&r.status!==404){const d=await r.json().catch(()=>({}));throw new Error(d.error||'Não consegui apagar.')}
+    delete m[cid];ls.set('vv-album-coment',JSON.stringify(m));f.comentarios=f.comentarios.filter(c=>c.id!==cid);renderLb(f);renderGrade();
+  }catch(err){$('cStatus').className='status error';$('cStatus').textContent=err.message}
+});
+$('lbGest').addEventListener('click',async e=>{
+  const f=lista()[atual];if(!f)return;const msg=$('gMsg');
+  if(e.target.closest('#gSalvar')){
+    try{const r=await fetch(`/api/album/gestora/fotos/${f.id}`,{method:'PUT',headers:{'Content-Type':'application/json','x-gestora-key':chaveG},body:JSON.stringify({legenda:$('gLeg').value,album:$('gAlb').value})});const d=await r.json();if(!r.ok)throw new Error(d.error);
+      Object.assign(f,{legenda:d.foto.legenda,album:d.foto.album});await carregar();msg.className='status ok';msg.textContent='Salvo ✓'}catch(err){msg.className='status error';msg.textContent=err.message}
+  }
+  const ap=e.target.closest('#gApagar');
+  if(ap){
+    if(!ap.classList.contains('armed')){ap.classList.add('armed');ap.textContent='Confirmar: apagar foto';setTimeout(()=>{ap.classList.remove('armed');ap.textContent='Apagar foto'},3500);return}
+    try{const r=await fetch(`/api/album/gestora/fotos/${f.id}`,{method:'DELETE',headers:{'x-gestora-key':chaveG}});if(!r.ok){const d=await r.json().catch(()=>({}));throw new Error(d.error||'Falhou.')}fecharLb();await carregar()}
+    catch(err){msg.className='status error';msg.textContent=err.message}
+  }
+});
+
+// ---------- Área da gestora ----------
+let prevs=[];
+async function verificarGestora(){
+  if(!chaveG){souGestora=false;return renderGest()}
+  try{const r=await fetch('/api/sentimentos/gestora',{headers:{'x-gestora-key':chaveG},cache:'no-store'});souGestora=r.ok;if(!r.ok&&r.status===401){chaveG=null;ls.set('vv-gestora',null)}}catch{souGestora=false}
+  renderGest();
+}
+function renderGest(msgTxt='',erro=false){
+  $('gestSub').textContent=souGestora?'você está como gestora':'publicar fotos';
+  if(!souGestora){
+    $('gestCorpo').innerHTML=`<p style="margin:0;color:var(--muted);font-size:14px">Só a gestora publica fotos. Entre com a senha do painel da gestora.</p>
+      <form class="gest-login" id="gLogin"><input class="input" id="gSenha" type="password" placeholder="Senha da gestora" autocomplete="current-password"><button class="btn-primary btn-sm" type="submit">Entrar</button></form><span class="status${erro?' error':''}" id="gStatus">${esc(msgTxt)}</span>`;
+    $('gLogin').onsubmit=async e=>{e.preventDefault();chaveG=$('gSenha').value.trim();if(!chaveG)return;
+      const r=await fetch('/api/sentimentos/gestora',{headers:{'x-gestora-key':chaveG}});
+      if(r.ok){ls.set('vv-gestora',chaveG);souGestora=true;renderGest();if(!$('lb').hidden)renderLb(lista()[atual])}else{chaveG=null;renderGest(r.status===401?'Senha incorreta.':'Não consegui entrar.',true)}};
+    return;
+  }
+  $('gestCorpo').innerHTML=`
+    <label class="escolher" for="gArquivos"><span style="font-size:28px">📷</span><b>Escolher fotos</b><span>Pode escolher várias de uma vez. Elas são reduzidas automaticamente antes de enviar.</span></label>
+    <input type="file" id="gArquivos" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" multiple hidden>
+    <div class="prevs" id="gPrevs"></div>
+    <div id="gPub" hidden style="display:flex;flex-direction:column;gap:8px">
+      <label class="label" for="gAlbum"><span>Álbum (opcional)</span></label>
+      <input class="input" id="gAlbum" maxlength="60" list="albunsLista" placeholder="Ex.: Confraternização de outubro">
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><button class="btn-primary" type="button" id="gPublicar">Publicar fotos</button><button class="btn-outline btn-sm" type="button" id="gLimpar">Limpar</button></div>
+    </div>
+    <span class="status${erro?' error':' ok'}" id="gStatus">${esc(msgTxt)}</span>
+    <p style="margin:0;font-size:12px;color:var(--muted)">Dica: abra uma foto do álbum para editar a legenda, mover de álbum, apagar a foto ou remover comentários. <button type="button" class="link-btn" id="gSair" style="background:none;border:0;padding:0;font:inherit;color:var(--teal2);text-decoration:underline;cursor:pointer;text-transform:none;letter-spacing:normal;height:auto">Sair da área da gestora</button></p>
+    <datalist id="albunsLista">${dados.albuns.map(a=>`<option value="${esc(a.nome)}">`).join('')}</datalist>`;
+  $('gArquivos').onchange=e=>adicionarArquivos([...e.target.files]);
+  $('gSair').onclick=()=>{souGestora=false;chaveG=null;ls.set('vv-gestora',null);renderGest('Você saiu.');if(!$('lb').hidden)renderLb(lista()[atual])};
+  $('gLimpar').onclick=()=>{prevs=[];renderPrevs()};
+  $('gPublicar').onclick=publicar;
+  renderPrevs();
+}
+function carregarImagem(file){
+  if(window.createImageBitmap)return createImageBitmap(file,{imageOrientation:'from-image'}).catch(()=>viaImg(file));
+  return viaImg(file);
+}
+function viaImg(file){return new Promise((ok,erro)=>{const u=URL.createObjectURL(file),i=new Image();i.onload=()=>{ok(i)};i.onerror=()=>{URL.revokeObjectURL(u);erro(new Error('formato'))};i.src=u})}
+function reduzir(img,max,q){
+  const w=img.width,h=img.height,e=Math.min(1,max/Math.max(w,h)),c=document.createElement('canvas');
+  c.width=Math.round(w*e);c.height=Math.round(h*e);const g=c.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,c.width,c.height);g.drawImage(img,0,0,c.width,c.height);
+  return {url:c.toDataURL('image/jpeg',q),w:c.width,h:c.height};
+}
+async function adicionarArquivos(files){
+  const st=$('gStatus');st.className='status';st.textContent='Preparando fotos…';let falhas=0;
+  for(const f of files.slice(0,30)){
+    try{const img=await carregarImagem(f);const g=reduzir(img,1600,0.82),p=reduzir(img,480,0.78);prevs.push({nome:f.name,grande:g.url,mini:p.url,largura:g.w,altura:g.h,legenda:''})}
+    catch{falhas++}
+  }
+  st.className='status'+(falhas?' error':'');st.textContent=falhas?`${falhas} ${falhas===1?'foto não pôde':'fotos não puderam'} ser lida(s). Use JPG, PNG ou WEBP (no iPhone, a câmera em "Mais compatível").`:'';
+  $('gArquivos').value='';renderPrevs();
+}
+function renderPrevs(){
+  const box=$('gPrevs');if(!box)return;
+  box.innerHTML=prevs.map((p,i)=>`<div class="prev"><img src="${p.mini}" alt=""><input data-i="${i}" maxlength="200" placeholder="Legenda (opcional)" value="${esc(p.legenda)}"><button type="button" class="tira" data-t="${i}">remover</button></div>`).join('');
+  $('gPub').hidden=!prevs.length;$('gPub').style.display=prevs.length?'flex':'none';
+  $('gPublicar').textContent=`Publicar ${prevs.length} ${prevs.length===1?'foto':'fotos'}`;
+  box.querySelectorAll('input').forEach(inp=>inp.oninput=()=>{prevs[+inp.dataset.i].legenda=inp.value});
+  box.querySelectorAll('.tira').forEach(b=>b.onclick=()=>{prevs.splice(+b.dataset.t,1);renderPrevs()});
+}
+async function publicar(){
+  const st=$('gStatus'),btn=$('gPublicar'),album=$('gAlbum').value.trim();btn.disabled=true;let ok=0;
+  for(let i=0;i<prevs.length;i++){
+    st.className='status';st.textContent=`Enviando ${i+1} de ${prevs.length}…`;
+    try{const p=prevs[i];const r=await fetch('/api/album/gestora/fotos',{method:'POST',headers:{'Content-Type':'application/json','x-gestora-key':chaveG},body:JSON.stringify({imagem:p.grande,miniatura:p.mini,legenda:p.legenda,album,largura:p.largura,altura:p.altura})});
+      const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error||'Falhou.');p.feita=true;ok++}
+    catch(e){st.className='status error';st.textContent=`Parou na foto ${i+1}: ${e.message}`;break}
+  }
+  prevs=prevs.filter(p=>!p.feita);btn.disabled=false;await carregar();
+  renderGest(ok?`${ok} ${ok===1?'foto publicada':'fotos publicadas'} ✓`:'',!ok);
+}
+
+addEventListener('vv-tema',()=>{});
+carregar().then(verificarGestora);
+setInterval(()=>{if(!document.hidden&&$('lb').hidden)carregar()},30000);
+</script>
+</body>
+</html>

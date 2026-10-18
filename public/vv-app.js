@@ -54,7 +54,7 @@
   function atualiza() {
     if (!pop) return;
     var inst = pop.querySelector(".vv-app-inst"), lem = pop.querySelector(".vv-app-lem");
-    if (instalado) inst.innerHTML = '<b>📲 App instalado</b><span>Abra o Valida Vision pelo ícone na tela inicial.</span>';
+    if (instalado) inst.innerHTML = '<b>📲 App instalado</b><span>Abra o Toca dos Bug Hunters pelo ícone na tela inicial.</span>';
     else if (promptInstalar) inst.innerHTML = '<b>📲 Instalar o app</b><span>Ícone na tela inicial, abre direto, sem barra do navegador.</span><button type="button" class="btn-primary btn-sm" data-acao="instalar">Instalar</button>';
     else if (ios) inst.innerHTML = '<b>📲 Instalar no iPhone</b><span>No Safari, toque em <b>Compartilhar</b> (□↑) e depois em <b>Adicionar à Tela de Início</b>.</span>';
     else inst.innerHTML = '<b>📲 Instalar o app</b><span>No menu do navegador (⋮), escolha <b>Instalar app</b> ou <b>Adicionar à tela inicial</b>.</span>';
