@@ -9,6 +9,29 @@
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/vv-base.css">
 <style>
+/* Pergunta da semana (gestora) */
+.pq-atual{font-size:19px;line-height:1.35;color:var(--ink);font-weight:500;margin:0;overflow-wrap:anywhere}
+.pq-meta{font-size:12px;color:var(--muted);margin:6px 0 12px}
+.pq-acoes{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+.pq-acoes .grow{flex:1}
+.pq-palavras{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 14px}
+.pq-palavras span{border-radius:99px;background:var(--teal-soft);color:var(--teal2);padding:4px 10px;font-size:12px;font-weight:700}
+.pq-palavras span i{font-style:normal;font-weight:400;opacity:.8;margin-left:4px}
+.pq-nova{border-top:1px solid var(--line);margin-top:18px;padding-top:16px}
+.pq-nova textarea{width:100%;box-sizing:border-box;min-height:64px;resize:vertical;border:1px solid #cfd8d6;border-radius:6px;padding:8px 10px;font:inherit;font-size:15px;background:#fff;color:var(--ink)}
+.pq-ideias{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 10px}
+.pq-ideias button{border:1px dashed var(--line);background:transparent;color:var(--text);border-radius:99px;padding:5px 10px;font:inherit;font-size:12px;cursor:pointer}
+.pq-ideias button:hover{border-color:var(--teal);color:var(--teal2)}
+.pq-resumo{border:1px solid var(--line);border-left:4px solid var(--teal);border-radius:6px;padding:12px 14px;margin:6px 0 14px;font-size:14px;line-height:1.5;background:#fff}
+.pq-resumo h4{margin:10px 0 4px;font-size:11px;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);font-weight:500}
+.pq-resumo ul{margin:0;padding-left:18px}
+.pq-ideias button,.pq-hist button.item{white-space:normal;text-transform:none;letter-spacing:normal;max-width:100%;text-align:left;height:auto;font-weight:400;line-height:1.35}
+.pq-hist button.item>span{flex:none}
+.pq-hist{margin-top:18px;border-top:1px solid var(--line);padding-top:14px}
+.pq-hist h4{margin:0 0 8px;font-size:11px;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);font-weight:500}
+.pq-hist button.item{display:flex;justify-content:space-between;gap:10px;width:100%;text-align:left;border:1px solid var(--line);background:#fff;border-radius:6px;padding:8px 10px;margin-bottom:6px;font:inherit;font-size:13px;color:var(--text);cursor:pointer}
+.pq-hist button.item.sel{border-color:var(--teal);box-shadow:0 0 0 2px var(--teal-soft)}
+.pq-hist button.item span{color:var(--muted);white-space:nowrap}
 /* Caixa de sugestões (gestora) */
 .sg-filtros{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
 .sg-filtros button{height:30px;padding:0 12px;border-radius:99px;border:1px solid var(--line);background:#fff;color:var(--text);font:inherit;font-size:12px;cursor:pointer}
@@ -23,6 +46,7 @@
 .sg .grow{flex:1}
 .sg .ok{font-size:12px;color:var(--teal2)}
 .sg .err{font-size:12px;color:#b42318}
+.msgsg.ok{color:var(--teal2)}.msgsg.err{color:#b42318}
 .sg-aviso{margin:0 0 12px;padding:8px 12px;border-radius:6px;background:var(--teal-soft);color:var(--teal2);font-size:13px}
 .sg-badge{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding:0 6px;border-radius:99px;background:#c27f0e;color:#fff;font-size:11px;font-weight:700;margin-left:6px}
 /* Evolução do Sentimento */
@@ -144,9 +168,15 @@ html[data-tema="escuro"] .ev-tip{background:#e4efed;color:#0f1a1c}
   .sug li{break-inside:avoid}
 }
 </style>
-<link rel="stylesheet" href="/vv-tema-auto.css?v=28">
-<link rel="stylesheet" href="/vv-tema.css?v=28">
+<link rel="stylesheet" href="/vv-tema-auto.css?v=29">
+<link rel="stylesheet" href="/vv-tema.css?v=30">
 <script src="/vv-tema.js?v=23"></script>
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#033a45">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Valida Vision">
+<script src="/vv-app.js?v=1" defer></script>
 </head>
 <body>
 
@@ -154,7 +184,7 @@ html[data-tema="escuro"] .ev-tip{background:#e4efed;color:#0f1a1c}
   <a class="logo" href="/">
     <img id="brandLogo" src="/logo.png" alt="" hidden onload="this.hidden=false;this.nextElementSibling.setAttribute('hidden','')">
     <svg width="28" height="24" viewBox="0 0 28 24" aria-hidden="true"><path d="M1 2h9l4 9 4-9h9L14 23z" fill="#2fc28f"/><path d="M10 2h8l-4 9z" fill="#1a8f6a"/></svg>
-    <b>Valida <span>Vision</span></b><span class="ver">v0.27</span>
+    <b>Valida <span>Vision</span></b><span class="ver">v0.28</span>
   </a>
   <div class="spacer"></div>
   <span class="env">Painel da gestora</span>
@@ -172,6 +202,10 @@ html[data-tema="escuro"] .ev-tip{background:#e4efed;color:#0f1a1c}
   <a class="nav active" href="/sentimento.html">
     <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 14.5s1.5 2 4 2 4-2 4-2"/><path d="M9 9.5h.01M15 9.5h.01"/></svg>
     <span>Sentimento da Semana</span>
+  </a>
+  <a class="nav" href="/pergunta.html">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.3a2.6 2.6 0 0 1 5 .9c0 1.7-2.5 2.2-2.5 3.8"/><path d="M12 17h.01"/></svg>
+    <span>Pergunta da semana</span>
   </a>
   <a class="nav" href="/sugestoes.html">
     <svg viewBox="0 0 24 24"><path d="M4 7h16v11a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M4 7l2.5-3h11L20 7"/><path d="M9 12h6"/></svg>
@@ -222,6 +256,8 @@ html[data-tema="escuro"] .ev-tip{background:#e4efed;color:#0f1a1c}
           <li><b>Compartilhe</b>: <kbd>Baixar PDF</kbd> gera uma página pronta para encaminhar; <kbd>Copiar resumo</kbd> copia um texto para colar no e-mail ou no Teams.</li>
           <li><b>Gere a análise da semana</b>: no card <kbd>💡 Análise da semana</kbd>, clique em <kbd>Gerar análise</kbd>. A IA lê as respostas completas (anônimas) e sugere o clima, temas, ações para a equipe e uma pergunta para abrir a conversa. Ela fica salva; use <kbd>Gerar novamente</kbd> se chegarem novas respostas ou <kbd>Apagar análise</kbd> para removê-la.</li>
           <li><b>Acompanhe a evolução</b>: no card <kbd>📈 Evolução do Sentimento</kbd> você vê as últimas semanas lado a lado — quantas respostas chegaram, quantas tinham <b>sinais de cansaço</b> (palavras como “cansado”, “puxada”, “corrida”), a palavra de cada semana e as palavras que subiram ou caíram. Se os sinais aparecem por 2 semanas seguidas ou mais, o painel avisa.</li>
+          <li><b>Lance a pergunta da semana</b>: no card <kbd>❓ Pergunta da semana</kbd>, escreva uma pergunta curta (ou escolha uma das ideias prontas) e clique em <kbd>Publicar pergunta</kbd>. A equipe responde em <b>/pergunta</b>, de forma anônima. Você vê as respostas, a nuvem e pode pedir um <kbd>Resumo com IA</kbd>. Publicar uma nova encerra a anterior, que fica no histórico.</li>
+          <li><b>Lembrete de sexta</b>: quem ativar o sino 🔔 no topo do site recebe um aviso toda sexta às 9h. No card <kbd>🔔 Lembrete de sexta</kbd> você vê quantas pessoas ativaram.</li>
           <li><b>Responda às sugestões</b>: no card <kbd>📮 Caixa de sugestões</kbd> ficam as ideias que a equipe mandou (anônimas). Mude o status, escreva uma resposta e marque <b>“Mostrar para a equipe”</b> para ela aparecer no mural “Ouvimos você”.</li>
           <li><b>Se aparecer algo impróprio</b>, em “Respostas da semana” clique em <kbd>Remover</kbd> e depois em <kbd>Confirmar</kbd>. Ao terminar, clique em <kbd>Sair</kbd>, principalmente em computador compartilhado.</li>
         </ol>
@@ -285,6 +321,16 @@ html[data-tema="escuro"] .ev-tip{background:#e4efed;color:#0f1a1c}
       <div class="card-head"><span>📈 Evolução do Sentimento</span><span class="counter" id="evSub">últimas semanas</span></div>
       <div class="card-body" id="evCorpo"><div class="an-vazio"><span class="carregando"></span></div></div>
     </section>
+    <section class="card no-print" id="perguntas">
+      <div class="card-head"><span>❓ Pergunta da semana</span><span class="counter"><a href="/pergunta.html" target="_blank" rel="noopener">Ver como a equipe vê ↗</a></span></div>
+      <div class="card-body" id="pqCorpo"><div class="an-vazio"><span class="carregando"></span></div></div>
+    </section>
+
+    <section class="card no-print" id="lembretes">
+      <div class="card-head"><span>🔔 Lembrete de sexta</span></div>
+      <div class="card-body" id="lbCorpo" style="font-size:14px"><span class="carregando"></span></div>
+    </section>
+
     <section class="card no-print" id="sugestoes">
       <div class="card-head"><span>📮 Caixa de sugestões<span class="sg-badge" id="sgBadge" hidden></span></span><span class="counter"><a href="/sugestoes.html" target="_blank" rel="noopener">Ver como a equipe vê ↗</a></span></div>
       <div class="card-body" id="sgCorpo"><div class="an-vazio"><span class="carregando"></span></div></div>
@@ -333,6 +379,8 @@ async function abrirPainel(){
   $('semanaSel').innerHTML=semanas.map(s=>`<option value="${s.semana}">${esc(s.rotulo)}${s.semana===d.atual?' (atual)':''} — ${s.total} ${s.total===1?'resposta':'respostas'}</option>`).join('');
   $('loginCard').hidden=true;$('painel').hidden=false;
   carregarSugestoes();
+  carregarPerguntas();
+  carregarLembretes();
   await carregarSemana(atual&&semanas.some(s=>s.semana===atual)?atual:d.atual);
 }
 
@@ -363,6 +411,71 @@ function render(anterior){
   vvNuvem($('cloudBox'),$('cloud'),$('fallback'),d.palavras);
 }
 
+
+// ---------- Pergunta da semana ----------
+let pqLista=[],pqSel=null,pqMin=3,pqGerando=false;
+const PQ_IDEIAS=['O que te ajudaria a ter mais foco no trabalho?','Qual ferramenta ou atalho te salvou esta semana?','O que poderíamos parar de fazer?','Do que você se orgulha nesta semana?','Que reunião poderia virar mensagem?','O que deixaria nossos testes mais tranquilos?'];
+async function carregarPerguntas(){
+  try{const d=await api('/api/perguntas/gestora');pqLista=d.perguntas;pqMin=d.minimoResumo||3;if(!pqSel||!pqLista.some(p=>p.id===pqSel))pqSel=(pqLista.find(p=>!p.encerradaEm)||pqLista[0])?.id||null;renderPerguntas()}
+  catch(e){$('pqCorpo').innerHTML=`<div class="an-vazio"><p>${esc(e.message)}</p></div>`}
+}
+const pqData=iso=>new Date(iso).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric'});
+function renderPerguntas(aviso=''){
+  const aberta=pqLista.find(p=>!p.encerradaEm),p=pqLista.find(x=>x.id===pqSel);
+  let h=aviso?`<p class="sg-aviso" role="status">${esc(aviso)}</p>`:'';
+  if(p){
+    h+=`<p class="pq-atual">${esc(p.texto)}</p><p class="pq-meta">${p.encerradaEm?`Encerrada · ${pqData(p.criadaEm)} a ${pqData(p.encerradaEm)}`:`<b style="color:var(--teal2)">● Aberta</b> desde ${pqData(p.criadaEm)}`} · ${p.total} ${p.total===1?'resposta':'respostas'}</p>`;
+    h+=`<div class="pq-acoes">${!p.encerradaEm?'<button class="btn-outline btn-sm" type="button" id="pqEncerrar">Encerrar pergunta</button>':''}<button class="btn-primary btn-sm" type="button" id="pqResumo" ${p.total<pqMin||pqGerando?'disabled':''}>${pqGerando?'Gerando…':p.resumo?'Gerar resumo de novo':'Resumo com IA'}</button>${p.total<pqMin?`<span class="ev-nota" style="margin:0">Resumo a partir de ${pqMin} respostas.</span>`:''}<span class="grow"></span><button class="btn-danger btn-sm" type="button" id="pqApagar">Apagar pergunta</button></div>`;
+    if(p.resumo){const r=p.resumo;h+=`<div class="pq-resumo"><b>💡 Resumo</b> <span class="ev-nota" style="margin:0">(${pqData(r.geradoEm)}, com ${r.totalNaGeracao} respostas${r.totalNaGeracao!==p.total?` — agora são ${p.total}`:''})</span><p style="margin:6px 0 0">${esc(r.resumo)}</p>${r.temas.length?`<h4>Temas</h4><ul>${r.temas.map(t=>`<li><b>${esc(t.tema)}</b> — ${esc(t.apoio)}</li>`).join('')}</ul>`:''}${r.proximosPassos.length?`<h4>Próximos passos sugeridos</h4><ul>${r.proximosPassos.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:''}</div>`}
+    if(p.palavras.length)h+=`<div class="pq-palavras">${p.palavras.slice(0,15).map(([w,n])=>`<span>${esc(w)}<i>${n}</i></span>`).join('')}</div>`;
+    h+=p.respostas.length?`<div class="respostas">${p.respostas.map(r=>`<div class="resp"><span class="txt">${esc(r.texto)}</span><button class="btn-danger rm pq-rm" type="button" data-rid="${esc(r.id)}">Remover</button></div>`).join('')}</div>`:'<p class="ev-nota">Ainda sem respostas. Divulgue o link <b>'+esc(location.host)+'/pergunta</b> para a equipe.</p>';
+  }else h+='<p class="ev-nota" style="margin-top:0">Nenhuma pergunta ainda. Publique a primeira abaixo.</p>';
+  h+=`<div class="pq-nova"><label class="label" for="pqTexto"><span>${aberta?'Nova pergunta (encerra a atual)':'Nova pergunta'}</span><span class="counter" id="pqCnt">0/140</span></label>
+    <textarea id="pqTexto" maxlength="140" placeholder="Ex.: O que te ajudaria a ter mais foco no trabalho?"></textarea>
+    <div class="pq-ideias">${PQ_IDEIAS.map(t=>`<button type="button" class="pq-ideia">${esc(t)}</button>`).join('')}</div>
+    <button class="btn-primary btn-sm" type="button" id="pqPublicar">Publicar pergunta</button> <span class="msgsg" id="pqMsg"></span></div>`;
+  const hist=pqLista.filter(x=>x.id!==pqSel);
+  if(hist.length)h+=`<div class="pq-hist"><h4>Outras perguntas</h4>${pqLista.map(x=>`<button type="button" class="item${x.id===pqSel?' sel':''}" data-sel="${esc(x.id)}">${esc(x.texto)}<span>${x.encerradaEm?pqData(x.criadaEm):'aberta'} · ${x.total}</span></button>`).join('')}</div>`;
+  $('pqCorpo').innerHTML=h;
+  const t=$('pqTexto');t.addEventListener('input',()=>$('pqCnt').textContent=`${t.value.length}/140`);
+}
+$('pqCorpo').addEventListener('click',async e=>{
+  const p=pqLista.find(x=>x.id===pqSel);
+  const ideia=e.target.closest('.pq-ideia');if(ideia){$('pqTexto').value=ideia.textContent;$('pqTexto').dispatchEvent(new Event('input'));$('pqTexto').focus();return}
+  const sel=e.target.closest('[data-sel]');if(sel){pqSel=sel.dataset.sel;return renderPerguntas()}
+  const dois=(b,acao,rotulo)=>{if(!b.classList.contains('armed')){b.classList.add('armed');b.dataset.r=b.textContent;b.textContent=rotulo||'Confirmar';setTimeout(()=>{b.classList.remove('armed');b.textContent=b.dataset.r},3500);return}acao()};
+  if(e.target.closest('#pqPublicar')){
+    const b=e.target.closest('#pqPublicar'),texto=$('pqTexto').value.trim();
+    if(texto.length<5){$('pqMsg').className='msgsg err';$('pqMsg').textContent='Escreva a pergunta (pelo menos 5 caracteres).';return}
+    const publicar=async()=>{b.disabled=true;try{const d=await api('/api/perguntas/gestora',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({texto})});pqSel=d.pergunta.id;await carregarPerguntas();renderPerguntas('Pergunta publicada ✓ A equipe já pode responder em /pergunta.')}catch(err){$('pqMsg').className='msgsg err';$('pqMsg').textContent=err.message;b.disabled=false}};
+    if(pqLista.some(x=>!x.encerradaEm))return dois(b,publicar,'Confirmar (encerra a atual)');
+    return publicar();
+  }
+  if(e.target.closest('#pqEncerrar'))return dois(e.target.closest('#pqEncerrar'),async()=>{await api(`/api/perguntas/gestora/${p.id}/encerrar`,{method:'POST'});await carregarPerguntas();renderPerguntas('Pergunta encerrada. Ela continua no histórico.')});
+  if(e.target.closest('#pqApagar'))return dois(e.target.closest('#pqApagar'),async()=>{await api(`/api/perguntas/gestora/${p.id}`,{method:'DELETE'});pqSel=null;await carregarPerguntas();renderPerguntas('Pergunta apagada.')});
+  const rm=e.target.closest('.pq-rm');if(rm)return dois(rm,async()=>{await api(`/api/perguntas/gestora/${p.id}/resposta/${rm.dataset.rid}`,{method:'DELETE'});await carregarPerguntas()});
+  if(e.target.closest('#pqResumo')){
+    pqGerando=true;renderPerguntas('Gerando o resumo com IA… costuma levar de 15 a 40 segundos.');
+    try{const d=await api(`/api/perguntas/gestora/${p.id}/resumo`,{method:'POST'});p.resumo=d.resumo;pqGerando=false;renderPerguntas('Resumo gerado ✓')}
+    catch(err){pqGerando=false;renderPerguntas(err.message)}
+  }
+});
+
+// ---------- Lembrete de sexta ----------
+async function carregarLembretes(){
+  try{const d=await api('/api/lembretes/gestora');
+    $('lbCorpo').innerHTML=`<p style="margin:0 0 10px"><b>${d.inscritos}</b> ${d.inscritos===1?'pessoa ativou':'pessoas ativaram'} o lembrete. Toda <b>sexta às 9h</b> elas recebem um aviso para responder o Sentimento (e a Pergunta da semana, se houver uma aberta).${d.ultimoEnvio?` Último envio: ${new Date(d.ultimoEnvio).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}.`:''}</p>
+    <p class="ev-nota" style="margin:0 0 10px">Para ativar, cada pessoa toca no sino 🔔 no topo do site. No iPhone é preciso instalar o app antes (Compartilhar → Adicionar à Tela de Início).</p>
+    <button class="btn-outline btn-sm" type="button" id="lbTestar" ${d.inscritos?'':'disabled'}>Enviar lembrete agora</button> <span class="msgsg" id="lbMsg"></span>`;
+  }catch(e){$('lbCorpo').textContent=e.message}
+}
+$('lbCorpo').addEventListener('click',async e=>{
+  const b=e.target.closest('#lbTestar');if(!b)return;
+  if(!b.classList.contains('armed')){b.classList.add('armed');b.textContent='Confirmar envio para todos';setTimeout(()=>{b.classList.remove('armed');b.textContent='Enviar lembrete agora'},3500);return}
+  b.disabled=true;$('lbMsg').className='msgsg';$('lbMsg').textContent='Enviando…';
+  try{const d=await api('/api/lembretes/gestora/testar',{method:'POST'});$('lbMsg').className='msgsg ok';$('lbMsg').textContent=`Enviado para ${d.enviados} de ${d.total}.`;setTimeout(carregarLembretes,2500)}
+  catch(err){$('lbMsg').className='msgsg err';$('lbMsg').textContent=err.message;b.disabled=false}
+});
 
 // ---------- Caixa de sugestões ----------
 let sugestoes=[],sgFiltro='abertas';

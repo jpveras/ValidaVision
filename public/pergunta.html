@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pergunta da semana · Valida Vision</title>
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/vv-base.css">
+<style>
+.pergunta{font-size:22px;line-height:1.35;color:var(--ink);font-weight:500;margin:0;overflow-wrap:anywhere}
+.pergunta-card{border-left:4px solid var(--teal)}
+.quando{font-size:12px;color:var(--muted);margin-top:8px}
+.texto-box{display:block;width:100%;box-sizing:border-box;min-height:96px;max-height:200px;resize:vertical;font:inherit;font-size:16px;line-height:1.45;padding:12px 14px;border:1px solid var(--line);border-radius:6px;background:#fff;color:var(--ink);overflow-wrap:anywhere}
+.texto-box:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px var(--teal-soft)}
+.vv-emojis{margin:8px 0 4px}
+.envio-acoes{display:flex;justify-content:flex-end;align-items:center;gap:12px;margin-top:12px}
+.envio-acoes .dica{margin-right:auto;font-size:12px;color:var(--muted)}
+.counter.perto{color:#b26b00}.counter.limite{color:#b42318;font-weight:700}
+.status.ok{color:var(--teal2)}
+.minhas{margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}
+.minhas-h{font-size:13px;color:var(--muted);margin:0 0 8px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip-minha{display:inline-flex;align-items:center;gap:8px;max-width:100%;box-sizing:border-box;padding:6px 8px 6px 14px;border:1px solid var(--line);border-radius:18px;background:#fff;font-weight:700;color:var(--teal2)}
+.chip-minha>span{overflow-wrap:anywhere;min-width:0;line-height:1.35}
+.chip-minha button{flex:none;height:24px;padding:0 10px;border:1px solid #f0c7c4;background:#fff;color:#b3261e;border-radius:999px;font-size:10px;font-weight:700;letter-spacing:.6px;cursor:pointer}
+.chip-minha button.confirmar{background:#b3261e;color:#fff;border-color:#b3261e}
+.done{display:flex;gap:14px;align-items:center}
+.done .ok{width:48px;height:48px;border-radius:50%;background:var(--teal-soft);display:grid;place-items:center;flex:none}
+.done .ok svg{width:24px;height:24px;stroke:var(--teal);fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.done h2{margin:0 0 2px;font-size:18px;font-weight:500;color:var(--ink)}
+.done p{margin:0;color:var(--muted);font-size:14px}
+.sem-pergunta{text-align:center;padding:28px 12px;color:var(--muted)}
+.sem-pergunta b{display:block;font-size:18px;color:var(--ink);margin-bottom:6px;font-weight:500}
+@media(max-width:760px){.pergunta{font-size:19px}.envio-acoes{flex-direction:column;align-items:stretch}.envio-acoes .dica{margin:0}.envio-acoes button{justify-content:center;width:100%}}
+@media screen{
+html[data-tema="escuro"] .texto-box,html[data-tema="escuro"] .chip-minha,html[data-tema="escuro"] .chip-minha button:not(.confirmar){background:var(--card);border-color:var(--line)}
+}
+</style>
+<link rel="stylesheet" href="/vv-tema-auto.css?v=29">
+<link rel="stylesheet" href="/vv-tema.css?v=30">
+<script src="/vv-tema.js?v=23"></script>
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#033a45">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Valida Vision">
+<script src="/vv-app.js?v=1" defer></script>
+</head>
+<body>
+
+<header class="topbar">
+  <a class="logo" href="/">
+    <img id="brandLogo" src="/logo.png" alt="" hidden onload="this.hidden=false;this.nextElementSibling.setAttribute('hidden','')">
+    <svg width="28" height="24" viewBox="0 0 28 24" aria-hidden="true"><path d="M1 2h9l4 9 4-9h9L14 23z" fill="#2fc28f"/><path d="M10 2h8l-4 9z" fill="#1a8f6a"/></svg>
+    <b>Valida <span>Vision</span></b><span class="ver">v0.28</span>
+  </a>
+  <div class="spacer"></div>
+  <span class="env" id="envBadge">Protótipo local</span>
+</header>
+
+<nav class="side" aria-label="Menu">
+  <a class="nav" href="/analise.html" data-recurso="analise">
+    <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4"/><circle cx="12" cy="10.5" r="2.5"/></svg>
+    <span>Análise de Tela</span>
+  </a>
+  <a class="nav" href="/elogios.html">
+    <svg viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.5 1-1.1a5.5 5.5 0 0 0 0-7.8z"/></svg>
+    <span>Elogie um Colega</span>
+  </a>
+  <a class="nav" href="/sentimento.html">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 14.5s1.5 2 4 2 4-2 4-2"/><path d="M9 9.5h.01M15 9.5h.01"/></svg>
+    <span>Sentimento da Semana</span>
+  </a>
+  <a class="nav active" href="/pergunta.html" aria-current="page">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.3a2.6 2.6 0 0 1 5 .9c0 1.7-2.5 2.2-2.5 3.8"/><path d="M12 17h.01"/></svg>
+    <span>Pergunta da semana</span>
+  </a>
+  <a class="nav" href="/sugestoes.html">
+    <svg viewBox="0 0 24 24"><path d="M4 7h16v11a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M4 7l2.5-3h11L20 7"/><path d="M9 12h6"/></svg>
+    <span>Caixa de sugestões</span>
+  </a>
+  <a class="nav" href="/api/health" target="_blank" rel="noopener">
+    <svg viewBox="0 0 24 24"><path d="M3 12h4l3-7 4 14 3-7h4"/></svg>
+    <span>Status da IA</span>
+  </a>
+</nav>
+
+<main class="content"><div class="panel"><div class="wrap">
+
+  <div id="storageWarn" class="alert" hidden>
+    <svg viewBox="0 0 24 24"><path d="M12 3 2 20h20L12 3z"/><path d="M12 10v4M12 17v.5"/></svg>
+    <div><b>Armazenamento temporário</b>O Vercel Blob não está conectado. As respostas podem se perder.</div>
+  </div>
+
+  <div class="page-head">
+    <div class="page-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.3a2.6 2.6 0 0 1 5 .9c0 1.7-2.5 2.2-2.5 3.8"/><path d="M12 17h.01"/></svg></div>
+    <h1 class="grow">Pergunta da semana</h1>
+  </div>
+  <p class="page-sub">Toda semana a coordenação faz uma pergunta para a equipe. Responda em poucas palavras, <b>sem se identificar</b> — as palavras mais citadas viram uma nuvem.</p>
+  <div class="divider"></div>
+
+  <section class="card pergunta-card" id="perguntaCard">
+    <div class="card-body" id="perguntaCorpo"><p class="quando">Carregando…</p></div>
+  </section>
+
+  <section class="card" id="nuvemCard" hidden>
+    <div class="card-head"><span>Nuvem da equipe</span><b class="counter" id="totalTxt"></b></div>
+    <div class="card-body" style="padding:16px">
+      <div class="cloud-box" id="cloudBox">
+        <canvas id="cloud" hidden></canvas>
+        <div id="fallback" class="fallback-cloud" hidden></div>
+        <div class="cloud-wait" id="cloudWait"><strong id="waitTitle">Responda para ver a nuvem da equipe</strong><span id="waitSub">Assim a sua resposta não é influenciada pelas dos colegas.</span></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="foot-link"><a href="/sentimento-gestora.html#perguntas">Painel da gestora</a></div>
+
+</div></div></main>
+
+<script src="/vendor/wordcloud2.js"></script>
+<script src="/vv-nuvem.js"></script>
+<script src="/vv-emojis.js?v=22"></script>
+<script>
+const $=id=>document.getElementById(id);
+const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+const local=/^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
+$('envBadge').textContent=local?'Protótipo local':'Demonstração';
+const ls={get(k){try{return localStorage.getItem(k)}catch{return null}},set(k,v){try{localStorage.setItem(k,v)}catch{}}};
+const K='vv-pergunta';
+let dados=null,assinatura='';
+const minhas=()=>{try{const m=JSON.parse(ls.get(K)||'null');return m&&dados?.pergunta&&m.pergunta===dados.pergunta.id?m.itens:[]}catch{return[]}};
+const salvarMinhas=l=>ls.set(K,JSON.stringify({pergunta:dados.pergunta.id,itens:l}));
+const dataBR=iso=>new Date(iso).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
+
+async function carregar(){
+  try{
+    const r=await fetch('/api/perguntas',{cache:'no-store'});const d=await r.json();if(!r.ok)throw new Error(d.error);
+    const mudou=!dados||dados.pergunta?.id!==d.pergunta?.id;dados=d;
+    $('storageWarn').hidden=d.armazenamento!=='temporario';
+    if(mudou)montar();else atualizar();
+  }catch(e){$('perguntaCorpo').innerHTML=`<p class="quando">${esc(e.message||'Não consegui carregar.')}</p>`}
+}
+function montar(){
+  const p=dados.pergunta;
+  if(!p){
+    $('perguntaCorpo').innerHTML=`<div class="sem-pergunta"><b>Nenhuma pergunta aberta agora</b>${dados.anterior?`A última foi “${esc(dados.anterior.texto)}” (${dados.anterior.total} ${dados.anterior.total===1?'resposta':'respostas'}). `:''}Volte em breve — a coordenação lança uma nova pergunta toda semana.</div>`;
+    $('nuvemCard').hidden=true;return;
+  }
+  $('perguntaCorpo').innerHTML=`
+    <p class="pergunta">${esc(p.texto)}</p>
+    <p class="quando">Pergunta de ${dataBR(p.criadaEm)} · respostas anônimas · até ${dados.maxPorPessoa} por pessoa</p>
+    <div class="divider" style="margin:16px 0"></div>
+    <form id="form" novalidate>
+      <label class="label" for="texto"><span>Sua resposta</span><span class="counter" id="cnt">0/200</span></label>
+      <textarea class="texto-box" id="texto" maxlength="200" rows="3" autocomplete="off" placeholder="Escreva em poucas palavras…"></textarea>
+      <div class="envio-acoes"><span class="dica">Até 200 caracteres · não precisa se identificar</span>
+        <button class="btn-primary" type="submit" id="enviar"><svg viewBox="0 0 24 24"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>Enviar</button></div>
+      <div class="status" id="status" role="status"></div>
+    </form>
+    <div class="done" id="done" hidden><div class="ok"><svg viewBox="0 0 24 24"><path d="M5 12.5 10 17 19 7"/></svg></div><div><h2>Obrigado por responder! 💚</h2><p>Você já enviou as ${dados.maxPorPessoa} respostas. Quer trocar alguma? Apague abaixo.</p></div></div>
+    <div class="minhas" id="minhasBox" hidden><p class="minhas-h">Suas respostas</p><div class="chips" id="chips"></div><div class="status" id="statusApagar" role="status"></div></div>
+    <div class="privacy">🔒 <span><b>Sua resposta é anônima.</b> Não guardamos seu nome, e-mail ou qualquer dado que identifique você. Evite citar nomes de colegas.</span></div>`;
+  const texto=$('texto');if(window.vvEmojis)vvEmojis(texto);
+  texto.addEventListener('input',()=>{const n=texto.value.length,c=$('cnt');c.textContent=`${n}/200`;c.className='counter'+(n>=200?' limite':n>=170?' perto':'')});
+  texto.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();$('form').requestSubmit()}});
+  $('form').addEventListener('submit',enviar);
+  $('chips').addEventListener('click',apagar);
+  $('nuvemCard').hidden=false;assinatura='';
+  sincronizar();atualizar();
+}
+function atualizar(){
+  const p=dados.pergunta;if(!p)return;
+  const m=minhas(),respondeu=m.length>0,fim=m.length>=dados.maxPorPessoa;
+  $('form').hidden=fim;$('done').hidden=!fim;
+  $('minhasBox').hidden=!respondeu;
+  $('chips').innerHTML=m.map(x=>`<span class="chip-minha"><span>${esc(x.texto)}</span><button type="button" data-id="${esc(x.id)}">Apagar</button></span>`).join('');
+  $('totalTxt').textContent=`${p.total} ${p.total===1?'resposta':'respostas'}`;
+  const mostrar=respondeu&&p.palavras.length;
+  $('cloudWait').hidden=!!mostrar;
+  if(respondeu&&!p.palavras.length){$('waitTitle').textContent='A nuvem aparece com as primeiras respostas';$('waitSub').textContent=''}
+  if(mostrar){const sig=JSON.stringify(p.palavras)+$('cloudBox').clientWidth+document.documentElement.dataset.tema;if(sig!==assinatura){assinatura=sig;vvNuvem($('cloudBox'),$('cloud'),$('fallback'),p.palavras)}}
+  else{$('cloud').hidden=true;$('fallback').hidden=true;assinatura=''}
+}
+async function sincronizar(){
+  const m=minhas();if(!m.length)return;
+  try{const r=await fetch('/api/perguntas/minhas',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({ids:m.map(x=>x.id)})});const d=await r.json();
+    if(r.ok&&d.pergunta===dados.pergunta.id){const ok=new Set(d.existem);const l=m.filter(x=>ok.has(x.id));if(l.length!==m.length){salvarMinhas(l);atualizar()}}}catch{}
+}
+const st=(el,t,tipo='')=>{el.textContent=t;el.className='status'+(tipo===true?' error':tipo?' '+tipo:'')};
+async function enviar(e){
+  e.preventDefault();const t=$('texto').value.trim();
+  if(!t){st($('status'),'Escreva a sua resposta.',true);return $('texto').focus()}
+  $('enviar').disabled=true;st($('status'),'Enviando…');
+  try{
+    const r=await fetch('/api/perguntas',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({texto:t,pergunta:dados.pergunta.id})});
+    const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error||'Não consegui enviar.');
+    salvarMinhas([...minhas(),{id:d.id,chave:d.chave,texto:t}]);
+    $('texto').value='';$('texto').dispatchEvent(new Event('input'));
+    st($('status'),'Resposta enviada! 💚','ok');await carregar();
+  }catch(err){st($('status'),err.message,true)}finally{$('enviar').disabled=false}
+}
+async function apagar(e){
+  const b=e.target.closest('button[data-id]');if(!b)return;
+  if(!b.classList.contains('confirmar')){b.classList.add('confirmar');b.textContent='Confirmar';setTimeout(()=>{b.classList.remove('confirmar');b.textContent='Apagar'},3000);return}
+  const item=minhas().find(x=>x.id===b.dataset.id);b.disabled=true;
+  try{
+    const r=await fetch('/api/perguntas/minha/'+encodeURIComponent(item.id),{method:'DELETE',headers:{'x-pergunta-chave':item.chave}});
+    const d=await r.json().catch(()=>({}));
+    if(!r.ok&&r.status!==404)throw new Error(d.error||'Não consegui apagar.');
+    salvarMinhas(minhas().filter(x=>x.id!==item.id));st($('statusApagar'),'Resposta apagada.','ok');await carregar();
+  }catch(err){st($('statusApagar'),err.message,true);b.disabled=false}
+}
+addEventListener('vv-tema',()=>{assinatura='';if(dados)atualizar()});
+let rz;addEventListener('resize',()=>{clearTimeout(rz);rz=setTimeout(()=>{assinatura='';if(dados)atualizar()},250)});
+carregar();setInterval(()=>{if(!document.hidden)carregar()},20000);
+</script>
+</body>
+</html>
