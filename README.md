@@ -41,6 +41,8 @@ Antes de enviar telas reais da empresa, valide as políticas internas de dados e
 
 ## Novidades da v0.28
 
+- **Ícone próprio do app** (v0.28.1): olho com coração ("Vision" + cuidado com a equipe), em degradê verde-petróleo. Arquivo-fonte `public/icone-valida-vision.svg`; PNGs `icon-192`, `icon-512`, `icon-512-maskable` e `apple-touch-icon`.
+
 - **❓ Pergunta da semana** (`/pergunta.html`, atalho `/pergunta`): a gestora lança uma pergunta curta
   no painel (com ideias prontas); a equipe responde anonimamente (até 200 caracteres, até 3 por pessoa,
   pode apagar). A nuvem aparece depois que a pessoa responde. No painel: respostas, palavras, remover,
