@@ -64,6 +64,7 @@ html[data-tema="escuro"][data-pagina="sentimento-gestora"] .sg{background:#1c313
 html[data-tema="escuro"][data-pagina="sentimento-gestora"] .sg select{border:1px solid #3e4342;background:#1c3134}
 html[data-tema="escuro"][data-pagina="sentimento-gestora"] .sg textarea{border:1px solid #3e4342;background:#1c3134}
 html[data-tema="escuro"][data-pagina="sentimento-gestora"] .sg .err{color:#ed857e}
+html[data-tema="escuro"][data-pagina="sentimento-gestora"] .msgsg.err{color:#ed857e}
 html[data-tema="escuro"][data-pagina="sentimento-gestora"] .ev-alerta{background:#342914;border:1px solid #4c412d;color:#f3d9a9}
 html[data-tema="escuro"][data-pagina="sentimento-gestora"] .ev-alerta.alto{background:#321717;border-color:#4f3131;color:#ee9c96}
 html[data-tema="escuro"][data-pagina="sentimento-gestora"] [data-tema="escuro"] .ev-tip{background:#1d2524;color:#deebed}
@@ -92,4 +93,15 @@ html[data-tema="escuro"][data-pagina="pergunta"] .counter.perto{color:#eec78b}
 html[data-tema="escuro"][data-pagina="pergunta"] .counter.limite{color:#ed857e}
 html[data-tema="escuro"][data-pagina="pergunta"] .chip-minha{background:#1c3134}
 html[data-tema="escuro"][data-pagina="pergunta"] .chip-minha button{border:1px solid #503634;background:#1c3134;color:#e9847e}
+html[data-tema="escuro"][data-pagina="album"] .filtros button{background:#1c3134}
+html[data-tema="escuro"][data-pagina="album"] .lb-lado{background:var(--card,#1c3134)}
+html[data-tema="escuro"][data-pagina="album"] .curtir{background:#1c3134}
+html[data-tema="escuro"][data-pagina="album"] .curtir.on{background:#321717;border-color:#50322f;color:#e07e77}
+html[data-tema="escuro"][data-pagina="album"] .com .apagar{color:#ed857e}
+html[data-tema="escuro"][data-pagina="album"] .lb-form input,html[data-tema="escuro"][data-pagina="album"] .lb-form textarea{background:#1c3134}
+html[data-tema="escuro"][data-pagina="album"] .lb-fechar,html[data-tema="escuro"][data-pagina="album"] .lb-nav{background:rgba(255,255,255,.14)}
+html[data-tema="escuro"][data-pagina="album"] .lb-fechar:hover,html[data-tema="escuro"][data-pagina="album"] .lb-nav:hover{background:rgba(255,255,255,.26)}
+html[data-tema="escuro"][data-pagina="album"] .lb-gest input{background:#1c3134}
+html[data-tema="escuro"][data-pagina="album"] .prev{background:#1c3134}
+html[data-tema="escuro"][data-pagina="album"] .prev .tira{color:#ed857e}
 }

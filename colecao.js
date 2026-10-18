@@ -181,5 +181,41 @@ export async function apagarDocs(pathnames) {
   for (let i = 0; i < pathnames.length; i += 500) await del(pathnames.slice(i, i + 500));
 }
 
+/** Grava um arquivo binário (ex.: foto do álbum). Nome único por arquivo, então não precisa de versão. */
+export async function gravarArquivo(pathname, buffer, contentType) {
+  const { put } = await sdk();
+  let ultimo;
+  for (const access of ordemAcesso()) {
+    try {
+      await put(pathname, buffer, { access, contentType, addRandomSuffix: false, allowOverwrite: true, cacheControlMaxAge: 31536000 });
+      blobAccess = access;
+      return;
+    } catch (e) {
+      ultimo = e;
+      if (!erroDeAcesso(e)) throw e;
+    }
+  }
+  throw ultimo;
+}
+
+/** Lê um arquivo binário: { stream, contentType } ou null. */
+export async function lerArquivo(pathname) {
+  const { get } = await sdk();
+  let ultimo;
+  for (const access of ordemAcesso()) {
+    try {
+      const r = await get(pathname, { access });
+      blobAccess = access;
+      if (!r || !r.stream) return null;
+      return { stream: r.stream, contentType: r.blob?.contentType || "application/octet-stream" };
+    } catch (e) {
+      if (e?.name === "BlobNotFoundError" || /not.?found/i.test(String(e?.message))) return null;
+      ultimo = e;
+      if (!erroDeAcesso(e)) throw e;
+    }
+  }
+  throw ultimo;
+}
+
 // Usado nos testes
 export const _colecao = { setSdk: (m) => { blobSdk = m; blobAccess = null; } };

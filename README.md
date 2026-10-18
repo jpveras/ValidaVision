@@ -1,4 +1,6 @@
-# Valida Vision — v0.28
+# Toca dos Bug Hunters — v0.29
+
+> Antes chamado **Valida Vision** (o repositório e o endereço `valida-vision.vercel.app` continuam com o nome antigo).
 
 ## Rodar
 
@@ -38,6 +40,19 @@ Os elogios ficam visíveis para quem abrir a página (é a ideia da dinâmica). 
 
 A chave fica só no `.env` e nunca vai para o browser. Não compartilhe o `.env`.
 Antes de enviar telas reais da empresa, valide as políticas internas de dados e PII.
+
+## Novidades da v0.29
+
+- **Novo nome: Toca dos Bug Hunters** (o cantinho da equipe Bug Hunters, analistas de testes).
+  Títulos, barra superior, app instalado ("Bug Hunters" na tela inicial), notificações e PDFs.
+  O endereço do site não mudou, para não quebrar links e QR Codes já divulgados.
+- **Ícone caça-bugs**: lupa ampliando um bug simpático (`public/icone-bug-hunters.svg`), também na aba do navegador.
+- **📷 Álbum do time** (`/album.html`, atalhos `/album` e `/fotos`): a gestora publica fotos (várias de uma vez,
+  com legenda e nome do álbum) pela "Área da gestora" no fim da página, com a mesma senha do painel.
+  A equipe vê em grade, abre a foto, curte (1 por navegador, também com toque duplo) e comenta com o próprio nome;
+  quem comentou pode apagar o próprio comentário. A gestora edita legendas, apaga fotos e remove comentários.
+  - Fotos reduzidas no navegador (até 1600 px + miniatura de 480 px) e servidas por `/api/album/foto/:id`
+    com cache longo na CDN. Blob: `album/_dados.json` e `album/fotos/<id>-g.jpg|-p.jpg`. Módulo `album.js`.
 
 ## Novidades da v0.28
 

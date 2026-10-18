@@ -111,3 +111,11 @@ html.vv-tema-anim, html.vv-tema-anim * { transition: background-color .25s, colo
 .vv-app-msg.erro { color: #b42318; }
 @media screen { html[data-tema="escuro"] .vv-app-msg.erro { color: #f07a72; } }
 @media print { .vv-app-btn, .vv-app-pop { display: none !important; } }
+
+/* Nome "Toca dos Bug Hunters" numa linha só no celular */
+@media (max-width: 520px) {
+  .topbar b { white-space: nowrap; font-size: 16px; }
+  .topbar .ver { display: none; }
+  .topbar .logo img, .topbar > img { width: 30px; height: 30px; }
+}
+@media (max-width: 360px) { .topbar b { font-size: 14.5px; } }
