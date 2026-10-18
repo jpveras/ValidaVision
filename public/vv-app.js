@@ -53,6 +53,8 @@
 
   function atualiza() {
     if (!pop) return;
+    var rec = pop.querySelector(".vv-app-rec");
+    if (rec) rec.hidden = !(window.vvRecado && window.vvRecado.tem());
     var inst = pop.querySelector(".vv-app-inst"), lem = pop.querySelector(".vv-app-lem");
     if (instalado) inst.innerHTML = '<b>📲 App instalado</b><span>Abra o Toca dos Bug Hunters pelo ícone na tela inicial.</span>';
     else if (promptInstalar) inst.innerHTML = '<b>📲 Instalar o app</b><span>Ícone na tela inicial, abre direto, sem barra do navegador.</span><button type="button" class="btn-primary btn-sm" data-acao="instalar">Instalar</button>';
@@ -98,7 +100,7 @@
     pop.hidden = true;
     pop.setAttribute("role", "dialog");
     pop.setAttribute("aria-label", "App e lembrete de sexta");
-    pop.innerHTML = '<div class="vv-app-item vv-app-inst"></div><div class="vv-app-item vv-app-lem"></div><p class="vv-app-msg" role="status"></p>';
+    pop.innerHTML = '<div class="vv-app-item vv-app-rec" hidden><b>📣 Recado da Chefa</b><span>Rever o recado que a chefa deixou para o time.</span><button type="button" class="btn-outline btn-sm" data-acao="recado">Ver recado</button></div><div class="vv-app-item vv-app-inst"></div><div class="vv-app-item vv-app-lem"></div><p class="vv-app-msg" role="status"></p>';
     document.body.appendChild(pop);
 
     btn.addEventListener("click", function (e) { e.stopPropagation(); abrir(); });
@@ -109,12 +111,14 @@
       if (a.dataset.acao === "instalar" && promptInstalar) promptInstalar.prompt().then(function () { promptInstalar = null; atualiza(); });
       if (a.dataset.acao === "ativar") ativar();
       if (a.dataset.acao === "desativar") desativar();
+      if (a.dataset.acao === "recado" && window.vvRecado) { abrir(false); window.vvRecado.abrir(); }
     });
     document.addEventListener("click", function () { if (aberto) abrir(false); });
     document.addEventListener("keydown", function (e) { if (e.key === "Escape" && aberto) abrir(false); });
     atualiza();
   }
 
+  window.addEventListener("vv-recado", function () { atualiza(); });
   window.vvApp = { abrir: function () { if (btn) { abrir(true); window.scrollTo(0, 0); } } };
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", function () { setTimeout(monta, 0); });
   else setTimeout(monta, 0);

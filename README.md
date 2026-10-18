@@ -1,4 +1,4 @@
-# Toca dos Bug Hunters — v0.29
+# Toca dos Bug Hunters — v0.30
 
 > Antes chamado **Valida Vision** (o repositório e o endereço `valida-vision.vercel.app` continuam com o nome antigo).
 
@@ -40,6 +40,16 @@ Os elogios ficam visíveis para quem abrir a página (é a ideia da dinâmica). 
 
 A chave fica só no `.env` e nunca vai para o browser. Não compartilhe o `.env`.
 Antes de enviar telas reais da empresa, valide as políticas internas de dados e PII.
+
+## Novidades da v0.30
+
+- **📣 Recado da Chefa!** — pop-up com a mensagem que a gestora configura no painel (título, mensagem até 600
+  caracteres com emojis e quebras de linha, assinatura, ideias prontas e pré-visualização). Aparece ao abrir a
+  Toca, no PC ou no app, conforme a frequência: uma vez por pessoa (volta quando o recado muda), uma vez por dia
+  ou sempre. Não aparece no telão, na moderação nem no painel. Dá para rever pelo sino 🔔.
+  Módulo `recado.js` (`/api/recado`), Blob `recado/_dados.json`, script `public/vv-recado.js` em todas as telas.
+- **Pergunta da semana oculta** (trocada pelo Recado): sai do menu e do painel pela regra
+  `[data-recurso="pergunta"]` em `vv-tema.css`; nada foi apagado (`/pergunta.html` e `/api/perguntas` continuam).
 
 ## Novidades da v0.29
 

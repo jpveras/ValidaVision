@@ -9,6 +9,17 @@
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/vv-base.css">
 <style>
+/* Recado da Chefa (gestora) */
+.rc-form{display:flex;flex-direction:column;gap:10px}
+.rc-form .linha{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.rc-form input[type=text],.rc-form textarea,.rc-form select{width:100%;box-sizing:border-box;border:1px solid #cfd8d6;border-radius:6px;padding:8px 10px;font:inherit;font-size:15px;background:#fff;color:var(--ink)}
+.rc-form textarea{min-height:110px;resize:vertical;line-height:1.45}
+.rc-form .duas{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.rc-estado{display:inline-flex;align-items:center;gap:6px;border-radius:99px;padding:4px 10px;font-size:12px;font-weight:700}
+.rc-estado.on{background:#e6f6ee;color:#067647}.rc-estado.off{background:#eef2f1;color:#475467}
+@media(max-width:760px){.rc-form .duas{grid-template-columns:1fr}}
+@media screen{html[data-tema="escuro"] .rc-form input[type=text],html[data-tema="escuro"] .rc-form textarea,html[data-tema="escuro"] .rc-form select{background:var(--card);border-color:var(--line);color:var(--ink)}
+html[data-tema="escuro"] .rc-estado.on{background:#123a2c;color:#7fe0b0}html[data-tema="escuro"] .rc-estado.off{background:#24383b;color:#c9d6d4}}
 /* Pergunta da semana (gestora) */
 .pq-atual{font-size:19px;line-height:1.35;color:var(--ink);font-weight:500;margin:0;overflow-wrap:anywhere}
 .pq-meta{font-size:12px;color:var(--muted);margin:6px 0 12px}
@@ -25,7 +36,7 @@
 .pq-resumo{border:1px solid var(--line);border-left:4px solid var(--teal);border-radius:6px;padding:12px 14px;margin:6px 0 14px;font-size:14px;line-height:1.5;background:#fff}
 .pq-resumo h4{margin:10px 0 4px;font-size:11px;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);font-weight:500}
 .pq-resumo ul{margin:0;padding-left:18px}
-.pq-ideias button,.pq-hist button.item{white-space:normal;text-transform:none;letter-spacing:normal;max-width:100%;text-align:left;height:auto;font-weight:400;line-height:1.35}
+.pq-ideias button,.pq-hist button.item,.rc-ideia{white-space:normal;text-transform:none;letter-spacing:normal;max-width:100%;text-align:left;height:auto;font-weight:400;line-height:1.35}
 .pq-hist button.item>span{flex:none}
 .pq-hist{margin-top:18px;border-top:1px solid var(--line);padding-top:14px}
 .pq-hist h4{margin:0 0 8px;font-size:11px;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);font-weight:500}
@@ -169,14 +180,15 @@ html[data-tema="escuro"] .ev-tip{background:#e4efed;color:#0f1a1c}
 }
 </style>
 <link rel="stylesheet" href="/vv-tema-auto.css?v=31">
-<link rel="stylesheet" href="/vv-tema.css?v=32">
+<link rel="stylesheet" href="/vv-tema.css?v=33">
 <script src="/vv-tema.js?v=23"></script>
 <link rel="manifest" href="/manifest.webmanifest?v=3">
 <meta name="theme-color" content="#033a45">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=3">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Bug Hunters">
-<script src="/vv-app.js?v=1" defer></script>
+<script src="/vv-app.js?v=2" defer></script>
+<script src="/vv-recado.js?v=1" defer></script>
 </head>
 <body>
 
@@ -184,7 +196,7 @@ html[data-tema="escuro"] .ev-tip{background:#e4efed;color:#0f1a1c}
   <a class="logo" href="/">
     <img id="brandLogo" src="/logo.png" alt="" hidden onload="this.hidden=false;this.nextElementSibling.setAttribute('hidden','')">
     <svg width="28" height="24" viewBox="0 0 28 24" aria-hidden="true"><path d="M1 2h9l4 9 4-9h9L14 23z" fill="#2fc28f"/><path d="M10 2h8l-4 9z" fill="#1a8f6a"/></svg>
-    <b>Toca dos <span>Bug Hunters</span></b><span class="ver">v0.29</span>
+    <b>Toca dos <span>Bug Hunters</span></b><span class="ver">v0.30</span>
   </a>
   <div class="spacer"></div>
   <span class="env">Painel da gestora</span>
@@ -203,7 +215,7 @@ html[data-tema="escuro"] .ev-tip{background:#e4efed;color:#0f1a1c}
     <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 14.5s1.5 2 4 2 4-2 4-2"/><path d="M9 9.5h.01M15 9.5h.01"/></svg>
     <span>Sentimento da Semana</span>
   </a>
-  <a class="nav" href="/pergunta.html">
+  <a class="nav" href="/pergunta.html" data-recurso="pergunta">
     <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.3a2.6 2.6 0 0 1 5 .9c0 1.7-2.5 2.2-2.5 3.8"/><path d="M12 17h.01"/></svg>
     <span>Pergunta da semana</span>
   </a>
@@ -260,7 +272,7 @@ html[data-tema="escuro"] .ev-tip{background:#e4efed;color:#0f1a1c}
           <li><b>Compartilhe</b>: <kbd>Baixar PDF</kbd> gera uma página pronta para encaminhar; <kbd>Copiar resumo</kbd> copia um texto para colar no e-mail ou no Teams.</li>
           <li><b>Gere a análise da semana</b>: no card <kbd>💡 Análise da semana</kbd>, clique em <kbd>Gerar análise</kbd>. A IA lê as respostas completas (anônimas) e sugere o clima, temas, ações para a equipe e uma pergunta para abrir a conversa. Ela fica salva; use <kbd>Gerar novamente</kbd> se chegarem novas respostas ou <kbd>Apagar análise</kbd> para removê-la.</li>
           <li><b>Acompanhe a evolução</b>: no card <kbd>📈 Evolução do Sentimento</kbd> você vê as últimas semanas lado a lado — quantas respostas chegaram, quantas tinham <b>sinais de cansaço</b> (palavras como “cansado”, “puxada”, “corrida”), a palavra de cada semana e as palavras que subiram ou caíram. Se os sinais aparecem por 2 semanas seguidas ou mais, o painel avisa.</li>
-          <li><b>Lance a pergunta da semana</b>: no card <kbd>❓ Pergunta da semana</kbd>, escreva uma pergunta curta (ou escolha uma das ideias prontas) e clique em <kbd>Publicar pergunta</kbd>. A equipe responde em <b>/pergunta</b>, de forma anônima. Você vê as respostas, a nuvem e pode pedir um <kbd>Resumo com IA</kbd>. Publicar uma nova encerra a anterior, que fica no histórico.</li>
+          <li><b>Deixe um recado para o time</b>: no card <kbd>📣 Recado da Chefa!</kbd>, escreva a mensagem (ex.: “Bem-vindos à Toca! Que seja uma semana abençoada! 🙏”), escolha com que frequência ela aparece e marque <b>Mostrar o recado</b>. Ele abre como uma janelinha para todo mundo que entrar na Toca, no PC ou no app. Use <kbd>Pré-visualizar</kbd> para ver como fica.</li>
           <li><b>Lembrete de sexta</b>: quem ativar o sino 🔔 no topo do site recebe um aviso toda sexta às 9h. No card <kbd>🔔 Lembrete de sexta</kbd> você vê quantas pessoas ativaram.</li>
           <li><b>Publique fotos no Álbum do time</b>: em <b>/album</b>, role até <kbd>🔒 Área da gestora</kbd> (a mesma senha deste painel), escolha as fotos, dê legendas e publique. A equipe curte e comenta; ao abrir uma foto você edita a legenda, apaga a foto ou remove comentários.</li>
           <li><b>Responda às sugestões</b>: no card <kbd>📮 Caixa de sugestões</kbd> ficam as ideias que a equipe mandou (anônimas). Mude o status, escreva uma resposta e marque <b>“Mostrar para a equipe”</b> para ela aparecer no mural “Ouvimos você”.</li>
@@ -326,7 +338,12 @@ html[data-tema="escuro"] .ev-tip{background:#e4efed;color:#0f1a1c}
       <div class="card-head"><span>📈 Evolução do Sentimento</span><span class="counter" id="evSub">últimas semanas</span></div>
       <div class="card-body" id="evCorpo"><div class="an-vazio"><span class="carregando"></span></div></div>
     </section>
-    <section class="card no-print" id="perguntas">
+    <section class="card no-print" id="recado">
+      <div class="card-head"><span>📣 Recado da Chefa!</span><span id="rcEstado"></span></div>
+      <div class="card-body" id="rcCorpo"><span class="carregando"></span></div>
+    </section>
+
+    <section class="card no-print" id="perguntas" data-recurso="pergunta">
       <div class="card-head"><span>❓ Pergunta da semana</span><span class="counter"><a href="/pergunta.html" target="_blank" rel="noopener">Ver como a equipe vê ↗</a></span></div>
       <div class="card-body" id="pqCorpo"><div class="an-vazio"><span class="carregando"></span></div></div>
     </section>
@@ -348,6 +365,7 @@ html[data-tema="escuro"] .ev-tip{background:#e4efed;color:#0f1a1c}
 
 <script src="/vendor/wordcloud2.js"></script>
 <script src="/vv-nuvem.js"></script>
+<script src="/vv-emojis.js?v=22"></script>
 <script>
 const $=id=>document.getElementById(id);
 const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
@@ -384,7 +402,7 @@ async function abrirPainel(){
   $('semanaSel').innerHTML=semanas.map(s=>`<option value="${s.semana}">${esc(s.rotulo)}${s.semana===d.atual?' (atual)':''} — ${s.total} ${s.total===1?'resposta':'respostas'}</option>`).join('');
   $('loginCard').hidden=true;$('painel').hidden=false;
   carregarSugestoes();
-  carregarPerguntas();
+  carregarRecado();
   carregarLembretes();
   await carregarSemana(atual&&semanas.some(s=>s.semana===atual)?atual:d.atual);
 }
@@ -416,6 +434,43 @@ function render(anterior){
   vvNuvem($('cloudBox'),$('cloud'),$('fallback'),d.palavras);
 }
 
+
+// ---------- Recado da Chefa ----------
+const RC_IDEIAS=['Bem-vindos à Toca dos Bug Hunters! Que seja uma semana abençoada! 🙏','Bom dia, time! Na sexta não esqueçam de responder o Sentimento da Semana 💚','Parabéns pela entrega da sprint! Vocês são demais 🚀🐞','Lembrete: nossa confraternização é sexta às 17h 🎉'];
+const RC_FREQ={'uma-vez':'Uma vez para cada pessoa (aparece de novo quando você mudar o recado)','diario':'Uma vez por dia','sempre':'Toda vez que abrir a Toca'};
+let recadoAtual=null;
+async function carregarRecado(){
+  try{recadoAtual=await api('/api/recado/gestora');renderRecado()}
+  catch(e){$('rcCorpo').textContent=e.message}
+}
+function renderRecado(msg='',erro=false){
+  const r=recadoAtual,on=r.ativo&&r.mensagem;
+  $('rcEstado').innerHTML=`<span class="rc-estado ${on?'on':'off'}">${on?'● No ar':'Desligado'}</span>`;
+  $('rcCorpo').innerHTML=`<form class="rc-form" id="rcForm" novalidate>
+    <p class="ev-nota" style="margin:0">A mensagem abre numa janelinha para todo mundo que entrar na Toca (PC ou app). Não aparece no telão nem neste painel.</p>
+    <label class="pub" style="display:flex;gap:8px;align-items:center;font-size:14px;cursor:pointer"><input type="checkbox" id="rcAtivo" ${r.ativo?'checked':''}> <b>Mostrar o recado</b></label>
+    <div class="duas"><div><label class="label" for="rcTitulo"><span>Título</span></label><input type="text" id="rcTitulo" maxlength="60" value="${esc(r.titulo||'Recado da Chefa!')}"></div>
+      <div><label class="label" for="rcAss"><span>Assinatura (opcional)</span></label><input type="text" id="rcAss" maxlength="60" value="${esc(r.assinatura||'')}" placeholder="Ex.: Sua chefa, Ana"></div></div>
+    <div><label class="label" for="rcMsg"><span>Mensagem</span><span class="counter" id="rcCnt">0/600</span></label><textarea id="rcMsg" maxlength="600" placeholder="Ex.: Bem-vindos à Toca! Que seja uma semana abençoada! 🙏">${esc(r.mensagem||'')}</textarea></div>
+    <div class="pq-ideias">${RC_IDEIAS.map(t=>`<button type="button" class="rc-ideia">${esc(t)}</button>`).join('')}</div>
+    <div><label class="label" for="rcFreq"><span>Com que frequência aparece</span></label><select id="rcFreq">${Object.entries(RC_FREQ).map(([k,t])=>`<option value="${k}" ${k===r.frequencia?'selected':''}>${t}</option>`).join('')}</select></div>
+    <div class="linha"><button class="btn-primary btn-sm" type="submit" id="rcSalvar">Salvar recado</button><button class="btn-outline btn-sm" type="button" id="rcPrevia">Pré-visualizar</button><span class="msgsg ${erro?'err':'ok'}" id="rcMsgSt">${esc(msg)}</span></div>
+    ${r.atualizadoEm?`<p class="ev-nota" style="margin:0">Última alteração: ${new Date(r.atualizadoEm).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}</p>`:''}
+  </form>`;
+  const t=$('rcMsg'),cnt=()=>$('rcCnt').textContent=`${t.value.length}/600`;t.addEventListener('input',cnt);cnt();
+  if(window.vvEmojis)vvEmojis(t);
+}
+$('rcCorpo').addEventListener('click',e=>{
+  const ideia=e.target.closest('.rc-ideia');if(ideia){$('rcMsg').value=ideia.textContent;$('rcMsg').dispatchEvent(new Event('input'));$('rcMsg').focus();return}
+  if(e.target.closest('#rcPrevia')){const m=$('rcMsg').value.trim();if(!m){$('rcMsgSt').className='msgsg err';$('rcMsgSt').textContent='Escreva a mensagem para pré-visualizar.';return}
+    window.vvRecado&&vvRecado.previa({titulo:$('rcTitulo').value.trim()||'Recado da Chefa!',mensagem:m,assinatura:$('rcAss').value.trim()})}
+});
+$('rcCorpo').addEventListener('submit',async e=>{
+  e.preventDefault();const b=$('rcSalvar');b.disabled=true;$('rcMsgSt').className='msgsg';$('rcMsgSt').textContent='Salvando…';
+  try{const d=await api('/api/recado/gestora',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({ativo:$('rcAtivo').checked,titulo:$('rcTitulo').value,mensagem:$('rcMsg').value,assinatura:$('rcAss').value,frequencia:$('rcFreq').value})});
+    recadoAtual=d.recado;renderRecado(d.recado.ativo?'Salvo e no ar ✓ O time vê ao abrir a Toca.':'Salvo. O recado está desligado.')}
+  catch(err){$('rcMsgSt').className='msgsg err';$('rcMsgSt').textContent=err.message;b.disabled=false}
+});
 
 // ---------- Pergunta da semana ----------
 let pqLista=[],pqSel=null,pqMin=3,pqGerando=false;
