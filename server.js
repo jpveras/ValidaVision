@@ -9,6 +9,8 @@ import { fileURLToPath } from "node:url";
 import { elogiosRouter } from "./elogios.js";
 import { sentimentosRouter } from "./sentimentos.js";
 import { sugestoesRouter } from "./sugestoes.js";
+import { perguntasRouter } from "./perguntas.js";
+import { lembretesRouter } from "./lembretes.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ENV_PATH = path.join(__dirname, ".env");
@@ -99,6 +101,13 @@ app.use("/api/sentimentos", sentimentosRouter);
 // Caixa de sugestões (anônima; a gestora responde com a senha do painel do Sentimento)
 app.use("/api/sugestoes", sugestoesRouter);
 app.get(["/sugestoes", "/sugestao", "/sugira"], (_req, res) => res.redirect(302, "/sugestoes.html"));
+
+// Pergunta da semana (a gestora cria; a equipe responde anonimamente)
+app.use("/api/perguntas", perguntasRouter);
+app.get(["/pergunta", "/responda"], (_req, res) => res.redirect(302, "/pergunta.html"));
+
+// Lembrete de sexta (notificações do app; envio pelo Vercel Cron, ver vercel.json)
+app.use("/api/lembretes", lembretesRouter);
 
 
 // ======================================================

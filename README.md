@@ -1,4 +1,4 @@
-# Valida Vision — v0.27
+# Valida Vision — v0.28
 
 ## Rodar
 
@@ -38,6 +38,22 @@ Os elogios ficam visíveis para quem abrir a página (é a ideia da dinâmica). 
 
 A chave fica só no `.env` e nunca vai para o browser. Não compartilhe o `.env`.
 Antes de enviar telas reais da empresa, valide as políticas internas de dados e PII.
+
+## Novidades da v0.28
+
+- **❓ Pergunta da semana** (`/pergunta.html`, atalho `/pergunta`): a gestora lança uma pergunta curta
+  no painel (com ideias prontas); a equipe responde anonimamente (até 200 caracteres, até 3 por pessoa,
+  pode apagar). A nuvem aparece depois que a pessoa responde. No painel: respostas, palavras, remover,
+  encerrar, histórico e **Resumo com IA** (a partir de 3 respostas). Módulo `perguntas.js`,
+  Blob `perguntas/_dados.json`.
+- **📲 App instalável + 🔔 lembrete de sexta**: manifesto (`manifest.webmanifest`), ícones, service
+  worker (`sw.js`) e botão 🔔 na barra superior (`vv-app.js`) para instalar o app e ativar o lembrete.
+  - O lembrete chega **toda sexta às 9h** (Vercel Cron em `vercel.json` → `GET /api/lembretes/enviar`;
+    só envia na sexta e no máximo 1 vez a cada 20 h). Menciona a Pergunta da semana quando há uma aberta.
+  - Chaves de notificação (VAPID) geradas pelo próprio servidor e guardadas na Blob privada
+    (`lembretes/vapid.json`); opcional: `VAPID_PUBLIC_KEY`/`VAPID_PRIVATE_KEY`/`VAPID_SUBJECT`/`CRON_SECRET`.
+  - Painel da gestora: quantas pessoas ativaram e botão "Enviar lembrete agora". iPhone: só com o app
+    instalado (Compartilhar → Adicionar à Tela de Início).
 
 ## Novidades da v0.27
 

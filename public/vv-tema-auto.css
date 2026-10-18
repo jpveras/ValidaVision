@@ -56,6 +56,9 @@ html[data-tema="escuro"][data-pagina="sentimento"] .counter.limite{color:#ed857e
 html[data-tema="escuro"][data-pagina="sentimento"] .chip-minha{background:#1c3134}
 html[data-tema="escuro"][data-pagina="sentimento"] .chip-minha button{border:1px solid #503634;background:#1c3134;color:#e9847e}
 html[data-tema="escuro"][data-pagina="sentimento"] .chip-minha button:hover{background:#321a17}
+html[data-tema="escuro"][data-pagina="sentimento-gestora"] .pq-nova textarea{border:1px solid #3e4342;background:#1c3134}
+html[data-tema="escuro"][data-pagina="sentimento-gestora"] .pq-resumo{background:#1c3134}
+html[data-tema="escuro"][data-pagina="sentimento-gestora"] .pq-hist button.item{background:#1c3134}
 html[data-tema="escuro"][data-pagina="sentimento-gestora"] .sg-filtros button{background:#1c3134}
 html[data-tema="escuro"][data-pagina="sentimento-gestora"] .sg{background:#1c3134}
 html[data-tema="escuro"][data-pagina="sentimento-gestora"] .sg select{border:1px solid #3e4342;background:#1c3134}
@@ -84,4 +87,9 @@ html[data-tema="escuro"][data-pagina="sugestoes"] .st.nova{background:#212524;co
 html[data-tema="escuro"][data-pagina="sugestoes"] .st.analise{background:#332a13;color:#f1d5a0}
 html[data-tema="escuro"][data-pagina="sugestoes"] .st.feito{background:#1b2a23;color:#a8f3d3}
 html[data-tema="escuro"][data-pagina="sugestoes"] .st.nao{background:#321717;color:#e98c85}
+html[data-tema="escuro"][data-pagina="pergunta"] .texto-box{background:#1c3134}
+html[data-tema="escuro"][data-pagina="pergunta"] .counter.perto{color:#eec78b}
+html[data-tema="escuro"][data-pagina="pergunta"] .counter.limite{color:#ed857e}
+html[data-tema="escuro"][data-pagina="pergunta"] .chip-minha{background:#1c3134}
+html[data-tema="escuro"][data-pagina="pergunta"] .chip-minha button{border:1px solid #503634;background:#1c3134;color:#e9847e}
 }
