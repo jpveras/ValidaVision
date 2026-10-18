@@ -119,3 +119,27 @@ html.vv-tema-anim, html.vv-tema-anim * { transition: background-color .25s, colo
   .topbar .logo img, .topbar > img { width: 30px; height: 30px; }
 }
 @media (max-width: 360px) { .topbar b { font-size: 14.5px; } }
+
+/* Recado da Chefa (pop-up) */
+.vv-recado-fundo { position: fixed; inset: 0; z-index: 80; background: rgba(3, 22, 27, .55); display: grid; place-items: center; padding: 16px; animation: vvRecFundo .2s ease-out; }
+.vv-recado-fundo.saindo { opacity: 0; transition: opacity .18s; }
+.vv-recado { position: relative; width: min(460px, 100%); max-height: calc(100vh - 32px); overflow: auto; background: var(--card, #fff); color: var(--text, #25343a); border-radius: 16px; box-shadow: 0 24px 60px rgba(0,0,0,.35); animation: vvRecPop .28s cubic-bezier(.2,.9,.3,1.2); }
+.vv-recado-topo { background: linear-gradient(135deg, #0e7069, #033a45); color: #fff; padding: 26px 24px 20px; text-align: center; border-radius: 16px 16px 0 0; }
+.vv-recado-ico { display: inline-grid; place-items: center; width: 56px; height: 56px; border-radius: 50%; background: rgba(255,255,255,.14); font-size: 28px; margin-bottom: 10px; }
+.vv-recado-topo h2 { margin: 0; font-size: 22px; font-weight: 700; letter-spacing: .2px; }
+.vv-recado-previa { display: inline-block; margin-top: 8px; font-size: 11px; font-weight: 700; letter-spacing: .6px; text-transform: uppercase; background: #f0b54a; color: #3a2a00; border-radius: 99px; padding: 3px 10px; }
+.vv-recado-corpo { padding: 20px 24px 6px; font-size: 17px; line-height: 1.55; color: var(--ink, #0b3b47); }
+.vv-recado-corpo p { margin: 0 0 10px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.vv-recado-ass { text-align: right; font-style: italic; color: var(--muted, #6b7a80); font-size: 15px; }
+.vv-recado-pe { padding: 8px 24px 22px; display: flex; justify-content: center; }
+.vv-recado-pe .btn-primary { min-width: 180px; justify-content: center; }
+.vv-recado-x { position: absolute; top: 10px; right: 10px; width: 34px; height: 34px; border-radius: 50%; border: 0; background: rgba(255,255,255,.16); color: #fff; font-size: 16px; cursor: pointer; display: grid; place-items: center; padding: 0; }
+.vv-recado-x:hover { background: rgba(255,255,255,.28); }
+html.vv-recado-aberto { overflow: hidden; }
+@keyframes vvRecFundo { from { opacity: 0; } to { opacity: 1; } }
+@keyframes vvRecPop { from { opacity: 0; transform: translateY(14px) scale(.96); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .vv-recado, .vv-recado-fundo { animation: none; } }
+@media print { .vv-recado-fundo { display: none !important; } }
+
+/* Pergunta da semana OCULTA (18/10/2026: trocada pelo Recado da Chefa). Para mostrar, comente esta linha. */
+[data-recurso="pergunta"] { display: none !important; }

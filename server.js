@@ -12,6 +12,7 @@ import { sugestoesRouter } from "./sugestoes.js";
 import { perguntasRouter } from "./perguntas.js";
 import { lembretesRouter } from "./lembretes.js";
 import { albumRouter } from "./album.js";
+import { recadoRouter } from "./recado.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ENV_PATH = path.join(__dirname, ".env");
@@ -112,6 +113,9 @@ app.use("/api/lembretes", lembretesRouter);
 
 // Álbum do time (a gestora publica fotos; a equipe curte e comenta)
 app.use("/api/album", albumRouter);
+
+// Recado da Chefa (pop-up configurado pela gestora)
+app.use("/api/recado", recadoRouter);
 app.get(["/album", "/fotos"], (_req, res) => res.redirect(302, "/album.html"));
 
 
