@@ -23,6 +23,12 @@ const conflito = (e) =>
   e?.constructor?.name === "BlobPreconditionFailedError" ||
   /precondition|already exists|etag/i.test(String(e?.message));
 const espera = (ms) => new Promise((r) => setTimeout(r, ms));
+// "Arquivo ainda não existe" (a mensagem/nome mudou entre versões da @vercel/blob:
+// hoje vem "The requested blob does not exist").
+const naoExiste = (e) =>
+  e?.name === "BlobNotFoundError" ||
+  e?.constructor?.name === "BlobNotFoundError" ||
+  /not.?found|does not exist|no such blob/i.test(String(e?.message));
 
 const semAspas = (t) => String(t || "").replace(/^W\//, "").replace(/"/g, "");
 
@@ -39,7 +45,7 @@ async function lerBlob(pathname) {
   try {
     h = await m.head(pathname);
   } catch (e) {
-    if (e?.name === "BlobNotFoundError" || /not.?found/i.test(String(e?.message))) return { data: null, etag: null };
+    if (naoExiste(e)) return { data: null, etag: null };
     throw e;
   }
   const atual = semAspas(h.etag);
@@ -73,7 +79,7 @@ async function lerBlobDireto(pathname) {
       if (!r || !r.stream) return { data: null, etag: null };
       return { data: JSON.parse(await new Response(r.stream).text()), etag: r.blob?.etag || null };
     } catch (e) {
-      if (e?.name === "BlobNotFoundError" || /not.?found/i.test(String(e?.message))) return { data: null, etag: null };
+      if (naoExiste(e)) return { data: null, etag: null };
       ultimo = e;
       if (!erroDeAcesso(e)) throw e;
     }
@@ -209,7 +215,7 @@ export async function lerArquivo(pathname) {
       if (!r || !r.stream) return null;
       return { stream: r.stream, contentType: r.blob?.contentType || "application/octet-stream" };
     } catch (e) {
-      if (e?.name === "BlobNotFoundError" || /not.?found/i.test(String(e?.message))) return null;
+      if (naoExiste(e)) return null;
       ultimo = e;
       if (!erroDeAcesso(e)) throw e;
     }
