@@ -5,6 +5,10 @@ name: APK Android (TWA)
 # Para uma versão nova: aumente appVersionCode/appVersionName em android/twa-manifest.json.
 on:
   workflow_dispatch:
+  push:
+    paths:
+      - "android/twa-manifest.json"
+      - ".github/workflows/apk.yml"
 
 jobs:
   apk:
