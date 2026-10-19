@@ -34,6 +34,23 @@ button.bloco{border-radius:0}
 .bloco.app{--cor:#d39612}
 .bloco.analise{--cor:#5b6b9a}
 .bloco.pergunta{--cor:#7a5bb5}
+/* Últimas atualizações */
+.novidades{margin:30px 0 0;border:1px solid var(--line);border-radius:14px;background:#fff;overflow:hidden}
+.novidades h2{margin:0;padding:14px 18px;font-size:15px;font-weight:700;color:var(--ink);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px}
+.novidades h2 small{margin-left:auto;font-size:12px;font-weight:400;color:var(--muted)}
+.nv-lista{list-style:none;margin:0;padding:0}
+.nv-lista li+li{border-top:1px solid var(--line)}
+.nv-lista a{display:flex;align-items:center;gap:12px;padding:11px 18px;color:var(--text);text-decoration:none;font-size:14px;line-height:1.4}
+.nv-lista a:hover{background:var(--teal-soft)}
+.nv-lista .ic{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;flex:none;font-size:16px;background:var(--panel)}
+.nv-lista .tx{flex:1;min-width:0}
+.nv-lista .tx b{color:var(--ink);font-weight:600}
+.nv-lista .tx span{display:block;font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nv-lista .qd{flex:none;font-size:12px;color:var(--muted);white-space:nowrap}
+.nv-vazio{padding:14px 18px;font-size:14px;color:var(--muted);margin:0}
+@media(max-width:560px){.nv-lista a{padding:10px 14px;gap:10px}.novidades h2{padding:12px 14px}}
+@media screen{html[data-tema="escuro"][data-pagina] .novidades{background:var(--card);border-color:var(--line)}html[data-tema="escuro"][data-pagina] .nv-lista .ic{background:#20393c}html[data-tema="escuro"][data-pagina] .nv-lista li a{color:var(--text)}html[data-tema="escuro"][data-pagina] .nv-lista li a:hover{background:#17332f}}
+@media(max-width:560px){.nv-lista .qd{font-size:11px}}
 .dica{margin:22px 0 0;font-size:14px;color:var(--muted);text-align:center}
 @media(max-width:900px){.menu{flex-wrap:wrap}.bloco{flex:1 1 33.333%}}
 @media(max-width:560px){
@@ -78,7 +95,7 @@ html.vv-bv{overflow:hidden}
 @media(max-width:560px){.bv h1{font-size:26px}.bv h1 span{font-size:31px}.bv-caixa{padding:28px 20px 22px}.bv-ico{width:78px;height:78px}}
 @media(prefers-reduced-motion:reduce){.bv,.bv-caixa,.bv-ico,.menu.entrar .bloco,.bv-barra i{animation:none!important}}
 </style>
-<link rel="stylesheet" href="/vv-tema-auto.css?v=33">
+<link rel="stylesheet" href="/vv-tema-auto.css?v=34">
 <link rel="stylesheet" href="/vv-tema.css?v=34">
 <script src="/vv-tema.js?v=23"></script>
 <link rel="manifest" href="/manifest.webmanifest?v=3">
@@ -114,7 +131,7 @@ html.vv-bv{overflow:hidden}
   <a class="logo" href="/inicio.html">
     <img id="brandLogo" src="/logo.png" alt="" hidden onload="this.hidden=false;this.nextElementSibling.setAttribute('hidden','')">
     <svg width="28" height="24" viewBox="0 0 28 24" aria-hidden="true"><path d="M1 2h9l4 9 4-9h9L14 23z" fill="#2fc28f"/><path d="M10 2h8l-4 9z" fill="#1a8f6a"/></svg>
-    <b>Toca dos <span>Bug Hunters</span></b><span class="ver">v0.32.1</span>
+    <b>Toca dos <span>Bug Hunters</span></b><span class="ver">v0.33</span>
   </a>
   <div class="spacer"></div>
 </header>
@@ -190,6 +207,11 @@ html.vv-bv{overflow:hidden}
     </button>
   </nav>
 
+  <section class="novidades" aria-labelledby="nvTit">
+    <h2 id="nvTit">🆕 Últimas atualizações</h2>
+    <ul class="nv-lista" id="nvLista"><li><p class="nv-vazio">Carregando…</p></li></ul>
+  </section>
+
 </div></div></main>
 
 <div class="bv" id="bv" role="dialog" aria-modal="true" aria-labelledby="bvTit" hidden>
@@ -225,6 +247,31 @@ html.vv-bv{overflow:hidden}
     setTimeout(function(){var b=document.getElementById('bvEntrar');if(b)b.focus()},80);
     timer=setTimeout(fechar,TEMPO+300);
   }else entrarMenus();
+
+  // ---------- Últimas atualizações (resumo do que aconteceu na Toca) ----------
+  var esc=function(v){return String(v==null?'':v).replace(/[&<>"']/g,function(m){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]})};
+  function quando(iso){if(!iso)return'';var s=(Date.now()-new Date(iso))/1000;if(s<60)return'agora';if(s<3600)return'há '+Math.floor(s/60)+' min';if(s<86400)return'há '+Math.floor(s/3600)+' h';var d=Math.floor(s/86400);if(d===1)return'ontem';if(d<7)return'há '+d+' dias';return new Date(iso).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})}
+  function curto(t,n){t=String(t||'').replace(/\s+/g,' ').trim();return t.length>n?t.slice(0,n-1)+'…':t}
+  var pega=function(u){return fetch(u,{cache:'no-store'}).then(function(r){return r.ok?r.json():null}).catch(function(){return null})};
+  var NOVIDADES_TOCA=[{em:'2026-10-19T07:00:00-03:00',ic:'🗂️',t:'Álbum agora separado por <b>momentos</b>',s:'Cada evento do time com as suas fotos',href:'/album.html'}];
+  Promise.all([pega('/api/album'),pega('/api/elogios'),pega('/api/sentimentos'),pega('/api/sugestoes')]).then(function(r){
+    var al=r[0],el=r[1],se=r[2],sg=r[3],itens=[];
+    if(al&&al.fotos&&al.fotos.length){
+      var f=al.fotos[0],m=(al.momentos||[]).find(function(x){return x.id===f.momentoId}),desde=Date.parse(f.criadaEm)-12*3600e3;
+      var n=al.fotos.filter(function(x){return x.momentoId===f.momentoId&&Date.parse(x.criadaEm)>=desde}).length;
+      itens.push({em:f.criadaEm,ic:'📷',t:(n>1?n+' fotos novas':'Foto nova')+(m?' em <b>'+esc(m.nome)+'</b>':' no álbum'),s:'Curta e comente no Álbum do time',href:'/album.html'});
+    }
+    if(el&&el.total){var u=el.elogios&&el.elogios[0];itens.push({em:u&&u.criadoEm,ic:'💚',t:'<b>'+el.total+'</b> '+(el.total===1?'elogio':'elogios')+' no mural',s:el.liberada?'A nuvem de elogios já está liberada!':'Faltam '+Math.max(0,el.meta-el.total)+' para liberar a nuvem',href:'/elogios.html'})}
+    if(se){itens.push({em:null,ic:'😊',t:se.total?'<b>'+se.total+'</b> '+(se.total===1?'resposta':'respostas')+' no Sentimento desta semana':'Sentimento da semana aberto',s:se.total&&se.palavraDaSemana?'Palavra mais citada: “'+esc(se.palavraDaSemana)+'”':'Conte em poucas palavras como foi a sua semana',href:'/sentimento.html',fixo:'esta semana'})}
+    if(sg&&sg.mural&&sg.mural.length){var x=sg.mural[0];itens.push({em:x.respondidaEm,ic:'📮',t:'Sugestão respondida pela gestora',s:'“'+esc(curto(x.texto,70))+'”',href:'/sugestoes.html'})}
+    NOVIDADES_TOCA.forEach(function(n){if(Date.now()-Date.parse(n.em)<14*86400e3)itens.push(n)});
+    var datados=itens.filter(function(i){return i.em}).sort(function(a,b){return String(b.em).localeCompare(String(a.em))});
+    var semData=itens.filter(function(i){return !i.em});
+    var lista=datados.concat(semData).slice(0,5);
+    var ul=document.getElementById('nvLista');
+    ul.innerHTML=lista.length?lista.map(function(i){return '<li><a href="'+i.href+'"><span class="ic" aria-hidden="true">'+i.ic+'</span><span class="tx">'+i.t+'<span>'+i.s+'</span></span><span class="qd">'+(i.em?quando(i.em):(i.fixo||''))+'</span></a></li>'}).join('')
+      :'<li><p class="nv-vazio">Por enquanto está tudo calmo por aqui. Que tal mandar um elogio? 💚</p></li>';
+  });
 
   // Bloco do app: abre o mesmo painel do sino 🔔 (instalar + lembrete de sexta)
   var app=document.getElementById('blocoApp');

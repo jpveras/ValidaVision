@@ -28,7 +28,8 @@ import { exigeGestora } from "./sentimentos.js";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DOC = "album/_dados.json";
 const LEGENDA_MAX = 200;
-const ALBUM_MAX = 60;
+const ALBUM_MAX = 60; // nome do momento
+const DESCRICAO_MAX = 140;
 const NOME_MAX = 40;
 const COMENTARIO_MAX = 300;
 const IMG_MAX = 3_500_000; // bytes, depois de decodificar (a foto grande reduzida fica bem abaixo disso)
@@ -38,6 +39,29 @@ const localDir = () => (process.env.VERCEL ? "/tmp" : path.join(__dirname, "data
 const localDoc = () => path.join(localDir(), "album.json");
 const localFotos = () => path.join(localDir(), "album");
 const caminhoFoto = (id, tam) => `album/fotos/${id}-${tam}.jpg`;
+
+// ---------------- Momentos ----------------
+// Cada foto pertence a um "momento" (ex.: "Confraternização de outubro", 18/10/2026), criado pela gestora.
+// Fotos antigas tinham só um texto em "album": viram momentos com id fixo (o mesmo na leitura e na gravação).
+const idLegado = (nome) => "m-" + crypto.createHash("sha1").update(String(nome).toLowerCase()).digest("hex").slice(0, 16);
+const hojeSP = () => new Intl.DateTimeFormat("en-CA", { timeZone: "America/Sao_Paulo" }).format(new Date());
+const DATA_RE = /^\d{4}-\d{2}-\d{2}$/;
+function normaliza(doc) {
+  doc.fotos ||= [];
+  doc.momentos ||= [];
+  for (const f of doc.fotos) {
+    if (f.momentoId || !f.album) continue;
+    const id = idLegado(f.album);
+    if (!doc.momentos.some((m) => m.id === id))
+      doc.momentos.push({ id, nome: f.album, data: String(f.criadaEm || "").slice(0, 10) || hojeSP(), descricao: "", criadoEm: f.criadaEm || new Date().toISOString() });
+    f.momentoId = id;
+  }
+  return doc;
+}
+const momentoPublico = (m, fotos) => {
+  const doMomento = fotos.filter((f) => f.momentoId === m.id).sort((a, b) => b.criadaEm.localeCompare(a.criadaEm));
+  return { id: m.id, nome: m.nome, data: m.data, descricao: m.descricao || "", total: doMomento.length, capa: doMomento[0]?.id || null, atualizadoEm: doMomento[0]?.criadaEm || m.criadoEm };
+};
 
 // ---------------- Dados ----------------
 const TTL = 20_000;
@@ -53,15 +77,15 @@ async function ler(force = false) {
       doc = { fotos: [] };
     }
   }
-  doc.fotos ||= [];
+  normaliza(doc);
   cache = { at: Date.now(), doc };
   return doc;
 }
 async function alterar(fn) {
   let doc;
-  if (usaBlob()) doc = await atualizarDoc(DOC, (cur) => fn({ fotos: [], ...(cur || {}) }));
+  if (usaBlob()) doc = await atualizarDoc(DOC, (cur) => fn(normaliza({ fotos: [], momentos: [], ...(cur || {}) })));
   else {
-    doc = fn(await ler(true));
+    doc = fn(normaliza(await ler(true)));
     await fs.mkdir(localDir(), { recursive: true });
     await fs.writeFile(localDoc(), JSON.stringify(doc, null, 2));
   }
@@ -118,6 +142,7 @@ const publica = (f, leitor) => ({
   id: f.id,
   legenda: f.legenda || "",
   album: f.album || "",
+  momentoId: f.momentoId || null,
   criadaEm: f.criadaEm,
   largura: f.largura || null,
   altura: f.altura || null,
@@ -147,9 +172,12 @@ albumRouter.get("/", sem_cache, async (req, res) => {
     const doc = await ler();
     const leitor = leitorDe(req);
     const fotos = doc.fotos.slice().sort((a, b) => b.criadaEm.localeCompare(a.criadaEm)).map((f) => publica(f, leitor));
-    const albuns = {};
-    for (const f of doc.fotos) if (f.album) albuns[f.album] = (albuns[f.album] || 0) + 1;
-    res.json({ fotos, albuns: Object.entries(albuns).sort((a, b) => b[1] - a[1]).map(([nome, total]) => ({ nome, total })), armazenamento: usaBlob() ? "vercel-blob" : process.env.VERCEL ? "temporario" : "arquivo-local" });
+    const momentos = doc.momentos
+      .map((m) => momentoPublico(m, doc.fotos))
+      .sort((a, b) => b.data.localeCompare(a.data) || String(b.atualizadoEm).localeCompare(String(a.atualizadoEm)));
+    const nomes = Object.fromEntries(doc.momentos.map((m) => [m.id, m.nome]));
+    for (const f of fotos) f.album = nomes[f.momentoId] || "";
+    res.json({ fotos, momentos, albuns: momentos.filter((m) => m.total).map((m) => ({ nome: m.nome, total: m.total })), armazenamento: usaBlob() ? "vercel-blob" : process.env.VERCEL ? "temporario" : "arquivo-local" });
   } catch (e) {
     console.error("Erro ao ler álbum:", e);
     res.status(500).json({ error: "Não consegui carregar o álbum agora." });
@@ -249,6 +277,9 @@ albumRouter.delete("/:id/comentario/:cid", sem_cache, async (req, res) => {
 albumRouter.post("/gestora/fotos", sem_cache, express.json({ limit: "4400kb" }), async (req, res) => {
   if (!(await exigeGestora(req, res))) return;
   try {
+    const momentoId = String(req.body?.momentoId || "");
+    if (momentoId && !(await ler()).momentos.some((m) => m.id === momentoId) && !(await ler(true)).momentos.some((m) => m.id === momentoId))
+      return res.status(400).json({ error: "Esse momento não existe mais. Escolha outro." });
     const grande = jpegDeDataUrl(req.body?.imagem);
     const mini = jpegDeDataUrl(req.body?.miniatura);
     if (!grande || !mini) return res.status(400).json({ error: "Imagem inválida. Use fotos JPG, PNG ou WEBP." });
@@ -258,7 +289,8 @@ albumRouter.post("/gestora/fotos", sem_cache, express.json({ limit: "4400kb" }),
     const foto = {
       id,
       legenda: limpa(req.body?.legenda, LEGENDA_MAX),
-      album: limpa(req.body?.album, ALBUM_MAX),
+      momentoId: momentoId || null,
+      album: momentoId ? "" : limpa(req.body?.album, ALBUM_MAX),
       criadaEm: new Date().toISOString(),
       largura: Number(req.body?.largura) || null,
       altura: Number(req.body?.altura) || null,
@@ -281,7 +313,12 @@ albumRouter.put("/gestora/fotos/:id", sem_cache, json, async (req, res) => {
       const f = doc.fotos.find((x) => x.id === String(req.params.id));
       if (!f) return doc;
       if (req.body?.legenda !== undefined) f.legenda = limpa(req.body.legenda, LEGENDA_MAX);
-      if (req.body?.album !== undefined) f.album = limpa(req.body.album, ALBUM_MAX);
+      if (req.body?.momentoId !== undefined) {
+        const mid = String(req.body.momentoId || "");
+        if (mid && !doc.momentos.some((m) => m.id === mid)) return doc;
+        f.momentoId = mid || null;
+        f.album = "";
+      }
       foto = f;
       return doc;
     });
@@ -315,6 +352,65 @@ albumRouter.delete("/gestora/fotos/:id/comentario/:cid", sem_cache, async (req, 
       if (f) f.comentarios = (f.comentarios || []).filter((c) => c.id !== String(req.params.cid));
       return doc;
     });
+    res.json({ ok: true });
+  } catch (e) {
+    res.status(500).json({ error: "Não consegui remover agora." });
+  }
+});
+
+// Momentos (a gestora cria antes de subir as fotos)
+function dadosMomento(body) {
+  const nome = limpa(body?.nome, ALBUM_MAX + 1);
+  const data = String(body?.data || "");
+  const descricao = limpa(body?.descricao, DESCRICAO_MAX + 1);
+  if (nome.length < 2) return { erro: "Dê um nome ao momento (ex.: Confraternização de outubro)." };
+  if (nome.length > ALBUM_MAX) return { erro: `Nome com no máximo ${ALBUM_MAX} caracteres.` };
+  if (descricao.length > DESCRICAO_MAX) return { erro: `Descrição com no máximo ${DESCRICAO_MAX} caracteres.` };
+  if (data && !DATA_RE.test(data)) return { erro: "Data inválida." };
+  return { nome, data: data || hojeSP(), descricao };
+}
+albumRouter.post("/gestora/momentos", sem_cache, json, async (req, res) => {
+  if (!(await exigeGestora(req, res))) return;
+  const d = dadosMomento(req.body);
+  if (d.erro) return res.status(400).json({ error: d.erro });
+  try {
+    const m = { id: crypto.randomUUID(), ...d, criadoEm: new Date().toISOString() };
+    const doc = await alterar((doc) => ((doc.momentos = [...doc.momentos, m].slice(-200)), doc));
+    res.json({ ok: true, momento: momentoPublico(m, doc.fotos) });
+  } catch (e) {
+    console.error("Erro ao criar momento:", e);
+    res.status(500).json({ error: "Não consegui criar o momento agora." });
+  }
+});
+albumRouter.put("/gestora/momentos/:id", sem_cache, json, async (req, res) => {
+  if (!(await exigeGestora(req, res))) return;
+  const d = dadosMomento(req.body);
+  if (d.erro) return res.status(400).json({ error: d.erro });
+  try {
+    let m = null;
+    const doc = await alterar((doc) => {
+      m = doc.momentos.find((x) => x.id === String(req.params.id));
+      if (m) Object.assign(m, d);
+      return doc;
+    });
+    if (!m) return res.status(404).json({ error: "Momento não encontrado." });
+    res.json({ ok: true, momento: momentoPublico(m, doc.fotos) });
+  } catch (e) {
+    res.status(500).json({ error: "Não consegui salvar agora." });
+  }
+});
+// Remove o momento; as fotos dele continuam no álbum (em "Outras fotos").
+albumRouter.delete("/gestora/momentos/:id", sem_cache, async (req, res) => {
+  if (!(await exigeGestora(req, res))) return;
+  try {
+    const id = String(req.params.id);
+    let tinha = false;
+    await alterar((doc) => {
+      doc.momentos = doc.momentos.filter((m) => (m.id === id ? ((tinha = true), false) : true));
+      for (const f of doc.fotos) if (f.momentoId === id) f.momentoId = null;
+      return doc;
+    });
+    if (!tinha) return res.status(404).json({ error: "Momento não encontrado." });
     res.json({ ok: true });
   } catch (e) {
     res.status(500).json({ error: "Não consegui remover agora." });

@@ -1,4 +1,4 @@
-# Toca dos Bug Hunters — v0.32
+# Toca dos Bug Hunters — v0.33
 
 > Endereço: **https://bughunters-time.vercel.app** (desde 19/10/2026). O antigo `valida-vision.vercel.app` redireciona para ele (307, configurado em Vercel → Domains), então links e QR Codes antigos continuam funcionando.
 > Antes chamado **Valida Vision** (o repositório e o projeto da Vercel continuam com o nome antigo).
@@ -41,6 +41,13 @@ Os elogios ficam visíveis para quem abrir a página (é a ideia da dinâmica). 
 
 A chave fica só no `.env` e nunca vai para o browser. Não compartilhe o `.env`.
 Antes de enviar telas reais da empresa, valide as políticas internas de dados e PII.
+
+## Novidades da v0.33
+
+- **📷 Álbum separado por momentos.** Na aba Álbum da Área da Gestora, o passo 1 é escolher ou **criar um momento** (nome, data, descrição opcional); só depois dá para escolher as fotos. Card "🗂️ Momentos" para editar ou remover (remover não apaga as fotos: vão para "Outras fotos"). No visualizador do álbum a gestora troca o momento de uma foto.
+  - Na página do álbum, as fotos aparecem em seções por momento (mais recente primeiro), com filtros por momento.
+  - Dados: `album/_dados.json` ganhou `momentos[]` e `foto.momentoId`. Fotos antigas com o texto "álbum" viram momentos automaticamente (id fixo `m-<sha1>`). Rotas: `POST/PUT/DELETE /api/album/gestora/momentos[/:id]`.
+- **🆕 Últimas atualizações no Início:** resumo curto (até 5 itens) com fotos novas, elogios no mural, Sentimento da semana, última sugestão respondida e novidades da Toca. Usa as rotas públicas que já existem (sem gravações novas na Blob).
 
 ## Novidades da v0.32.3
 
