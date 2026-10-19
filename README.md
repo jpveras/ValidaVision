@@ -41,6 +41,10 @@ Os elogios ficam visíveis para quem abrir a página (é a ideia da dinâmica). 
 A chave fica só no `.env` e nunca vai para o browser. Não compartilhe o `.env`.
 Antes de enviar telas reais da empresa, valide as políticas internas de dados e PII.
 
+## Novidades da v0.32.1
+
+- Boas-vindas fica **10 s** no navegador (PC ou celular). No **app instalado** aparece só na primeira vez que a pessoa abre o app depois de instalar (`localStorage` `vv-bv-app`).
+
 ## Novidades da v0.32
 
 - **🏠 Início com menus em blocos coloridos** (`/inicio.html`; `/` e `/inicio` levam para lá). Antes o site abria direto no Elogie um Colega. Blocos: Elogie um Colega, Sentimento da Semana, Álbum do time, Caixa de sugestões e App e lembrete (abre o painel do sino); Análise de Tela e Pergunta continuam ocultas (`data-recurso`).
