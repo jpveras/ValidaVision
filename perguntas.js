@@ -199,7 +199,7 @@ const paraGestora = (p) => ({
 });
 
 perguntasRouter.get("/gestora", async (req, res) => {
-  if (!exigeGestora(req, res)) return;
+  if (!(await exigeGestora(req, res))) return;
   try {
     const doc = await ler(true);
     const ord = doc.perguntas.slice().sort((a, b) => b.criadaEm.localeCompare(a.criadaEm));
@@ -212,7 +212,7 @@ perguntasRouter.get("/gestora", async (req, res) => {
 
 // Nova pergunta: encerra a que estiver aberta.
 perguntasRouter.post("/gestora", async (req, res) => {
-  if (!exigeGestora(req, res)) return;
+  if (!(await exigeGestora(req, res))) return;
   try {
     const texto = limpa(req.body?.texto, PERGUNTA_MAX);
     if (texto.length < 5) return res.status(400).json({ error: "Escreva a pergunta (pelo menos 5 caracteres)." });
@@ -233,7 +233,7 @@ perguntasRouter.post("/gestora", async (req, res) => {
 });
 
 perguntasRouter.post("/gestora/:id/encerrar", async (req, res) => {
-  if (!exigeGestora(req, res)) return;
+  if (!(await exigeGestora(req, res))) return;
   try {
     const id = String(req.params.id);
     await alterar((doc) => {
@@ -248,7 +248,7 @@ perguntasRouter.post("/gestora/:id/encerrar", async (req, res) => {
 });
 
 perguntasRouter.delete("/gestora/:id/resposta/:rid", async (req, res) => {
-  if (!exigeGestora(req, res)) return;
+  if (!(await exigeGestora(req, res))) return;
   try {
     await alterar((doc) => {
       const p = doc.perguntas.find((x) => x.id === String(req.params.id));
@@ -262,7 +262,7 @@ perguntasRouter.delete("/gestora/:id/resposta/:rid", async (req, res) => {
 });
 
 perguntasRouter.delete("/gestora/:id", async (req, res) => {
-  if (!exigeGestora(req, res)) return;
+  if (!(await exigeGestora(req, res))) return;
   try {
     await alterar((doc) => ((doc.perguntas = doc.perguntas.filter((x) => x.id !== String(req.params.id))), doc));
     res.json({ ok: true });
@@ -302,7 +302,7 @@ const embaralha = (l) => {
 };
 
 perguntasRouter.post("/gestora/:id/resumo", async (req, res) => {
-  if (!exigeGestora(req, res)) return;
+  if (!(await exigeGestora(req, res))) return;
   try {
     const doc = await ler(true);
     const p = doc.perguntas.find((x) => x.id === String(req.params.id));

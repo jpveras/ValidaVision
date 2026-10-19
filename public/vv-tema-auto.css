@@ -56,29 +56,44 @@ html[data-tema="escuro"][data-pagina="sentimento"] .counter.limite{color:#ed857e
 html[data-tema="escuro"][data-pagina="sentimento"] .chip-minha{background:#1c3134}
 html[data-tema="escuro"][data-pagina="sentimento"] .chip-minha button{border:1px solid #503634;background:#1c3134;color:#e9847e}
 html[data-tema="escuro"][data-pagina="sentimento"] .chip-minha button:hover{background:#321a17}
-html[data-tema="escuro"][data-pagina="sentimento-gestora"] .pq-nova textarea{border:1px solid #3e4342;background:#1c3134}
-html[data-tema="escuro"][data-pagina="sentimento-gestora"] .pq-resumo{background:#1c3134}
-html[data-tema="escuro"][data-pagina="sentimento-gestora"] .pq-hist button.item{background:#1c3134}
-html[data-tema="escuro"][data-pagina="sentimento-gestora"] .sg-filtros button{background:#1c3134}
-html[data-tema="escuro"][data-pagina="sentimento-gestora"] .sg{background:#1c3134}
-html[data-tema="escuro"][data-pagina="sentimento-gestora"] .sg select{border:1px solid #3e4342;background:#1c3134}
-html[data-tema="escuro"][data-pagina="sentimento-gestora"] .sg textarea{border:1px solid #3e4342;background:#1c3134}
-html[data-tema="escuro"][data-pagina="sentimento-gestora"] .sg .err{color:#ed857e}
-html[data-tema="escuro"][data-pagina="sentimento-gestora"] .msgsg.err{color:#ed857e}
-html[data-tema="escuro"][data-pagina="sentimento-gestora"] .ev-alerta{background:#342914;border:1px solid #4c412d;color:#f3d9a9}
-html[data-tema="escuro"][data-pagina="sentimento-gestora"] .ev-alerta.alto{background:#321717;border-color:#4f3131;color:#ee9c96}
-html[data-tema="escuro"][data-pagina="sentimento-gestora"] [data-tema="escuro"] .ev-tip{background:#1d2524;color:#deebed}
-html[data-tema="escuro"][data-pagina="sentimento-gestora"] .ev-cols li{background:#1c3134}
-html[data-tema="escuro"][data-pagina="sentimento-gestora"] .toolbar select{border:1px solid #3e4342;background:#1c3134}
-html[data-tema="escuro"][data-pagina="sentimento-gestora"] .tile{background:#1c3134}
-html[data-tema="escuro"][data-pagina="sentimento-gestora"] .resp{background:#1c3134}
-html[data-tema="escuro"][data-pagina="sentimento-gestora"] .guia{background:#1c3134}
-html[data-tema="escuro"][data-pagina="sentimento-gestora"] .guia kbd{border:1px solid #3e4342}
-html[data-tema="escuro"][data-pagina="sentimento-gestora"] .clima.positivo{background:#1b2a23;color:#a8f3d3}
-html[data-tema="escuro"][data-pagina="sentimento-gestora"] .clima.neutro{background:#212524;color:#bdcbd0}
-html[data-tema="escuro"][data-pagina="sentimento-gestora"] .clima.atencao{background:#332a13;color:#efc590}
-html[data-tema="escuro"][data-pagina="sentimento-gestora"] .clima.alerta{background:#321717;color:#ed857e}
-html[data-tema="escuro"][data-pagina="sentimento-gestora"] .sug li{background:#1c3134}
+html[data-tema="escuro"][data-pagina="gestora"] .gt-abas button{background:#1c3134}
+html[data-tema="escuro"][data-pagina="gestora"] .gt-card{background:#1c3134}
+html[data-tema="escuro"][data-pagina="gestora"] .gt-card.atencao{border-color:#4c412d;background:#362b14}
+html[data-tema="escuro"][data-pagina="gestora"] .gt-card.atencao b{color:#efc590}
+html[data-tema="escuro"][data-pagina="gestora"] .tile.pend b{color:#eec78b}
+html[data-tema="escuro"][data-pagina="gestora"] .sw{background:#181a1a}
+html[data-tema="escuro"][data-pagina="gestora"] .sw::after{background:#1c3134}
+html[data-tema="escuro"][data-pagina="gestora"] .btn-rm{background:#1c3134;border:1px solid #483131;color:#ed857e}
+html[data-tema="escuro"][data-pagina="gestora"] .pend-card{border-color:#4c412d}
+html[data-tema="escuro"][data-pagina="gestora"] .pend-card .card-head{background:#342914;color:#eec78b}
+html[data-tema="escuro"][data-pagina="gestora"] .prev{background:#1c3134}
+html[data-tema="escuro"][data-pagina="gestora"] .prev .tira{color:#ed857e}
+html[data-tema="escuro"][data-pagina="gestora"] .rc-form input[type=text],html[data-tema="escuro"][data-pagina="gestora"] .rc-form textarea,html[data-tema="escuro"][data-pagina="gestora"] .rc-form select{border:1px solid #3e4342;background:#1c3134}
+html[data-tema="escuro"][data-pagina="gestora"] .rc-estado.on{background:#1b2a23;color:#a8f3d3}
+html[data-tema="escuro"][data-pagina="gestora"] .rc-estado.off{background:#212524;color:#b2bcca}
+html[data-tema="escuro"][data-pagina="gestora"] .pq-nova textarea{border:1px solid #3e4342;background:#1c3134}
+html[data-tema="escuro"][data-pagina="gestora"] .pq-resumo{background:#1c3134}
+html[data-tema="escuro"][data-pagina="gestora"] .pq-hist button.item{background:#1c3134}
+html[data-tema="escuro"][data-pagina="gestora"] .sg-filtros button{background:#1c3134}
+html[data-tema="escuro"][data-pagina="gestora"] .sg{background:#1c3134}
+html[data-tema="escuro"][data-pagina="gestora"] .sg select{border:1px solid #3e4342;background:#1c3134}
+html[data-tema="escuro"][data-pagina="gestora"] .sg textarea{border:1px solid #3e4342;background:#1c3134}
+html[data-tema="escuro"][data-pagina="gestora"] .sg .err{color:#ed857e}
+html[data-tema="escuro"][data-pagina="gestora"] .msgsg.err{color:#ed857e}
+html[data-tema="escuro"][data-pagina="gestora"] .ev-alerta{background:#342914;border:1px solid #4c412d;color:#f3d9a9}
+html[data-tema="escuro"][data-pagina="gestora"] .ev-alerta.alto{background:#321717;border-color:#4f3131;color:#ee9c96}
+html[data-tema="escuro"][data-pagina="gestora"] [data-tema="escuro"] .ev-tip{background:#1d2524;color:#deebed}
+html[data-tema="escuro"][data-pagina="gestora"] .ev-cols li{background:#1c3134}
+html[data-tema="escuro"][data-pagina="gestora"] .toolbar select{border:1px solid #3e4342;background:#1c3134}
+html[data-tema="escuro"][data-pagina="gestora"] .tile{background:#1c3134}
+html[data-tema="escuro"][data-pagina="gestora"] .resp{background:#1c3134}
+html[data-tema="escuro"][data-pagina="gestora"] .guia{background:#1c3134}
+html[data-tema="escuro"][data-pagina="gestora"] .guia kbd{border:1px solid #3e4342}
+html[data-tema="escuro"][data-pagina="gestora"] .clima.positivo{background:#1b2a23;color:#a8f3d3}
+html[data-tema="escuro"][data-pagina="gestora"] .clima.neutro{background:#212524;color:#bdcbd0}
+html[data-tema="escuro"][data-pagina="gestora"] .clima.atencao{background:#332a13;color:#efc590}
+html[data-tema="escuro"][data-pagina="gestora"] .clima.alerta{background:#321717;color:#ed857e}
+html[data-tema="escuro"][data-pagina="gestora"] .sug li{background:#1c3134}
 html[data-tema="escuro"][data-pagina="sugestoes"] .texto-box{background:#1c3134}
 html[data-tema="escuro"][data-pagina="sugestoes"] .counter.perto{color:#eec78b}
 html[data-tema="escuro"][data-pagina="sugestoes"] .counter.limite{color:#ed857e}
@@ -102,6 +117,5 @@ html[data-tema="escuro"][data-pagina="album"] .lb-form input,html[data-tema="esc
 html[data-tema="escuro"][data-pagina="album"] .lb-fechar,html[data-tema="escuro"][data-pagina="album"] .lb-nav{background:rgba(255,255,255,.14)}
 html[data-tema="escuro"][data-pagina="album"] .lb-fechar:hover,html[data-tema="escuro"][data-pagina="album"] .lb-nav:hover{background:rgba(255,255,255,.26)}
 html[data-tema="escuro"][data-pagina="album"] .lb-gest input{background:#1c3134}
-html[data-tema="escuro"][data-pagina="album"] .prev{background:#1c3134}
-html[data-tema="escuro"][data-pagina="album"] .prev .tira{color:#ed857e}
+html[data-tema="escuro"][data-pagina="album"] .gest-aviso{background:#1c3134}
 }

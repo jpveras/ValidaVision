@@ -1,4 +1,4 @@
-# Toca dos Bug Hunters — v0.30
+# Toca dos Bug Hunters — v0.31
 
 > Antes chamado **Valida Vision** (o repositório e o endereço `valida-vision.vercel.app` continuam com o nome antigo).
 
@@ -40,6 +40,14 @@ Os elogios ficam visíveis para quem abrir a página (é a ideia da dinâmica). 
 
 A chave fica só no `.env` e nunca vai para o browser. Não compartilhe o `.env`.
 Antes de enviar telas reais da empresa, valide as políticas internas de dados e PII.
+
+## Novidades da v0.31
+
+- **🛡️ Área da Gestora** (`/gestora.html`, atalhos `/gestora`, `/painel`, `/chefa`): o painel saiu de dentro do Sentimento da Semana e virou um lugar só da gestora. Entra-se pelo **escudo ao lado do sino 🔔** em qualquer página (com pontinho verde quando ela está conectada).
+  - Abas: **Início** (cartões com o que pede atenção: elogios aguardando, respostas da semana, sugestões novas, recado, fotos, lembrete), **Sentimento**, **Recado**, **Elogios** (moderação completa, atualiza sozinha), **Álbum** (publicar fotos + fotos recentes), **Sugestões**, **Lembrete** e **Senha**. Pergunta da semana continua oculta.
+  - **Senha escolhida pela gestora** (aba 🔑 Senha): guardada só como resumo scrypt em `gestora/_senha.json` (`senha-gestora.js`). A senha original `SENTIMENTO_GESTORA_KEY` continua valendo como recuperação. API: `GET /api/gestora`, `PUT /api/gestora/senha` (`gestora.js`).
+  - A senha da gestora também libera a moderação dos Elogios (`/elogios-moderacao.html` e modo moderador do Elogie continuam aceitando `ELOGIOS_ADMIN_KEY`).
+  - `/sentimento-gestora.html` redireciona para `/gestora.html#sentimento`. O álbum não tem mais a caixa de login no rodapé: a gestora conectada vê um aviso e as ferramentas ao abrir cada foto.
 
 ## Novidades da v0.30
 

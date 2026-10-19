@@ -3,12 +3,93 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex">
-<title>Painel da Gestora · Sentimento da Semana</title>
+<title>Área da Gestora · Toca dos Bug Hunters</title>
 <link rel="icon" type="image/png" href="/favicon.png?v=3">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/vv-base.css">
 <style>
+/* Área da Gestora: barra e abas */
+.gt-barra{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.gt-barra .grow{flex:1}
+.gt-ola{font-size:18px;font-weight:500;color:var(--ink)}
+.gt-abas{position:relative;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin:0 0 20px;padding:2px 2px 12px;border-bottom:1px solid var(--line);-webkit-overflow-scrolling:touch}
+.gt-abas::-webkit-scrollbar{display:none}
+.gt-abas button{flex:none;display:inline-flex;align-items:center;gap:6px;height:38px;padding:0 14px;border-radius:99px;border:1px solid var(--line);background:#fff;color:var(--text);font:inherit;font-size:14px;font-weight:500;text-transform:none;letter-spacing:normal;cursor:pointer;white-space:nowrap}
+.gt-abas button:hover{border-color:var(--teal);color:var(--teal2)}
+.gt-abas button[aria-selected="true"]{background:var(--teal);border-color:var(--teal);color:#fff}
+.gt-abas button:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+.gt-n{font-style:normal;min-width:20px;height:20px;padding:0 6px;border-radius:99px;background:#c27f0e;color:#fff;font-size:11px;font-weight:700;display:inline-grid;place-items:center}
+.gt-resumo{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:22px}
+.gt-card{display:flex;flex-direction:column;align-items:flex-start;gap:3px;text-align:left;background:#fff;border:1px solid var(--line);border-radius:10px;padding:16px;cursor:pointer;font:inherit;color:var(--text);text-transform:none;letter-spacing:normal;height:auto;min-width:0;transition:border-color .15s,box-shadow .15s}
+.gt-card:hover{border-color:var(--teal);box-shadow:0 4px 14px rgba(0,0,0,.07)}
+.gt-card .ico{font-size:22px;line-height:1;margin-bottom:6px}
+.gt-card small{font-size:11px;letter-spacing:.8px;text-transform:uppercase;color:var(--muted)}
+.gt-card b{font-size:24px;color:var(--ink);font-weight:700;line-height:1.15}
+.gt-card .d{font-size:13px;color:var(--muted);line-height:1.4;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.gt-card.atencao{border-color:#f0d19a;background:#fff9ec}
+.gt-card.atencao b{color:#a15c07}
+@media(max-width:900px){.gt-resumo{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.gt-card,.gt-card *{white-space:normal}
+.gt-card small{overflow-wrap:anywhere}
+@media screen{html[data-tema="escuro"][data-pagina] .gt-abas button[aria-selected="true"]{background:var(--teal);border-color:var(--teal);color:#fff}}
+@media(max-width:520px){.gt-resumo{gap:8px}.gt-card{padding:12px}.gt-card b{font-size:20px}.gt-card small{font-size:10px;letter-spacing:.4px}.gt-abas button{height:36px;padding:0 12px;font-size:13px}}
+/* Elogios (moderação) */
+.el-barra{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px;font-size:13px}
+.el-barra a{color:var(--teal2)}
+.el-barra .grow{flex:1}
+.ao-vivo{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)}
+.ao-vivo i{width:8px;height:8px;border-radius:50%;background:#2fc28f;animation:pulsa 1.6s infinite}
+@keyframes pulsa{50%{opacity:.3}}
+.el-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px}
+.tile.pend b{color:#b26b00}
+.toggle{display:flex;align-items:flex-start;gap:12px;cursor:pointer;position:relative}
+.toggle input{position:absolute;opacity:0;pointer-events:none}
+.sw{flex:none;width:46px;height:26px;border-radius:99px;background:#c9d3d1;position:relative;transition:background .2s;margin-top:2px}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.toggle input:checked+.sw{background:var(--teal)}
+.toggle input:checked+.sw::after{left:23px}
+.toggle input:focus-visible+.sw{box-shadow:0 0 0 3px var(--teal-soft)}
+.toggle b{display:block;color:var(--ink)}
+.toggle span.d{display:block;font-size:13px;color:var(--muted);line-height:1.45;margin-top:2px}
+.el-lista .item{display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-top:1px solid var(--line)}
+.el-lista .item:first-child{border-top:0;padding-top:0}
+.el-lista .item .t{flex:1;min-width:0}
+.el-lista .item .t b{color:var(--ink)}
+.el-lista .item .t p{margin:4px 0;line-height:1.45;overflow-wrap:anywhere}
+.el-lista .item .t small{color:var(--muted);font-size:12px}
+.el-lista .item .a{flex:none;display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.el-lista .item.novo{animation:pisca 1.6s ease-out}
+@keyframes pisca{from{background:var(--teal-soft)}to{background:transparent}}
+.btn-ok{background:var(--teal);color:#fff;border:1px solid var(--teal);height:32px;padding:0 12px;font-size:11px;border-radius:99px}
+.btn-rm{background:#fff;border:1px solid #e3a5a5;color:#b42318;height:32px;padding:0 12px;font-size:11px;border-radius:99px}
+.btn-rm.armed{background:#b42318;border-color:#b42318;color:#fff}
+.pend-card{border-color:#f0d19a}
+.pend-card .card-head{background:#fff6e5;color:#b26b00}
+.vazio{color:var(--muted);font-size:14px;margin:0}
+@media(max-width:520px){.el-lista .item{flex-direction:column}.el-lista .item .a{justify-content:flex-start}.el-stats{gap:8px}.el-stats .tile b{font-size:20px}}
+/* Álbum (publicar) */
+.gest-card .card-body{display:flex;flex-direction:column;gap:12px}
+.prevs:empty,.gest-card .status:empty{display:none}
+.card-head .counter a{color:var(--teal2)}
+datalist{display:none}
+.prevs{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.prev{border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#fff;display:flex;flex-direction:column}
+.prev img{width:100%;aspect-ratio:1/1;object-fit:cover;display:block}
+.prev input{border:0;border-top:1px solid var(--line);padding:8px;font:inherit;font-size:13px;background:transparent;color:var(--ink);min-width:0}
+.prev .tira{border:0;background:none;color:#b42318;font:inherit;font-size:11px;cursor:pointer;padding:4px 8px 8px;text-align:left;text-transform:none;letter-spacing:normal;height:auto}
+.escolher{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;border:2px dashed var(--line);border-radius:10px;padding:22px;cursor:pointer;color:var(--muted);text-align:center}
+.escolher:hover{border-color:var(--teal);color:var(--teal2)}
+.escolher b{color:var(--ink);font-weight:600}
+.status.ok{color:var(--teal2)}
+.al-grade{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px}
+.al-grade a{position:relative;display:block;border-radius:8px;overflow:hidden;aspect-ratio:1/1;background:var(--panel)}
+.al-grade img{width:100%;height:100%;object-fit:cover;display:block}
+.al-grade span{position:absolute;left:0;right:0;bottom:0;padding:14px 6px 5px;font-size:11px;color:#fff;background:linear-gradient(transparent,rgba(0,0,0,.65))}
+/* Senha */
+.sn-form{display:flex;flex-direction:column;gap:8px;max-width:460px}
+.sn-ver{display:flex;gap:8px;align-items:center;font-size:13px;cursor:pointer;color:var(--text)}
+.sn-form .linha{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:6px}
 /* Recado da Chefa (gestora) */
 .rc-form{display:flex;flex-direction:column;gap:10px}
 .rc-form .linha{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
@@ -179,8 +260,8 @@ html[data-tema="escuro"] .ev-tip{background:#e4efed;color:#0f1a1c}
   .sug li{break-inside:avoid}
 }
 </style>
-<link rel="stylesheet" href="/vv-tema-auto.css?v=31">
-<link rel="stylesheet" href="/vv-tema.css?v=33">
+<link rel="stylesheet" href="/vv-tema-auto.css?v=32">
+<link rel="stylesheet" href="/vv-tema.css?v=34">
 <script src="/vv-tema.js?v=23"></script>
 <link rel="manifest" href="/manifest.webmanifest?v=3">
 <meta name="theme-color" content="#033a45">
@@ -188,6 +269,7 @@ html[data-tema="escuro"] .ev-tip{background:#e4efed;color:#0f1a1c}
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Bug Hunters">
 <script src="/vv-app.js?v=2" defer></script>
+<script src="/vv-gestora.js?v=1" defer></script>
 <script src="/vv-recado.js?v=1" defer></script>
 </head>
 <body>
@@ -196,10 +278,10 @@ html[data-tema="escuro"] .ev-tip{background:#e4efed;color:#0f1a1c}
   <a class="logo" href="/">
     <img id="brandLogo" src="/logo.png" alt="" hidden onload="this.hidden=false;this.nextElementSibling.setAttribute('hidden','')">
     <svg width="28" height="24" viewBox="0 0 28 24" aria-hidden="true"><path d="M1 2h9l4 9 4-9h9L14 23z" fill="#2fc28f"/><path d="M10 2h8l-4 9z" fill="#1a8f6a"/></svg>
-    <b>Toca dos <span>Bug Hunters</span></b><span class="ver">v0.30</span>
+    <b>Toca dos <span>Bug Hunters</span></b><span class="ver">v0.31</span>
   </a>
   <div class="spacer"></div>
-  <span class="env">Painel da gestora</span>
+  <span class="env">Área da Gestora</span>
 </header>
 
 <nav class="side" aria-label="Menu">
@@ -211,7 +293,7 @@ html[data-tema="escuro"] .ev-tip{background:#e4efed;color:#0f1a1c}
     <svg viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.5 1-1.1a5.5 5.5 0 0 0 0-7.8z"/></svg>
     <span>Elogie um Colega</span>
   </a>
-  <a class="nav active" href="/sentimento.html">
+  <a class="nav" href="/sentimento.html">
     <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 14.5s1.5 2 4 2 4-2 4-2"/><path d="M9 9.5h.01M15 9.5h.01"/></svg>
     <span>Sentimento da Semana</span>
   </a>
@@ -236,17 +318,17 @@ html[data-tema="escuro"] .ev-tip{background:#e4efed;color:#0f1a1c}
 <main class="content"><div class="panel"><div class="wrap">
 
   <div class="page-head no-print">
-    <div class="page-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 14.5s1.5 2 4 2 4-2 4-2"/><path d="M9 9.5h.01M15 9.5h.01"/></svg></div>
-    <h1 class="grow">Sentimento da Equipe</h1>
+    <div class="page-icon"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 4.6-3 8.4-7 10-4-1.6-7-5.4-7-10V6z"/><path d="M9.5 12l1.8 1.8 3.4-3.6"/></svg></div>
+    <h1 class="grow">Área da Gestora</h1>
   </div>
-  <p class="page-sub no-print">Painel da coordenação: veja como a equipe descreveu cada semana e use isso para planejar ações. As respostas são anônimas.</p>
+  <p class="page-sub no-print">Tudo o que só a gestora faz, num lugar só: o clima da equipe, o recado para o time, a moderação dos elogios, as fotos do álbum, as sugestões e o lembrete de sexta.</p>
   <div class="divider no-print"></div>
 
   <section class="card login" id="loginCard">
-    <div class="card-head">Acesso da gestora</div>
+    <div class="card-head">🔐 Entrar na Área da Gestora</div>
     <form class="card-body" id="loginForm" novalidate>
-      <p class="login-sobre">Este painel mostra, toda semana, a frase curta que cada pessoa da equipe escreveu sobre a própria semana — de forma anônima. Use a senha que recebeu para entrar.</p>
-      <label class="label" for="senha"><span>Senha do painel</span></label>
+      <p class="login-sobre">Área exclusiva da gestora. Entre com a sua senha — depois, se quiser, você escolhe uma senha nova na aba <b>🔑 Senha</b>.</p>
+      <label class="label" for="senha"><span>Senha da gestora</span></label>
       <div class="row">
         <input class="input" id="senha" type="password" autocomplete="current-password" placeholder="Senha">
         <button class="btn-primary" type="submit">Entrar</button>
@@ -258,43 +340,57 @@ html[data-tema="escuro"] .ev-tip{background:#e4efed;color:#0f1a1c}
   <div id="painel" hidden>
     <div class="print-head"><h1>Sentimento da Equipe — Toca dos Bug Hunters</h1><p id="printRotulo"></p></div>
 
-    <details class="guia" id="guia" open>
-      <summary>📘 Como usar este painel <span class="seta"><span class="fechar">Recolher ▲</span><span class="abrir">Mostrar ▼</span></span></summary>
-      <div class="corpo">
-        <p><b>Para que serve:</b> toda sexta-feira, cada pessoa da equipe responde, em uma frase curta (até 100 caracteres), como foi a própria semana. Aqui você vê o conjunto dessas respostas para entender o clima da equipe e decidir, com a coordenação, se é preciso algum plano de ação. <b>As respostas são anônimas</b>: o sistema não guarda nome nem nada que identifique quem respondeu.</p>
 
-        <h3>Passo a passo</h3>
-        <ol class="passos">
-          <li><b>Escolha a semana</b> no seletor logo abaixo. A semana atual já vem marcada com “(atual)”; as anteriores ficam no histórico.</li>
-          <li><b>Leia os quatro cartões</b>: a <b>palavra da semana</b> (a mais citada nas respostas), as <b>respostas</b> (quantas a equipe enviou; cada pessoa pode mandar até 3), quantas <b>palavras diferentes</b> apareceram e a palavra da <b>semana anterior</b>, para comparar.</li>
-          <li><b>Observe a nuvem</b>: quanto maior a palavra, mais vezes ela apareceu nas respostas (palavras muito comuns, como "de" ou "muito", ficam de fora). Palavras de mesmo tom (ex.: “cansado”, “puxada”, “corrida”) juntas indicam um padrão.</li>
-          <li><b>Confira o ranking</b> para ver os números exatos de cada palavra e <b>leia as respostas</b>: o contexto (o que pesou, o que foi bom) está nas frases.</li>
-          <li><b>Compartilhe</b>: <kbd>Baixar PDF</kbd> gera uma página pronta para encaminhar; <kbd>Copiar resumo</kbd> copia um texto para colar no e-mail ou no Teams.</li>
-          <li><b>Gere a análise da semana</b>: no card <kbd>💡 Análise da semana</kbd>, clique em <kbd>Gerar análise</kbd>. A IA lê as respostas completas (anônimas) e sugere o clima, temas, ações para a equipe e uma pergunta para abrir a conversa. Ela fica salva; use <kbd>Gerar novamente</kbd> se chegarem novas respostas ou <kbd>Apagar análise</kbd> para removê-la.</li>
-          <li><b>Acompanhe a evolução</b>: no card <kbd>📈 Evolução do Sentimento</kbd> você vê as últimas semanas lado a lado — quantas respostas chegaram, quantas tinham <b>sinais de cansaço</b> (palavras como “cansado”, “puxada”, “corrida”), a palavra de cada semana e as palavras que subiram ou caíram. Se os sinais aparecem por 2 semanas seguidas ou mais, o painel avisa.</li>
-          <li><b>Deixe um recado para o time</b>: no card <kbd>📣 Recado da Chefa!</kbd>, escreva a mensagem (ex.: “Bem-vindos à Toca! Que seja uma semana abençoada! 🙏”), escolha com que frequência ela aparece e marque <b>Mostrar o recado</b>. Ele abre como uma janelinha para todo mundo que entrar na Toca, no PC ou no app. Use <kbd>Pré-visualizar</kbd> para ver como fica.</li>
-          <li><b>Lembrete de sexta</b>: quem ativar o sino 🔔 no topo do site recebe um aviso toda sexta às 9h. No card <kbd>🔔 Lembrete de sexta</kbd> você vê quantas pessoas ativaram.</li>
-          <li><b>Publique fotos no Álbum do time</b>: em <b>/album</b>, role até <kbd>🔒 Área da gestora</kbd> (a mesma senha deste painel), escolha as fotos, dê legendas e publique. A equipe curte e comenta; ao abrir uma foto você edita a legenda, apaga a foto ou remove comentários.</li>
-          <li><b>Responda às sugestões</b>: no card <kbd>📮 Caixa de sugestões</kbd> ficam as ideias que a equipe mandou (anônimas). Mude o status, escreva uma resposta e marque <b>“Mostrar para a equipe”</b> para ela aparecer no mural “Ouvimos você”.</li>
-          <li><b>Se aparecer algo impróprio</b>, em “Respostas da semana” clique em <kbd>Remover</kbd> e depois em <kbd>Confirmar</kbd>. Ao terminar, clique em <kbd>Sair</kbd>, principalmente em computador compartilhado.</li>
-        </ol>
+    <div class="gt-barra no-print">
+      <span class="gt-ola">Olá, chefa! 👋</span>
+      <span class="grow"></span>
+      <button class="btn-outline btn-sm" id="sair" type="button">Sair</button>
+    </div>
+    <nav class="gt-abas no-print" role="tablist" aria-label="Áreas da gestora">
+      <button type="button" role="tab" data-aba="inicio"><span aria-hidden="true">🏠</span>Início</button>
+      <button type="button" role="tab" data-aba="sentimento"><span aria-hidden="true">😊</span>Sentimento</button>
+      <button type="button" role="tab" data-aba="recado"><span aria-hidden="true">📣</span>Recado</button>
+      <button type="button" role="tab" data-aba="elogios"><span aria-hidden="true">💚</span>Elogios<i class="gt-n" id="nElogios" hidden></i></button>
+      <button type="button" role="tab" data-aba="album"><span aria-hidden="true">📷</span>Álbum</button>
+      <button type="button" role="tab" data-aba="sugestoes"><span aria-hidden="true">📮</span>Sugestões<i class="gt-n" id="nSug" hidden></i></button>
+      <button type="button" role="tab" data-aba="lembrete"><span aria-hidden="true">🔔</span>Lembrete</button>
+      <button type="button" role="tab" data-aba="pergunta" data-recurso="pergunta"><span aria-hidden="true">❓</span>Pergunta</button>
+      <button type="button" role="tab" data-aba="senha"><span aria-hidden="true">🔑</span>Senha</button>
+    </nav>
 
-        <h3>Dicas para analisar</h3>
-        <ul class="dicas">
-          <li><b>Poucas respostas</b> (menos respostas do que pessoas na equipe) também é um sinal: pode valer lembrar a equipe ou entender o motivo.</li>
-          <li><b>Compare com a semana anterior</b>: a mudança de tom de uma semana para outra costuma dizer mais do que uma semana isolada.</li>
-          <li><b>Palavras negativas repetidas por várias semanas</b> merecem conversa e plano de ação; uma semana puxada isolada pode ser só pico de demanda.</li>
-          <li>Leve <b>o padrão</b>, e não respostas isoladas, para a conversa com a equipe — e preserve o anonimato: não tente descobrir quem escreveu o quê.</li>
-        </ul>
-      </div>
-    </details>
+    <section class="gt-aba" data-painel="inicio" role="tabpanel">
+      <div class="gt-resumo" id="gtResumo"></div>
+      <details class="guia" id="guia" open>
+        <summary>📘 Como usar a Área da Gestora <span class="seta"><span class="fechar">Recolher ▲</span><span class="abrir">Mostrar ▼</span></span></summary>
+        <div class="corpo">
+          <p>Cada aba acima é um lugar da Toca que você cuida. Os cartões no topo desta página mostram o que está pedindo a sua atenção — toque num cartão para ir direto à aba.</p>
+          <h3>O que dá para fazer em cada aba</h3>
+          <ol class="passos">
+            <li><b>😊 Sentimento</b>: escolha a semana e veja a palavra da semana, a nuvem, o ranking e as respostas (anônimas). Gere a <kbd>💡 Análise da semana</kbd> com IA, acompanhe a <kbd>📈 Evolução</kbd>, <kbd>Baixe o PDF</kbd> ou <kbd>Copie o resumo</kbd>. Remova só respostas impróprias.</li>
+            <li><b>📣 Recado</b>: escreva a mensagem (ex.: “Bem-vindos à Toca! Que seja uma semana abençoada! 🙏”), escolha a frequência e marque <b>Mostrar o recado</b>. Ele abre numa janelinha para todo mundo que entrar na Toca. Use <kbd>Pré-visualizar</kbd>.</li>
+            <li><b>💚 Elogios</b>: acompanhe os elogios chegando (com nome), aprove ou remova. Ligue <b>Aprovar antes de mostrar no telão</b> se quiser conferir tudo antes.</li>
+            <li><b>📷 Álbum</b>: escolha as fotos, dê legendas e publique. Para editar a legenda, apagar uma foto ou remover comentários, abra a foto no álbum — com você conectada, os botões de gestora aparecem lá.</li>
+            <li><b>📮 Sugestões</b>: mude o status, responda e marque <b>“Mostrar para a equipe”</b> para a resposta aparecer no mural “Ouvimos você”.</li>
+            <li><b>🔔 Lembrete</b>: veja quantas pessoas ativaram o aviso de sexta (9h) e, se precisar, envie um lembrete na hora.</li>
+            <li><b>🔑 Senha</b>: escolha uma senha só sua quando quiser.</li>
+            <li><b>Para sair</b>, clique em <kbd>Sair</kbd> — principalmente em computador compartilhado. Para voltar, toque no escudo 🛡️ ao lado do sino, no topo de qualquer página.</li>
+          </ol>
+          <h3>Dicas para o Sentimento</h3>
+          <ul class="dicas">
+            <li><b>Poucas respostas</b> (menos respostas do que pessoas na equipe) também é um sinal: pode valer lembrar a equipe ou entender o motivo.</li>
+            <li><b>Compare com a semana anterior</b>: a mudança de tom de uma semana para outra costuma dizer mais do que uma semana isolada.</li>
+            <li>Leve <b>o padrão</b>, e não respostas isoladas, para a conversa com a equipe — e preserve o anonimato.</li>
+          </ul>
+        </div>
+      </details>
+    </section>
 
+    <section class="gt-aba" data-painel="sentimento" role="tabpanel">
     <div class="toolbar">
       <select id="semanaSel" aria-label="Semana"></select>
       <span class="grow"></span>
       <button class="btn-outline btn-sm" id="copiar" type="button"><svg viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V4H4v12h4"/></svg>Copiar resumo</button>
       <button class="btn-primary btn-sm" id="pdf" type="button"><svg viewBox="0 0 24 24"><path d="M6 9V3h12v6M6 18H4v-7h16v7h-2M8 14h8v7H8z"/></svg>Baixar PDF</button>
-      <button class="btn-outline btn-sm" id="sair" type="button">Sair</button>
     </div>
     <div class="status" id="msg" role="status" style="margin:-10px 0 14px"></div>
 
@@ -338,28 +434,100 @@ html[data-tema="escuro"] .ev-tip{background:#e4efed;color:#0f1a1c}
       <div class="card-head"><span>📈 Evolução do Sentimento</span><span class="counter" id="evSub">últimas semanas</span></div>
       <div class="card-body" id="evCorpo"><div class="an-vazio"><span class="carregando"></span></div></div>
     </section>
+    </section>
+
+    <section class="gt-aba" data-painel="recado" role="tabpanel">
     <section class="card no-print" id="recado">
       <div class="card-head"><span>📣 Recado da Chefa!</span><span id="rcEstado"></span></div>
       <div class="card-body" id="rcCorpo"><span class="carregando"></span></div>
     </section>
-
-    <section class="card no-print" id="perguntas" data-recurso="pergunta">
-      <div class="card-head"><span>❓ Pergunta da semana</span><span class="counter"><a href="/pergunta.html" target="_blank" rel="noopener">Ver como a equipe vê ↗</a></span></div>
-      <div class="card-body" id="pqCorpo"><div class="an-vazio"><span class="carregando"></span></div></div>
     </section>
 
-    <section class="card no-print" id="lembretes">
-      <div class="card-head"><span>🔔 Lembrete de sexta</span></div>
-      <div class="card-body" id="lbCorpo" style="font-size:14px"><span class="carregando"></span></div>
+    <section class="gt-aba" data-painel="elogios" role="tabpanel">
+      <div class="el-barra">
+        <span class="ao-vivo"><i></i> Atualiza sozinho a cada poucos segundos</span>
+        <span class="grow"></span>
+        <a href="/elogios.html" target="_blank" rel="noopener">Abrir a tela do Elogie ↗</a>
+      </div>
+      <div class="el-stats">
+        <div class="tile"><small>No telão</small><b id="sAprov">0</b></div>
+        <div class="tile pend"><small>Aguardando</small><b id="sPend">0</b></div>
+        <div class="tile"><small>Meta</small><b id="sMeta">15</b></div>
+      </div>
+      <section class="card">
+        <div class="card-body" style="padding:16px">
+          <label class="toggle">
+            <input type="checkbox" id="aprovarAntes">
+            <span class="sw" aria-hidden="true"></span>
+            <span><b>Aprovar antes de mostrar no telão</b>
+            <span class="d" id="toggleDesc">Desligado: os elogios aparecem na hora; você remove o que for impróprio.</span></span>
+          </label>
+          <div class="status" id="elMsg" role="status"></div>
+        </div>
+      </section>
+      <section class="card pend-card" id="pendCard" hidden>
+        <div class="card-head"><span>⏳ Aguardando aprovação <span class="counter" id="pendN"></span></span>
+          <button class="btn-ok" id="aprovarTodos" type="button">Aprovar todos</button></div>
+        <div class="card-body el-lista" id="pendentes"></div>
+      </section>
+      <section class="card">
+        <div class="card-head"><span>💚 No telão <span class="counter" id="aprovN"></span></span></div>
+        <div class="card-body el-lista" id="aprovados"><p class="vazio">Nenhum elogio ainda.</p></div>
+      </section>
+      <p class="ev-nota">Dica: durante a apresentação no telão, deixe esta aba aberta no celular — os elogios chegam aqui com nome e texto antes de aparecerem para todo mundo.</p>
     </section>
 
+    <section class="gt-aba" data-painel="album" role="tabpanel">
+      <section class="card gest-card">
+        <div class="card-head"><span>📷 Publicar fotos no Álbum do time</span><span class="counter"><a href="/album.html" target="_blank" rel="noopener">Ver o álbum ↗</a></span></div>
+        <div class="card-body" id="gestCorpo"><span class="carregando"></span></div>
+      </section>
+      <section class="card">
+        <div class="card-head"><span>Fotos mais recentes</span><span class="counter" id="alSub"></span></div>
+        <div class="card-body" id="alRecentes"><span class="carregando"></span></div>
+      </section>
+    </section>
+
+    <section class="gt-aba" data-painel="sugestoes" role="tabpanel">
     <section class="card no-print" id="sugestoes">
       <div class="card-head"><span>📮 Caixa de sugestões<span class="sg-badge" id="sgBadge" hidden></span></span><span class="counter"><a href="/sugestoes.html" target="_blank" rel="noopener">Ver como a equipe vê ↗</a></span></div>
       <div class="card-body" id="sgCorpo"><div class="an-vazio"><span class="carregando"></span></div></div>
     </section>
+    </section>
+
+    <section class="gt-aba" data-painel="lembrete" role="tabpanel">
+    <section class="card no-print" id="lembretes">
+      <div class="card-head"><span>🔔 Lembrete de sexta</span></div>
+      <div class="card-body" id="lbCorpo" style="font-size:14px"><span class="carregando"></span></div>
+    </section>
+    </section>
+
+    <section class="gt-aba" data-painel="pergunta" data-recurso="pergunta" role="tabpanel">
+    <section class="card no-print" id="perguntas" data-recurso="pergunta">
+      <div class="card-head"><span>❓ Pergunta da semana</span><span class="counter"><a href="/pergunta.html" target="_blank" rel="noopener">Ver como a equipe vê ↗</a></span></div>
+      <div class="card-body" id="pqCorpo"><div class="an-vazio"><span class="carregando"></span></div></div>
+    </section>
+    </section>
+
+    <section class="gt-aba" data-painel="senha" role="tabpanel">
+      <section class="card">
+        <div class="card-head"><span>🔑 Trocar a minha senha</span><span id="snEstado"></span></div>
+        <form class="card-body sn-form" id="snForm" novalidate>
+          <p class="ev-nota" style="margin:0 0 4px">Escolha uma senha só sua para entrar na Área da Gestora. Ela vale no PC e no celular.</p>
+          <label class="label" for="snAtual"><span>Senha atual</span></label>
+          <input class="input" id="snAtual" type="password" autocomplete="current-password">
+          <label class="label" for="snNova"><span>Nova senha</span><span class="counter">mínimo 6 caracteres</span></label>
+          <input class="input" id="snNova" type="password" autocomplete="new-password" maxlength="64">
+          <label class="label" for="snConf"><span>Repita a nova senha</span></label>
+          <input class="input" id="snConf" type="password" autocomplete="new-password" maxlength="64">
+          <label class="sn-ver"><input type="checkbox" id="snVer"> Mostrar as senhas</label>
+          <div class="linha"><button class="btn-primary btn-sm" type="submit" id="snSalvar">Trocar senha</button><span class="msgsg" id="snMsg" role="status"></span></div>
+          <p class="ev-nota" style="margin:6px 0 0">Esqueceu a senha? Quem administra a Toca (na Vercel) consegue entrar com a senha original e definir uma nova para você.</p>
+        </form>
+      </section>
+    </section>
   </div>
 
-  <div class="foot-link no-print"><a href="/sentimento.html">Voltar para o Sentimento da Semana</a></div>
 
 </div></div></main>
 
@@ -370,11 +538,74 @@ html[data-tema="escuro"] .ev-tip{background:#e4efed;color:#0f1a1c}
 const $=id=>document.getElementById(id);
 const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
 const ls={get(k){try{return localStorage.getItem(k)}catch{return null}},set(k,v){try{v==null?localStorage.removeItem(k):localStorage.setItem(k,v)}catch{}}};
-let chave=ls.get('vv-gestora'),semanas=[],atual=null,dados=null,analise=null,minimoAnalise=3,gerando=false;
+let chave=ls.get('vv-gestora'),semanas=[],atual=null,semanaAtual=null,dados=null,analise=null,minimoAnalise=3,gerando=false;
 const guia=document.getElementById('guia');
 if(ls.get('vv-gestora-guia')==='fechado')guia.open=false;
 guia.addEventListener('toggle',()=>ls.set('vv-gestora-guia',guia.open?null:'fechado'));
 const msg=(t,e=false)=>{$('msg').textContent=t;$('msg').className='status'+(e?' error':'')};
+
+// ---------- Abas ----------
+const ABAS=['inicio','sentimento','recado','elogios','album','sugestoes','lembrete','pergunta','senha'];
+const ALIAS={perguntas:'pergunta',lembretes:'lembrete',evCard:'sentimento',analiseCard:'sentimento'};
+let aba='inicio';
+const R={}; // números do resumo (Início)
+function abaDoHash(){const h=decodeURIComponent(location.hash.slice(1));return ABAS.includes(h)?h:(ALIAS[h]||'inicio')}
+function irPara(nome,{hist=true}={}){
+  if(!ABAS.includes(nome))nome='inicio';
+  aba=nome;
+  document.querySelectorAll('.gt-abas [data-aba]').forEach(b=>{
+    const on=b.dataset.aba===nome;b.setAttribute('aria-selected',String(on));b.tabIndex=on?0:-1;
+    if(on){const nav=b.parentElement;nav.scrollLeft=Math.max(0,b.offsetLeft-nav.clientWidth/2+b.offsetWidth/2)}
+  });
+  document.querySelectorAll('.gt-aba').forEach(p=>p.hidden=p.dataset.painel!==nome);
+  if(hist&&location.hash!=='#'+nome)history.replaceState(null,'','#'+nome);
+  aoMostrar(nome);
+}
+function aoMostrar(nome){
+  clearTimeout(elTimer);
+  if(nome==='sentimento'&&dados)requestAnimationFrame(()=>vvNuvem($('cloudBox'),$('cloud'),$('fallback'),dados.palavras));
+  if(nome==='elogios'){carregarElogios();agendarElogios()}
+  if(nome==='inicio'){renderResumo();carregarElogios()}
+  if(nome==='album'&&!albumDados)carregarAlbum();
+  if(nome==='senha')renderSenhaEstado();
+}
+document.querySelector('.gt-abas').addEventListener('click',e=>{const b=e.target.closest('[data-aba]');if(b)irPara(b.dataset.aba)});
+document.querySelector('.gt-abas').addEventListener('keydown',e=>{
+  if(!['ArrowRight','ArrowLeft'].includes(e.key))return;
+  const vis=[...document.querySelectorAll('.gt-abas [data-aba]')].filter(b=>b.offsetParent);
+  const i=vis.findIndex(b=>b.dataset.aba===aba),n=vis[(i+(e.key==='ArrowRight'?1:-1)+vis.length)%vis.length];
+  irPara(n.dataset.aba);n.focus();
+});
+addEventListener('hashchange',()=>{if(!$('painel').hidden&&abaDoHash()!==aba)irPara(abaDoHash(),{hist:false})});
+$('gtResumo').addEventListener('click',e=>{const c=e.target.closest('[data-ir]');if(c){irPara(c.dataset.ir);scrollTo({top:0,behavior:'smooth'})}});
+
+// ---------- Início (resumo) ----------
+const curto=(t,n=70)=>{t=String(t||'').replace(/\s+/g,' ').trim();return t.length>n?t.slice(0,n-1)+'…':t};
+function renderResumo(){
+  const card=(ir,ico,rot,num,d,atencao)=>`<button type="button" class="gt-card${atencao?' atencao':''}" data-ir="${ir}"><span class="ico" aria-hidden="true">${ico}</span><small>${rot}</small><b>${num}</b><span class="d">${d}</span></button>`;
+  const c=[],sp='<span class="carregando"></span>';
+  const el=R.elogios;
+  if(!el)c.push(card('elogios','💚','Elogios',sp,'carregando…'));
+  else if(el.pendentes.length)c.push(card('elogios','💚','Elogios aguardando',el.pendentes.length,`${el.aprovados.length} no telão · toque para aprovar`,true));
+  else c.push(card('elogios','💚','Elogios no telão',el.aprovados.length,el.config.aprovarAntes?'Aprovação antes do telão: ligada':'Aparecem na hora no telão'));
+  const sem=semanas.find(x=>x.semana===semanaAtual);
+  const palavra=dados&&atual===semanaAtual&&dados.palavras[0]?dados.palavras[0][0]:null;
+  c.push(card('sentimento','😊','Sentimento desta semana',sem?sem.total:sp,sem?(sem.total?(palavra?`Palavra da semana: “${esc(palavra)}”`:`${sem.total===1?'resposta':'respostas'} até agora`):'Ainda sem respostas'):'carregando…'));
+  const sg=R.sugestoes;
+  if(!sg)c.push(card('sugestoes','📮','Sugestões',sp,'carregando…'));
+  else{const novas=sg.filter(s=>s.status==='nova').length;c.push(card('sugestoes','📮',novas?'Sugestões novas':'Sugestões',novas||sg.length,novas?`${sg.length} no total · toque para responder`:sg.length?'Nenhuma nova — tudo em dia':'Nenhuma ainda',novas>0))}
+  const rc=R.recado;
+  if(!rc)c.push(card('recado','📣','Recado da Chefa',sp,'carregando…'));
+  else{const on=rc.ativo&&rc.mensagem;c.push(card('recado','📣','Recado da Chefa',on?'No ar':'Desligado',on?esc(curto(rc.mensagem)):'Escreva um recado para o time'))}
+  const al=R.album;
+  if(!al)c.push(card('album','📷','Álbum do time',sp,'carregando…'));
+  else{const cur=al.fotos.reduce((a,f)=>a+f.curtidas,0),com=al.fotos.reduce((a,f)=>a+f.comentarios.length,0);c.push(card('album','📷','Fotos no álbum',al.fotos.length,al.fotos.length?`${cur} ${cur===1?'curtida':'curtidas'} · ${com} ${com===1?'comentário':'comentários'}`:'Publique as primeiras fotos'))}
+  const lb=R.lembrete;
+  if(!lb)c.push(card('lembrete','🔔','Lembrete de sexta',sp,'carregando…'));
+  else c.push(card('lembrete','🔔','Com lembrete de sexta',lb.inscritos,lb.ultimoEnvio?`Último envio: ${new Date(lb.ultimoEnvio).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}`:'Toda sexta às 9h'));
+  $('gtResumo').innerHTML=c.join('');
+}
+function expirou(){chave=null;clearTimeout(elTimer);ls.set('vv-gestora',null);mostrarLogin('Sua sessão expirou. Entre novamente.',true)}
 
 async function api(url,opts={}){
   const r=await fetch(url,{...opts,cache:'no-store',headers:{...(opts.headers||{}),'x-gestora-key':chave||''}});
@@ -391,19 +622,22 @@ function mostrarLogin(texto,erro){
 
 $('loginForm').addEventListener('submit',async e=>{
   e.preventDefault();chave=$('senha').value.trim();if(!chave)return;
-  try{await api('/api/sentimentos/gestora');ls.set('vv-gestora',chave);$('senha').value='';await abrirPainel()}
+  try{infoG=await api('/api/gestora');ls.set('vv-gestora',chave);$('senha').value='';await abrirPainel()}
   catch(err){chave=null;mostrarLogin(err.status===401?'Senha incorreta.':err.message,true)}
 });
-$('sair').onclick=()=>{chave=null;ls.set('vv-gestora',null);mostrarLogin('Você saiu do painel.')};
+$('sair').onclick=()=>{chave=null;clearTimeout(elTimer);ls.set('vv-gestora',null);history.replaceState(null,'',location.pathname);mostrarLogin('Você saiu da Área da Gestora.')};
 
 async function abrirPainel(){
   const d=await api('/api/sentimentos/gestora/semanas');
-  semanas=d.semanas;
+  semanas=d.semanas;semanaAtual=d.atual;
   $('semanaSel').innerHTML=semanas.map(s=>`<option value="${s.semana}">${esc(s.rotulo)}${s.semana===d.atual?' (atual)':''} — ${s.total} ${s.total===1?'resposta':'respostas'}</option>`).join('');
   $('loginCard').hidden=true;$('painel').hidden=false;
   carregarSugestoes();
   carregarRecado();
   carregarLembretes();
+  carregarAlbum();
+  if(infoG)renderSenhaEstado();else carregarInfoGestora();
+  irPara(abaDoHash(),{hist:false});
   await carregarSemana(atual&&semanas.some(s=>s.semana===atual)?atual:d.atual);
 }
 
@@ -416,7 +650,7 @@ async function carregarSemana(semana){
     render(anterior);
     carregarAnalise(semana);
     carregarEvolucao(semana);
-  }catch(err){if(err.status===401){chave=null;ls.set('vv-gestora',null);return mostrarLogin('Sua sessão expirou. Entre novamente.',true)}msg(err.message,true)}
+  }catch(err){if(err.status===401)return expirou();msg(err.message,true)}
 }
 $('semanaSel').onchange=e=>carregarSemana(e.target.value);
 
@@ -431,7 +665,8 @@ function render(anterior){
   $('rank').innerHTML=d.palavras.length?d.palavras.map(([p,n])=>`<tr><td>${esc(p)}</td><td class="barcell"><div class="mini" style="width:${(n/max*100).toFixed(0)}%"></div></td><td class="n">${n}</td></tr>`).join(''):'<tr><td colspan="3" class="empty">Sem respostas nesta semana.</td></tr>';
   $('respostas').innerHTML=d.respostas.length?d.respostas.map(r=>`<div class="resp"><span class="txt">${esc(r.texto??r.palavra??'')}</span><button class="btn-danger rm" type="button" data-id="${esc(r.id)}">Remover</button></div>`).join(''):'<span class="empty">Nenhuma resposta.</span>';
   $('cloudWait').hidden=!!d.palavras.length;
-  vvNuvem($('cloudBox'),$('cloud'),$('fallback'),d.palavras);
+  if(aba==='sentimento')vvNuvem($('cloudBox'),$('cloud'),$('fallback'),d.palavras);
+  renderResumo();
 }
 
 
@@ -444,7 +679,7 @@ async function carregarRecado(){
   catch(e){$('rcCorpo').textContent=e.message}
 }
 function renderRecado(msg='',erro=false){
-  const r=recadoAtual,on=r.ativo&&r.mensagem;
+  const r=recadoAtual,on=r.ativo&&r.mensagem;R.recado=r;renderResumo();
   $('rcEstado').innerHTML=`<span class="rc-estado ${on?'on':'off'}">${on?'● No ar':'Desligado'}</span>`;
   $('rcCorpo').innerHTML=`<form class="rc-form" id="rcForm" novalidate>
     <p class="ev-nota" style="margin:0">A mensagem abre numa janelinha para todo mundo que entrar na Toca (PC ou app). Não aparece no telão nem neste painel.</p>
@@ -523,7 +758,7 @@ $('pqCorpo').addEventListener('click',async e=>{
 
 // ---------- Lembrete de sexta ----------
 async function carregarLembretes(){
-  try{const d=await api('/api/lembretes/gestora');
+  try{const d=await api('/api/lembretes/gestora');R.lembrete=d;renderResumo();
     $('lbCorpo').innerHTML=`<p style="margin:0 0 10px"><b>${d.inscritos}</b> ${d.inscritos===1?'pessoa ativou':'pessoas ativaram'} o lembrete. Toda <b>sexta às 9h</b> elas recebem um aviso para responder o Sentimento (e a Pergunta da semana, se houver uma aberta).${d.ultimoEnvio?` Último envio: ${new Date(d.ultimoEnvio).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}.`:''}</p>
     <p class="ev-nota" style="margin:0 0 10px">Para ativar, cada pessoa toca no sino 🔔 no topo do site. No iPhone é preciso instalar o app antes (Compartilhar → Adicionar à Tela de Início).</p>
     <button class="btn-outline btn-sm" type="button" id="lbTestar" ${d.inscritos?'':'disabled'}>Enviar lembrete agora</button> <span class="msgsg" id="lbMsg"></span>`;
@@ -547,6 +782,7 @@ async function carregarSugestoes(){
 function renderSugestoes(aviso=''){
   const novas=sugestoes.filter(s=>s.status==='nova').length;
   $('sgBadge').hidden=!novas;$('sgBadge').textContent=novas;$('sgBadge').title=`${novas} ${novas===1?'nova':'novas'}`;
+  $('nSug').hidden=!novas;$('nSug').textContent=novas;R.sugestoes=sugestoes;renderResumo();
   if(!sugestoes.length){$('sgCorpo').innerHTML='<div class="an-vazio"><p>Nenhuma sugestão ainda. Divulgue o link <b>'+esc(location.host)+'/sugestoes</b> para a equipe.</p></div>';return}
   const filtros={abertas:['Abertas',s=>s.status==='nova'||s.status==='analise'],todas:['Todas',()=>true],respondidas:['Respondidas',s=>!!s.resposta],feito:['Feitas',s=>s.status==='feito']};
   const lista=sugestoes.filter(filtros[sgFiltro][1]);
@@ -724,9 +960,161 @@ $('copiar').onclick=async()=>{
   try{await navigator.clipboard.writeText(linhas.join('\n'));msg('Resumo copiado. É só colar no e-mail ou no Teams.')}catch{msg('Não consegui copiar automaticamente.',true)}
 };
 
-addEventListener('vv-tema',()=>{if(dados&&!$('painel').hidden)vvNuvem($('cloudBox'),$('cloud'),$('fallback'),dados.palavras)});
-let rz;addEventListener('resize',()=>{clearTimeout(rz);rz=setTimeout(()=>{if(dados&&!$('painel').hidden)vvNuvem($('cloudBox'),$('cloud'),$('fallback'),dados.palavras)},250)});
+// ---------- Elogios (moderação) ----------
+let elVisto=new Set(),elPrimeira=true,elTimer=null;
+const elMsg=(t,e=false)=>{$('elMsg').textContent=t;$('elMsg').className='status'+(e?' error':'')};
+function quandoEl(iso){const d=new Date(iso),s=(Date.now()-d)/1000;if(s<60)return'agora';if(s<3600)return`há ${Math.floor(s/60)} min`;return d.toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}
+const elItem=(e,pend)=>`<div class="item${!elPrimeira&&!elVisto.has(e.id)?' novo':''}"><div class="t"><b>${esc(e.nome)}</b><p>${esc(e.texto)}</p><small>${quandoEl(e.criadoEm)}</small></div><div class="a">${pend?`<button class="btn-ok" data-ok="${esc(e.id)}" type="button">Aprovar</button>`:''}<button class="btn-rm" data-rm="${esc(e.id)}" type="button">Remover</button></div></div>`;
+function renderElogios(d){
+  R.elogios=d;
+  $('sAprov').textContent=d.aprovados.length;$('sPend').textContent=d.pendentes.length;$('sMeta').textContent=d.meta;
+  $('aprovarAntes').checked=!!d.config.aprovarAntes;
+  $('toggleDesc').textContent=d.config.aprovarAntes
+    ?'Ligado: elogios novos ficam aqui esperando e só entram na nuvem depois que você aprovar.'
+    :'Desligado: os elogios aparecem na hora; você remove o que for impróprio.';
+  $('pendCard').hidden=!d.pendentes.length&&!d.config.aprovarAntes;
+  $('pendN').textContent=d.pendentes.length?`(${d.pendentes.length})`:'';
+  $('aprovarTodos').hidden=!d.pendentes.length;
+  $('pendentes').innerHTML=d.pendentes.length?d.pendentes.map(e=>elItem(e,true)).join(''):'<p class="vazio">Nada esperando. Os próximos elogios aparecem aqui.</p>';
+  $('aprovN').textContent=d.aprovados.length?`(${d.aprovados.length})`:'';
+  $('aprovados').innerHTML=d.aprovados.length?d.aprovados.map(e=>elItem(e,false)).join(''):'<p class="vazio">Nenhum elogio no telão ainda.</p>';
+  [...d.pendentes,...d.aprovados].forEach(e=>elVisto.add(e.id));elPrimeira=false;
+  $('nElogios').hidden=!d.pendentes.length;$('nElogios').textContent=d.pendentes.length;
+  if(aba==='inicio')renderResumo();
+}
+async function carregarElogios(){
+  try{renderElogios(await api('/api/elogios/moderacao'))}
+  catch(err){if(err.status===401)return expirou();if(aba==='elogios')elMsg(err.message,true)}
+}
+function agendarElogios(){clearTimeout(elTimer);if(aba!=='elogios')return;elTimer=setTimeout(async()=>{if(!document.hidden&&aba==='elogios'&&chave)await carregarElogios();agendarElogios()},4000)}
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&chave&&aba==='elogios')carregarElogios()});
+$('aprovarAntes').addEventListener('change',async e=>{
+  const on=e.target.checked;e.target.disabled=true;
+  try{const r=await api('/api/elogios/config',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({aprovarAntes:on})});
+    elMsg(on?'Aprovação ligada: os próximos elogios esperam a sua aprovação.':r.aprovadosAgora?`Aprovação desligada. ${r.aprovadosAgora} ${r.aprovadosAgora===1?'elogio que esperava foi publicado':'elogios que esperavam foram publicados'}.`:'Aprovação desligada: os elogios aparecem na hora.');
+    await carregarElogios()}
+  catch(err){e.target.checked=!on;elMsg(err.message,true)}
+  finally{e.target.disabled=false}
+});
+$('aprovarTodos').onclick=async()=>{
+  try{const r=await api('/api/elogios/aprovar-todos',{method:'POST'});elMsg(`${r.aprovados} ${r.aprovados===1?'elogio aprovado':'elogios aprovados'}.`);await carregarElogios()}catch(err){elMsg(err.message,true)}
+};
+document.querySelector('[data-painel="elogios"]').addEventListener('click',async e=>{
+  const ok=e.target.closest('[data-ok]'),rm=e.target.closest('[data-rm]');
+  if(ok){ok.disabled=true;try{await api('/api/elogios/'+encodeURIComponent(ok.dataset.ok)+'/aprovar',{method:'POST'});elMsg('Elogio aprovado: já está no telão.');await carregarElogios()}catch(err){elMsg(err.message,true);ok.disabled=false}}
+  if(rm){
+    if(!rm.classList.contains('armed')){rm.classList.add('armed');rm.textContent='Confirmar';setTimeout(()=>{rm.classList.remove('armed');rm.textContent='Remover'},3000);return}
+    rm.disabled=true;try{await api('/api/elogios/'+encodeURIComponent(rm.dataset.rm),{method:'DELETE'});elMsg('Elogio removido.');await carregarElogios()}catch(err){elMsg(err.message,true);rm.disabled=false}
+  }
+});
 
-(async()=>{if(!chave)return mostrarLogin();try{await api('/api/sentimentos/gestora');await abrirPainel()}catch{chave=null;ls.set('vv-gestora',null);mostrarLogin()}})();
+// ---------- Álbum (publicar fotos) ----------
+let albumDados=null,prevs=[];
+async function carregarAlbum(){
+  try{const r=await fetch('/api/album',{cache:'no-store'});const d=await r.json();if(!r.ok)throw new Error(d.error||'Falhou.');albumDados=d;R.album=d;renderResumo();renderAlbum()}
+  catch(e){$('alRecentes').innerHTML=`<p class="vazio">${esc(e.message)}</p>`;if(!$('gPrevs'))renderGest()}
+}
+function renderAlbum(msgTxt,erro){
+  if(!$('gPrevs')||msgTxt!==undefined)renderGest(msgTxt||'',erro);
+  const f=albumDados?albumDados.fotos:[];
+  const cur=f.reduce((a,x)=>a+x.curtidas,0),com=f.reduce((a,x)=>a+x.comentarios.length,0);
+  $('alSub').textContent=f.length?`${f.length} ${f.length===1?'foto':'fotos'} · ${cur} ${cur===1?'curtida':'curtidas'} · ${com} ${com===1?'comentário':'comentários'}`:'';
+  $('alRecentes').innerHTML=f.length
+    ?`<div class="al-grade">${f.slice(0,12).map(x=>`<a href="/album.html" target="_blank" rel="noopener" title="${esc(x.legenda||'Abrir no álbum')}"><img src="/api/album/foto/${esc(x.id)}?t=p" alt="${esc(x.legenda)}" loading="lazy"><span>♥ ${x.curtidas} · 💬 ${x.comentarios.length}</span></a>`).join('')}</div>
+      <p class="ev-nota" style="margin:12px 0 0">Para editar a legenda, mover de álbum, apagar uma foto ou remover comentários, abra a foto no álbum — com você conectada, os botões de gestora aparecem lá.</p>`
+    :'<p class="vazio">O álbum ainda está vazio. Publique as primeiras fotos acima 📷</p>';
+}
+function renderGest(msgTxt='',erro=false){
+  $('gestCorpo').innerHTML=`
+    <label class="escolher" for="gArquivos"><span style="font-size:28px">📷</span><b>Escolher fotos</b><span>Pode escolher várias de uma vez. Elas são reduzidas automaticamente antes de enviar.</span></label>
+    <input type="file" id="gArquivos" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" multiple hidden>
+    <div class="prevs" id="gPrevs"></div>
+    <div id="gPub" style="display:none;flex-direction:column;gap:8px">
+      <label class="label" for="gAlbum"><span>Álbum (opcional)</span></label>
+      <input class="input" id="gAlbum" maxlength="60" list="albunsLista" placeholder="Ex.: Confraternização de outubro">
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><button class="btn-primary" type="button" id="gPublicar">Publicar fotos</button><button class="btn-outline btn-sm" type="button" id="gLimpar">Limpar</button></div>
+    </div>
+    <span class="status${erro?' error':' ok'}" id="gStatus">${esc(msgTxt)}</span>
+    <datalist id="albunsLista">${(albumDados?.albuns||[]).map(a=>`<option value="${esc(a.nome)}">`).join('')}</datalist>`;
+  $('gArquivos').onchange=e=>adicionarArquivos([...e.target.files]);
+  $('gLimpar').onclick=()=>{prevs=[];renderPrevs()};
+  $('gPublicar').onclick=publicar;
+  renderPrevs();
+}
+function carregarImagem(file){
+  if(window.createImageBitmap)return createImageBitmap(file,{imageOrientation:'from-image'}).catch(()=>viaImg(file));
+  return viaImg(file);
+}
+function viaImg(file){return new Promise((ok,erro)=>{const u=URL.createObjectURL(file),i=new Image();i.onload=()=>{ok(i)};i.onerror=()=>{URL.revokeObjectURL(u);erro(new Error('formato'))};i.src=u})}
+function reduzir(img,max,q){
+  const w=img.width,h=img.height,e=Math.min(1,max/Math.max(w,h)),c=document.createElement('canvas');
+  c.width=Math.round(w*e);c.height=Math.round(h*e);const g=c.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,c.width,c.height);g.drawImage(img,0,0,c.width,c.height);
+  return {url:c.toDataURL('image/jpeg',q),w:c.width,h:c.height};
+}
+async function adicionarArquivos(files){
+  const st=$('gStatus');st.className='status';st.textContent='Preparando fotos…';let falhas=0;
+  for(const f of files.slice(0,30)){
+    try{const img=await carregarImagem(f);const g=reduzir(img,1600,0.82),p=reduzir(img,480,0.78);prevs.push({nome:f.name,grande:g.url,mini:p.url,largura:g.w,altura:g.h,legenda:''})}
+    catch{falhas++}
+  }
+  st.className='status'+(falhas?' error':'');st.textContent=falhas?`${falhas} ${falhas===1?'foto não pôde':'fotos não puderam'} ser lida(s). Use JPG, PNG ou WEBP (no iPhone, a câmera em "Mais compatível").`:'';
+  $('gArquivos').value='';renderPrevs();
+}
+function renderPrevs(){
+  const box=$('gPrevs');if(!box)return;
+  box.innerHTML=prevs.map((p,i)=>`<div class="prev"><img src="${p.mini}" alt=""><input data-i="${i}" maxlength="200" placeholder="Legenda (opcional)" value="${esc(p.legenda)}"><button type="button" class="tira" data-t="${i}">remover</button></div>`).join('');
+  $('gPub').style.display=prevs.length?'flex':'none';
+  $('gPublicar').textContent=`Publicar ${prevs.length} ${prevs.length===1?'foto':'fotos'}`;
+  box.querySelectorAll('input').forEach(inp=>inp.oninput=()=>{prevs[+inp.dataset.i].legenda=inp.value});
+  box.querySelectorAll('.tira').forEach(b=>b.onclick=()=>{prevs.splice(+b.dataset.t,1);renderPrevs()});
+}
+async function publicar(){
+  const st=$('gStatus'),btn=$('gPublicar'),album=$('gAlbum').value.trim();btn.disabled=true;let ok=0,parou='';
+  for(let i=0;i<prevs.length;i++){
+    st.className='status';st.textContent=`Enviando ${i+1} de ${prevs.length}…`;
+    try{const p=prevs[i];const d=await api('/api/album/gestora/fotos',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({imagem:p.grande,miniatura:p.mini,legenda:p.legenda,album,largura:p.largura,altura:p.altura})});
+      p.feita=true;ok++}
+    catch(e){if(e.status===401)return expirou();parou=`Parou na foto ${i+1}: ${e.message}`;break}
+  }
+  prevs=prevs.filter(p=>!p.feita);btn.disabled=false;
+  await carregarAlbum();
+  renderAlbum(parou||(ok?`${ok} ${ok===1?'foto publicada':'fotos publicadas'} ✓ A equipe já pode curtir e comentar.`:''),!!parou);
+}
+
+// ---------- Senha ----------
+let infoG=null;
+async function carregarInfoGestora(){try{infoG=await api('/api/gestora');renderSenhaEstado()}catch{}}
+function renderSenhaEstado(){
+  $('snEstado').innerHTML=!infoG?'':infoG.senhaPropria
+    ?`<span class="rc-estado on">Senha própria${infoG.senhaTrocadaEm?' · desde '+new Date(infoG.senhaTrocadaEm).toLocaleDateString('pt-BR'):''}</span>`
+    :'<span class="rc-estado off">Usando a senha original</span>';
+}
+$('snVer').onchange=e=>['snAtual','snNova','snConf'].forEach(id=>$(id).type=e.target.checked?'text':'password');
+$('snForm').addEventListener('submit',async e=>{
+  e.preventDefault();
+  const m=$('snMsg'),atualS=$('snAtual').value,nova=$('snNova').value,conf=$('snConf').value,b=$('snSalvar');
+  const erro=t=>{m.className='msgsg err';m.textContent=t};
+  if(!atualS)return erro('Digite a senha atual.');
+  if(nova.length<6)return erro('A nova senha precisa ter pelo menos 6 caracteres.');
+  if(nova.trim()!==nova)return erro('A senha não pode começar nem terminar com espaço.');
+  if(nova!==conf)return erro('As duas senhas novas não são iguais.');
+  if(nova===atualS)return erro('A nova senha é igual à atual.');
+  b.disabled=true;m.className='msgsg';m.textContent='Trocando…';
+  try{
+    const r=await fetch('/api/gestora/senha',{method:'PUT',cache:'no-store',headers:{'Content-Type':'application/json','x-gestora-key':atualS},body:JSON.stringify({nova})});
+    const d=await r.json().catch(()=>({}));
+    if(!r.ok)throw new Error(r.status===401?'A senha atual está incorreta.':d.error||'Não consegui trocar a senha.');
+    chave=nova;ls.set('vv-gestora',nova);
+    ['snAtual','snNova','snConf'].forEach(id=>$(id).value='');
+    infoG={...(infoG||{}),senhaPropria:true,senhaTrocadaEm:d.senhaTrocadaEm};renderSenhaEstado();
+    m.className='msgsg ok';m.textContent='Senha trocada ✓ Da próxima vez, entre com a nova senha (vale no PC e no celular).';
+  }catch(err){erro(err.message)}
+  finally{b.disabled=false}
+});
+
+addEventListener('vv-tema',()=>{if(dados&&!$('painel').hidden&&aba==='sentimento')vvNuvem($('cloudBox'),$('cloud'),$('fallback'),dados.palavras)});
+let rz;addEventListener('resize',()=>{clearTimeout(rz);rz=setTimeout(()=>{if(dados&&!$('painel').hidden&&aba==='sentimento')vvNuvem($('cloudBox'),$('cloud'),$('fallback'),dados.palavras)},250)});
+
+(async()=>{if(!chave)return mostrarLogin();try{infoG=await api('/api/gestora');await abrirPainel()}catch(err){if(err.status===401){chave=null;ls.set('vv-gestora',null);return mostrarLogin()}mostrarLogin(err.message||'',true)}})();
 </script>
 </body></html>

@@ -22,6 +22,7 @@ import { fileURLToPath } from "node:url";
 import dotenv from "dotenv";
 import { readFileSync } from "node:fs";
 import { lerDoc, atualizarDoc, gravarDocDireto, listarDocs, apagarDocs, _colecao } from "./colecao.js";
+import { confereGestora, gestoraConfigurada } from "./sentimentos.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PREFIX = "elogios/";
@@ -210,7 +211,9 @@ const ultimoEnvio = new Map(); // ip -> horários dos envios no último minuto
 
 const tentativas = new Map(); // ip -> { n, desde } (freio contra chutes de senha)
 
-function exigeAdmin(req, res) {
+// Libera a moderação para quem tem a senha do moderador (ELOGIOS_ADMIN_KEY)
+// ou a senha da gestora (a Área da Gestora também modera os elogios).
+async function exigeAdmin(req, res) {
   const { adminKey } = conf();
   const ip = String(req.get("x-forwarded-for") || req.ip || "").split(",")[0].trim();
   const t = tentativas.get(ip);
@@ -219,14 +222,16 @@ function exigeAdmin(req, res) {
     res.status(429).json({ error: "Muitas tentativas. Aguarde alguns minutos." });
     return false;
   }
-  if (!adminKey) {
+  if (!adminKey && !(await gestoraConfigurada())) {
     res.status(403).json({ error: "Defina ELOGIOS_ADMIN_KEY no .env (ou na Vercel) para liberar esta ação." });
     return false;
   }
-  const enviada = String(req.get("x-admin-key") || "");
-  const ok =
+  const enviada = String(req.get("x-admin-key") || req.get("x-gestora-key") || "");
+  let ok =
+    !!adminKey &&
     enviada.length === adminKey.length &&
     crypto.timingSafeEqual(Buffer.from(enviada), Buffer.from(adminKey));
+  if (!ok) ok = await confereGestora(enviada);
   if (!ok) {
     const cur = tentativas.get(ip) || { n: 0, desde: Date.now() };
     cur.n++;
@@ -242,8 +247,8 @@ export const elogiosRouter = express.Router();
 elogiosRouter.use(express.json({ limit: "10kb" }));
 
 // Confere a senha do moderador (usada pela tela para liberar a área do moderador).
-elogiosRouter.get("/moderador", (req, res) => {
-  if (!exigeAdmin(req, res)) return;
+elogiosRouter.get("/moderador", async (req, res) => {
+  if (!(await exigeAdmin(req, res))) return;
   res.set("Cache-Control", "no-store");
   res.json({ ok: true });
 });
@@ -304,7 +309,7 @@ elogiosRouter.post("/", async (req, res) => {
 // ---- Moderação ----
 // Lista completa (inclusive pendentes) para a tela de moderação.
 elogiosRouter.get("/moderacao", async (req, res) => {
-  if (!exigeAdmin(req, res)) return;
+  if (!(await exigeAdmin(req, res))) return;
   try {
     const lista = await lerTodos(true);
     const config = await lerConfig(true);
@@ -322,7 +327,7 @@ elogiosRouter.get("/moderacao", async (req, res) => {
 });
 
 elogiosRouter.put("/config", async (req, res) => {
-  if (!exigeAdmin(req, res)) return;
+  if (!(await exigeAdmin(req, res))) return;
   try {
     const aprovarAntes = !!req.body?.aprovarAntes;
     const config = await salvarConfig({ aprovarAntes });
@@ -342,7 +347,7 @@ elogiosRouter.put("/config", async (req, res) => {
 });
 
 elogiosRouter.post("/aprovar-todos", async (req, res) => {
-  if (!exigeAdmin(req, res)) return;
+  if (!(await exigeAdmin(req, res))) return;
   try {
     let n = 0;
     await aposGravar(await store().update((l) => l.map((e) => (pendente(e) ? (n++, { ...e, status: "aprovado" }) : e))));
@@ -354,7 +359,7 @@ elogiosRouter.post("/aprovar-todos", async (req, res) => {
 });
 
 elogiosRouter.post("/:id/aprovar", async (req, res) => {
-  if (!exigeAdmin(req, res)) return;
+  if (!(await exigeAdmin(req, res))) return;
   try {
     const id = String(req.params.id);
     let achou = false;
@@ -368,7 +373,7 @@ elogiosRouter.post("/:id/aprovar", async (req, res) => {
 });
 
 elogiosRouter.delete("/:id", async (req, res) => {
-  if (!exigeAdmin(req, res)) return;
+  if (!(await exigeAdmin(req, res))) return;
   try {
     await aposGravar(await store().remove(String(req.params.id)));
     res.json({ ok: true });
@@ -379,7 +384,7 @@ elogiosRouter.delete("/:id", async (req, res) => {
 });
 
 elogiosRouter.delete("/", async (req, res) => {
-  if (!exigeAdmin(req, res)) return;
+  if (!(await exigeAdmin(req, res))) return;
   try {
     await aposGravar(await store().clear());
     res.json({ ok: true });
