@@ -30,7 +30,7 @@ const PADRAO = { ativo: false, id: null, titulo: "Recado da Chefa!", mensagem: "
 const usaBlob = () => !!process.env.BLOB_READ_WRITE_TOKEN;
 const localFile = () => path.join(process.env.VERCEL ? "/tmp" : path.join(__dirname, "data"), "recado.json");
 
-const TTL = 15_000;
+const TTL = 60_000; // lido a cada abertura de página; quem salva já atualiza a memória na hora
 let cache = { at: 0, doc: null };
 async function ler(force = false) {
   if (!force && cache.doc && Date.now() - cache.at < TTL) return cache.doc;

@@ -23,7 +23,7 @@ const localFile = () => path.join(process.env.VERCEL ? "/tmp" : path.join(__dirn
 export const SENHA_MIN = 6;
 export const SENHA_MAX = 64;
 
-const TTL = 30_000;
+const TTL = 120_000;
 let cache = { at: 0, doc: undefined };
 const acertos = new Map(); // `${hash}|${sha256(senha)}` -> true (evita recalcular o scrypt a cada clique)
 

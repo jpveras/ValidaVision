@@ -145,7 +145,7 @@ const store = () => (process.env.BLOB_READ_WRITE_TOKEN ? blobStore : fileStore);
 // só consultamos o armazenamento a cada READ_TTL. Depois de gravar, o cache já
 // recebe a lista nova, sem nova consulta.
 let readCache = { at: 0, data: null };
-const READ_TTL = 8000;
+const READ_TTL = 15000; // o telão pede a cada 3 s; a Blob é consultada no máximo 1x a cada 15 s
 const ordenar = (l) => [...l].sort((a, b) => a.criadoEm.localeCompare(b.criadoEm));
 async function lerTodos(force = false) {
   if (!force && readCache.data && Date.now() - readCache.at < READ_TTL) return readCache.data;
@@ -165,7 +165,7 @@ const configFile = () => path.join(process.env.VERCEL ? "/tmp" : path.join(__dir
 let configCache = { at: 0, data: null };
 const CONFIG_PADRAO = { aprovarAntes: false };
 async function lerConfig(force = false) {
-  if (!force && configCache.data && Date.now() - configCache.at < READ_TTL) return configCache.data;
+  if (!force && configCache.data && Date.now() - configCache.at < 60_000) return configCache.data; // muda raramente
   let c = null;
   try {
     c = process.env.BLOB_READ_WRITE_TOKEN ? await lerDoc(CONFIG_DOC) : JSON.parse(await fs.readFile(configFile(), "utf8"));
