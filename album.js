@@ -247,7 +247,7 @@ albumRouter.delete("/:id/comentario/:cid", sem_cache, async (req, res) => {
 
 // ---------------- Gestora ----------------
 albumRouter.post("/gestora/fotos", sem_cache, express.json({ limit: "4400kb" }), async (req, res) => {
-  if (!exigeGestora(req, res)) return;
+  if (!(await exigeGestora(req, res))) return;
   try {
     const grande = jpegDeDataUrl(req.body?.imagem);
     const mini = jpegDeDataUrl(req.body?.miniatura);
@@ -274,7 +274,7 @@ albumRouter.post("/gestora/fotos", sem_cache, express.json({ limit: "4400kb" }),
 });
 
 albumRouter.put("/gestora/fotos/:id", sem_cache, json, async (req, res) => {
-  if (!exigeGestora(req, res)) return;
+  if (!(await exigeGestora(req, res))) return;
   try {
     let foto = null;
     await alterar((doc) => {
@@ -293,7 +293,7 @@ albumRouter.put("/gestora/fotos/:id", sem_cache, json, async (req, res) => {
 });
 
 albumRouter.delete("/gestora/fotos/:id", sem_cache, async (req, res) => {
-  if (!exigeGestora(req, res)) return;
+  if (!(await exigeGestora(req, res))) return;
   try {
     const id = String(req.params.id);
     let tinha = false;
@@ -308,7 +308,7 @@ albumRouter.delete("/gestora/fotos/:id", sem_cache, async (req, res) => {
 });
 
 albumRouter.delete("/gestora/fotos/:id/comentario/:cid", sem_cache, async (req, res) => {
-  if (!exigeGestora(req, res)) return;
+  if (!(await exigeGestora(req, res))) return;
   try {
     await alterar((doc) => {
       const f = doc.fotos.find((x) => x.id === String(req.params.id));

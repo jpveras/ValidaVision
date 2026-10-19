@@ -84,7 +84,7 @@ recadoRouter.get("/", async (_req, res) => {
 });
 
 recadoRouter.get("/gestora", async (req, res) => {
-  if (!exigeGestora(req, res)) return;
+  if (!(await exigeGestora(req, res))) return;
   try {
     res.set("Cache-Control", "no-store");
     res.json({ ...(await ler(true)), frequencias: FREQ });
@@ -94,7 +94,7 @@ recadoRouter.get("/gestora", async (req, res) => {
 });
 
 recadoRouter.put("/gestora", async (req, res) => {
-  if (!exigeGestora(req, res)) return;
+  if (!(await exigeGestora(req, res))) return;
   try {
     const atual = await ler(true);
     const titulo = limpaLinha(req.body?.titulo, 60) || "Recado da Chefa!";

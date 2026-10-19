@@ -20,6 +20,7 @@ body{background:var(--page);font-family:Roboto,"Segoe UI",Arial,sans-serif;color
 main{width:100%;max-width:760px;margin:0 auto;padding:16px 16px 40px}
 h1{margin:4px 0 4px;font-size:24px;font-weight:500;color:var(--ink)}
 .sub{margin:0 0 16px;color:var(--muted);line-height:1.5;font-size:14px}
+.sub a{color:var(--teal2)}
 .card{background:#fff;border:1px solid var(--line);border-radius:8px;margin-bottom:14px}
 .card-head{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--line);font-weight:500;color:var(--ink)}
 .card-head .n{margin-left:auto;font-size:12px;color:var(--muted);font-weight:400}
@@ -71,8 +72,8 @@ button:disabled{opacity:.5;cursor:not-allowed}
 @keyframes pulsa{50%{opacity:.3}}
 @media(max-width:520px){.item{flex-direction:column}.item .a{justify-content:flex-start}.stats{grid-template-columns:repeat(3,1fr)}.stat b{font-size:20px}.login-row{flex-direction:column}}
 </style>
-<link rel="stylesheet" href="/vv-tema-auto.css?v=31">
-<link rel="stylesheet" href="/vv-tema.css?v=33">
+<link rel="stylesheet" href="/vv-tema-auto.css?v=32">
+<link rel="stylesheet" href="/vv-tema.css?v=34">
 <script src="/vv-tema.js?v=23"></script>
 <link rel="manifest" href="/manifest.webmanifest?v=3">
 <meta name="theme-color" content="#033a45">
@@ -80,19 +81,20 @@ button:disabled{opacity:.5;cursor:not-allowed}
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Bug Hunters">
 <script src="/vv-app.js?v=2" defer></script>
+<script src="/vv-gestora.js?v=1" defer></script>
 <script src="/vv-recado.js?v=1" defer></script>
 </head>
 <body>
 <header class="topbar"><img src="/logo.png" alt=""><b>Toca dos <span>Bug Hunters</span></b><span class="tag">Moderação</span></header>
 <main>
   <h1>Moderação dos elogios</h1>
-  <p class="sub">Abra esta tela no celular ou numa janela que <b>não</b> está sendo compartilhada. Aqui você vê os elogios chegando, com nome e texto, antes de todo mundo.</p>
+  <p class="sub">Abra esta tela no celular ou numa janela que <b>não</b> está sendo compartilhada. Aqui você vê os elogios chegando, com nome e texto, antes de todo mundo. A gestora também modera pela <a href="/gestora.html#elogios">Área da Gestora</a>.</p>
 
   <section class="card" id="loginCard">
     <div class="card-head">Entrar</div>
     <form class="card-body" id="loginForm" novalidate>
       <div class="login-row">
-        <input class="input" id="senha" type="password" placeholder="Senha do moderador" autocomplete="current-password">
+        <input class="input" id="senha" type="password" placeholder="Senha do moderador ou da gestora" autocomplete="current-password">
         <button class="btn-primary" type="submit">Entrar</button>
       </div>
       <div class="msg" id="loginMsg"></div>
@@ -142,7 +144,7 @@ const $=id=>document.getElementById(id);
 const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
 // A senha fica só neste navegador (mesma chave usada na tela do Elogie).
 const ls={get(k){try{return localStorage.getItem(k)}catch{return null}},set(k,v){try{v==null?localStorage.removeItem(k):localStorage.setItem(k,v)}catch{}}};
-let chave=ls.get('vv-moderador'),visto=new Set(),primeira=true,timer;
+let chave=ls.get('vv-moderador')||ls.get('vv-gestora'),visto=new Set(),primeira=true,timer;
 const msg=(t,erro=false)=>{$('msg').textContent=t;$('msg').className='msg'+(erro?' erro':'')};
 async function api(url,opts={}){
   const r=await fetch(url,{...opts,cache:'no-store',headers:{...(opts.body?{'Content-Type':'application/json'}:{}),'x-admin-key':chave||''}});

@@ -6,7 +6,7 @@
   var K = "vv-recado";
   var recado = null, aberto = false, anterior = null;
   var pagina = location.pathname.replace(/^\/|\.html$/g, "") || "index";
-  var semAuto = /[?&]apresentar=1/.test(location.search) || pagina === "elogios-moderacao" || pagina === "sentimento-gestora";
+  var semAuto = /[?&]apresentar=1/.test(location.search) || pagina === "elogios-moderacao" || pagina === "gestora" || pagina === "sentimento-gestora";
 
   function lerVisto() { try { return JSON.parse(localStorage.getItem(K) || "null") || {}; } catch (e) { return {}; } }
   function marcarVisto() { if (!recado || !recado.id) return; try { localStorage.setItem(K, JSON.stringify({ id: recado.id, dia: hoje() })); } catch (e) { /* ok */ } }

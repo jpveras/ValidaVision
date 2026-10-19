@@ -13,6 +13,7 @@ import { perguntasRouter } from "./perguntas.js";
 import { lembretesRouter } from "./lembretes.js";
 import { albumRouter } from "./album.js";
 import { recadoRouter } from "./recado.js";
+import { gestoraRouter } from "./gestora.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ENV_PATH = path.join(__dirname, ".env");
@@ -88,6 +89,11 @@ const upload = multer({
 const analiseVisivel = () => /^(1|true|sim)$/i.test(String(process.env.ANALISE_TELA_VISIVEL || "").trim());
 app.get(["/", "/index.html"], (_req, res) => res.redirect(302, analiseVisivel() ? "/analise.html" : "/elogios.html"));
 
+// O antigo painel da gestora (dentro do Sentimento) virou a Área da Gestora.
+// O endereço antigo continua funcionando e cai na aba do Sentimento.
+app.get("/sentimento-gestora.html", (_req, res) => res.redirect(302, "/gestora.html#sentimento"));
+app.get(["/gestora", "/painel", "/chefa"], (_req, res) => res.redirect(302, "/gestora.html"));
+
 app.use(express.static(path.join(__dirname, "public")));
 
 // Elogie um Colega (rotas próprias, não interferem na análise de tela)
@@ -116,6 +122,9 @@ app.use("/api/album", albumRouter);
 
 // Recado da Chefa (pop-up configurado pela gestora)
 app.use("/api/recado", recadoRouter);
+
+// Área da Gestora (entrada e troca de senha; cada área tem a própria API)
+app.use("/api/gestora", gestoraRouter);
 app.get(["/album", "/fotos"], (_req, res) => res.redirect(302, "/album.html"));
 
 

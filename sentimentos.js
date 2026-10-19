@@ -25,6 +25,7 @@ import { fileURLToPath } from "node:url";
 import { gerarJSON, iaConfig, IAErro } from "./ia.js";
 import { contarTermos } from "./palavras.js";
 import { lerDoc, atualizarDoc, gravarDocDireto, apagarDocs, listarDocs, _colecao } from "./colecao.js";
+import { confereSenhaEscolhida, infoSenha } from "./senha-gestora.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PREFIX = "sentimentos/";
@@ -196,10 +197,33 @@ function validaTexto(raw) {
 // ---------------- Senha da gestora ----------------
 
 const tentativas = new Map();
-export function exigeGestora(req, res) {
+// Confere a senha da gestora: a original da Vercel (SENTIMENTO_GESTORA_KEY, que vale como
+// recuperação) ou a que ela escolheu na Área da Gestora (senha-gestora.js).
+export async function confereGestora(enviada) {
+  enviada = String(enviada || "");
+  if (!enviada) return false;
   const { gestoraKey } = conf();
-  if (!gestoraKey) {
-    res.status(403).json({ error: "Defina SENTIMENTO_GESTORA_KEY (no .env ou na Vercel) para liberar o painel da gestora." });
+  if (gestoraKey && enviada.length === gestoraKey.length && crypto.timingSafeEqual(Buffer.from(enviada), Buffer.from(gestoraKey))) return true;
+  try {
+    return await confereSenhaEscolhida(enviada);
+  } catch (e) {
+    console.error("Erro ao conferir a senha escolhida da gestora:", e);
+    return false;
+  }
+}
+
+export async function gestoraConfigurada() {
+  if (conf().gestoraKey) return true;
+  try {
+    return !!(await infoSenha());
+  } catch {
+    return false;
+  }
+}
+
+export async function exigeGestora(req, res) {
+  if (!(await gestoraConfigurada())) {
+    res.status(403).json({ error: "Defina SENTIMENTO_GESTORA_KEY (no .env ou na Vercel) para liberar a Área da Gestora." });
     return false;
   }
   const ip = String(req.get("x-forwarded-for") || req.ip || "").split(",")[0].trim();
@@ -209,9 +233,7 @@ export function exigeGestora(req, res) {
     res.status(429).json({ error: "Muitas tentativas. Aguarde alguns minutos." });
     return false;
   }
-  const enviada = String(req.get("x-gestora-key") || "");
-  const ok = enviada.length === gestoraKey.length && crypto.timingSafeEqual(Buffer.from(enviada), Buffer.from(gestoraKey));
-  if (!ok) {
+  if (!(await confereGestora(req.get("x-gestora-key")))) {
     const cur = tentativas.get(ip) || { n: 0, desde: Date.now() };
     cur.n++;
     tentativas.set(ip, cur);
@@ -342,13 +364,13 @@ sentimentosRouter.post("/", async (req, res) => {
 });
 
 // ---- Painel da gestora ----
-sentimentosRouter.get("/gestora", (req, res) => {
-  if (!exigeGestora(req, res)) return;
+sentimentosRouter.get("/gestora", async (req, res) => {
+  if (!(await exigeGestora(req, res))) return;
   res.json({ ok: true });
 });
 
 sentimentosRouter.get("/gestora/semanas", async (req, res) => {
-  if (!exigeGestora(req, res)) return;
+  if (!(await exigeGestora(req, res))) return;
   try {
     const atual = semanaDe();
     const c = await store().semanas();
@@ -367,7 +389,7 @@ sentimentosRouter.get("/gestora/semanas", async (req, res) => {
 });
 
 sentimentosRouter.get("/gestora/semana/:semana", async (req, res) => {
-  if (!exigeGestora(req, res)) return;
+  if (!(await exigeGestora(req, res))) return;
   const semana = String(req.params.semana);
   if (!SEMANA_RE.test(semana)) return res.status(400).json({ error: "Semana inválida." });
   try {
@@ -387,7 +409,7 @@ sentimentosRouter.get("/gestora/semana/:semana", async (req, res) => {
 // A gestora apaga a análise salva de uma semana (ex.: depois de remover as palavras).
 // Precisa vir ANTES da rota de remover palavra (/:semana/:id), senão "analise" vira um id.
 sentimentosRouter.delete("/gestora/semana/:semana/analise", async (req, res) => {
-  if (!exigeGestora(req, res)) return;
+  if (!(await exigeGestora(req, res))) return;
   const semana = String(req.params.semana);
   if (!SEMANA_RE.test(semana)) return res.status(400).json({ error: "Semana inválida." });
   try {
@@ -400,7 +422,7 @@ sentimentosRouter.delete("/gestora/semana/:semana/analise", async (req, res) => 
 });
 
 sentimentosRouter.delete("/gestora/semana/:semana/:id", async (req, res) => {
-  if (!exigeGestora(req, res)) return;
+  if (!(await exigeGestora(req, res))) return;
   const semana = String(req.params.semana);
   if (!SEMANA_RE.test(semana)) return res.status(400).json({ error: "Semana inválida." });
   try {
@@ -502,7 +524,7 @@ export function evolucaoDe(semanasComDados, ate, equipe, n = 8) {
 }
 
 sentimentosRouter.get("/gestora/evolucao", async (req, res) => {
-  if (!exigeGestora(req, res)) return;
+  if (!(await exigeGestora(req, res))) return;
   const ate = SEMANA_RE.test(String(req.query.ate || "")) ? String(req.query.ate) : semanaDe();
   const n = Math.min(12, Math.max(2, Number.parseInt(req.query.n, 10) || 8));
   try {
@@ -707,7 +729,7 @@ async function semanaAnteriorCom(semana) {
 }
 
 sentimentosRouter.get("/gestora/semana/:semana/analise", async (req, res) => {
-  if (!exigeGestora(req, res)) return;
+  if (!(await exigeGestora(req, res))) return;
   const semana = String(req.params.semana);
   if (!SEMANA_RE.test(semana)) return res.status(400).json({ error: "Semana inválida." });
   try {
@@ -719,7 +741,7 @@ sentimentosRouter.get("/gestora/semana/:semana/analise", async (req, res) => {
 });
 
 sentimentosRouter.post("/gestora/semana/:semana/analise", async (req, res) => {
-  if (!exigeGestora(req, res)) return;
+  if (!(await exigeGestora(req, res))) return;
   const semana = String(req.params.semana);
   if (!SEMANA_RE.test(semana)) return res.status(400).json({ error: "Semana inválida." });
   try {

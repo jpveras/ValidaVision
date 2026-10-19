@@ -192,7 +192,7 @@ lembretesRouter.get("/enviar", async (req, res) => {
 
 // Painel da gestora: quantas pessoas ativaram e envio de teste.
 lembretesRouter.get("/gestora", async (req, res) => {
-  if (!exigeGestora(req, res)) return;
+  if (!(await exigeGestora(req, res))) return;
   try {
     const d = await inscricoes();
     res.json({ inscritos: d.itens.length, ultimoEnvio: d.ultimoEnvio || null });
@@ -202,7 +202,7 @@ lembretesRouter.get("/gestora", async (req, res) => {
 });
 const ultimoTeste = { t: 0 };
 lembretesRouter.post("/gestora/testar", async (req, res) => {
-  if (!exigeGestora(req, res)) return;
+  if (!(await exigeGestora(req, res))) return;
   try {
     if (Date.now() - ultimoTeste.t < 5 * 60 * 1000) return res.status(429).json({ error: "Aguarde alguns minutos entre um envio e outro." });
     ultimoTeste.t = Date.now();

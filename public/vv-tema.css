@@ -143,3 +143,15 @@ html.vv-recado-aberto { overflow: hidden; }
 
 /* Pergunta da semana OCULTA (18/10/2026: trocada pelo Recado da Chefa). Para mostrar, comente esta linha. */
 [data-recurso="pergunta"] { display: none !important; }
+
+/* Área da Gestora: escudo na barra superior (ao lado do sino) */
+.vv-gestora-btn {
+  width: 34px; height: 34px; flex: none; border-radius: 50%; border: 1px solid rgba(255,255,255,.22);
+  background: rgba(255,255,255,.08); color: #fff; display: inline-grid; place-items: center; padding: 0; position: relative; text-decoration: none;
+}
+.vv-gestora-btn:hover { background: rgba(255,255,255,.18); }
+.vv-gestora-btn:focus-visible { outline: 2px solid #2fc28f; outline-offset: 2px; }
+.vv-gestora-btn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.vv-gestora-btn.on::after { content: ""; position: absolute; top: 5px; right: 6px; width: 7px; height: 7px; border-radius: 50%; background: #2fc28f; }
+.vv-gestora-btn.atual { background: rgba(255,255,255,.22); border-color: rgba(255,255,255,.4); }
+@media print { .vv-gestora-btn { display: none !important; } }

@@ -65,27 +65,17 @@
   .foto .info .leg{display:none}
   .foto .info{justify-content:flex-end}
 }
-/* Área da gestora */
-.gest-card .card-body{display:flex;flex-direction:column;gap:12px}
-.gest-login{display:flex;gap:8px;flex-wrap:wrap}
-.gest-login .input{flex:1;min-width:180px}
-.prevs{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
-.prev{border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#fff;display:flex;flex-direction:column}
-.prev img{width:100%;aspect-ratio:1/1;object-fit:cover;display:block}
-.prev input{border:0;border-top:1px solid var(--line);padding:8px;font:inherit;font-size:13px;background:transparent;color:var(--ink);min-width:0}
-.prev .tira{border:0;background:none;color:#b42318;font:inherit;font-size:11px;cursor:pointer;padding:4px 8px 8px;text-align:left;text-transform:none;letter-spacing:normal;height:auto}
-.escolher{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;border:2px dashed var(--line);border-radius:10px;padding:22px;cursor:pointer;color:var(--muted);text-align:center}
-.escolher:hover{border-color:var(--teal);color:var(--teal2)}
-.escolher b{color:var(--ink);font-weight:600}
-.status.ok{color:var(--teal2)}
+/* Aviso para a gestora conectada */
+.gest-aviso{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-left:4px solid var(--teal);background:#fff;border-radius:8px;padding:10px 14px;margin:0 0 16px;font-size:14px;line-height:1.45;color:var(--text)}
+.gest-aviso a{color:var(--teal2)}
 @media screen{
 html[data-tema="escuro"] .filtros button:not(.on),html[data-tema="escuro"] .curtir:not(.on),html[data-tema="escuro"] .lb-form input,html[data-tema="escuro"] .lb-form textarea,html[data-tema="escuro"] .lb-gest input,html[data-tema="escuro"] .prev{background:var(--card);border-color:var(--line);color:var(--ink)}
 html[data-tema="escuro"] .curtir.on{background:#3a1a18;border-color:#6b2b26;color:#f5b3ad}
 }
 </style>
 
-<link rel="stylesheet" href="/vv-tema-auto.css?v=31">
-<link rel="stylesheet" href="/vv-tema.css?v=33">
+<link rel="stylesheet" href="/vv-tema-auto.css?v=32">
+<link rel="stylesheet" href="/vv-tema.css?v=34">
 <script src="/vv-tema.js?v=23"></script>
 <link rel="manifest" href="/manifest.webmanifest?v=3">
 <meta name="theme-color" content="#033a45">
@@ -93,6 +83,7 @@ html[data-tema="escuro"] .curtir.on{background:#3a1a18;border-color:#6b2b26;colo
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Bug Hunters">
 <script src="/vv-app.js?v=2" defer></script>
+<script src="/vv-gestora.js?v=1" defer></script>
 <script src="/vv-recado.js?v=1" defer></script>
 
 </head>
@@ -102,7 +93,7 @@ html[data-tema="escuro"] .curtir.on{background:#3a1a18;border-color:#6b2b26;colo
   <a class="logo" href="/">
     <img id="brandLogo" src="/logo.png" alt="" hidden onload="this.hidden=false;this.nextElementSibling.setAttribute('hidden','')">
     <svg width="28" height="24" viewBox="0 0 28 24" aria-hidden="true"><path d="M1 2h9l4 9 4-9h9L14 23z" fill="#2fc28f"/><path d="M10 2h8l-4 9z" fill="#1a8f6a"/></svg>
-    <b>Toca dos <span>Bug Hunters</span></b><span class="ver">v0.30</span>
+    <b>Toca dos <span>Bug Hunters</span></b><span class="ver">v0.31</span>
   </a>
   <div class="spacer"></div>
   <span class="env" id="envBadge">Protótipo local</span>
@@ -153,13 +144,10 @@ html[data-tema="escuro"] .curtir.on{background:#3a1a18;border-color:#6b2b26;colo
   <p class="page-sub">Os momentos dos Bug Hunters 🐞 — curta e comente as fotos! Quem publica as fotos é a gestora.</p>
   <div class="divider"></div>
 
+  <div class="gest-aviso" id="gestAviso" hidden>🛡️ <span><b>Você está como gestora.</b> Abra uma foto para editar a legenda, apagar a foto ou remover comentários. Para publicar fotos novas, use a <a href="/gestora.html#album">Área da Gestora</a>.</span></div>
   <div class="filtros" id="filtros"></div>
   <div class="grade" id="grade"><p class="vazio-album">Carregando…</p></div>
 
-  <section class="card gest-card" id="gestCard" style="margin-top:28px">
-    <div class="card-head"><span>🔒 Área da gestora</span><span class="counter" id="gestSub">publicar fotos</span></div>
-    <div class="card-body" id="gestCorpo"></div>
-  </section>
 
 </div></div></main>
 
@@ -296,78 +284,14 @@ $('lbGest').addEventListener('click',async e=>{
   }
 });
 
-// ---------- Área da gestora ----------
-let prevs=[];
+// ---------- Gestora conectada (entra pelo escudo 🛡️ na barra superior) ----------
 async function verificarGestora(){
-  if(!chaveG){souGestora=false;return renderGest()}
-  try{const r=await fetch('/api/sentimentos/gestora',{headers:{'x-gestora-key':chaveG},cache:'no-store'});souGestora=r.ok;if(!r.ok&&r.status===401){chaveG=null;ls.set('vv-gestora',null)}}catch{souGestora=false}
-  renderGest();
-}
-function renderGest(msgTxt='',erro=false){
-  $('gestSub').textContent=souGestora?'você está como gestora':'publicar fotos';
-  if(!souGestora){
-    $('gestCorpo').innerHTML=`<p style="margin:0;color:var(--muted);font-size:14px">Só a gestora publica fotos. Entre com a senha do painel da gestora.</p>
-      <form class="gest-login" id="gLogin"><input class="input" id="gSenha" type="password" placeholder="Senha da gestora" autocomplete="current-password"><button class="btn-primary btn-sm" type="submit">Entrar</button></form><span class="status${erro?' error':''}" id="gStatus">${esc(msgTxt)}</span>`;
-    $('gLogin').onsubmit=async e=>{e.preventDefault();chaveG=$('gSenha').value.trim();if(!chaveG)return;
-      const r=await fetch('/api/sentimentos/gestora',{headers:{'x-gestora-key':chaveG}});
-      if(r.ok){ls.set('vv-gestora',chaveG);souGestora=true;renderGest();if(!$('lb').hidden)renderLb(lista()[atual])}else{chaveG=null;renderGest(r.status===401?'Senha incorreta.':'Não consegui entrar.',true)}};
-    return;
+  souGestora=false;
+  if(chaveG){
+    try{const r=await fetch('/api/gestora',{headers:{'x-gestora-key':chaveG},cache:'no-store'});souGestora=r.ok;if(r.status===401){chaveG=null;ls.set('vv-gestora',null)}}catch{souGestora=false}
   }
-  $('gestCorpo').innerHTML=`
-    <label class="escolher" for="gArquivos"><span style="font-size:28px">📷</span><b>Escolher fotos</b><span>Pode escolher várias de uma vez. Elas são reduzidas automaticamente antes de enviar.</span></label>
-    <input type="file" id="gArquivos" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" multiple hidden>
-    <div class="prevs" id="gPrevs"></div>
-    <div id="gPub" hidden style="display:flex;flex-direction:column;gap:8px">
-      <label class="label" for="gAlbum"><span>Álbum (opcional)</span></label>
-      <input class="input" id="gAlbum" maxlength="60" list="albunsLista" placeholder="Ex.: Confraternização de outubro">
-      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><button class="btn-primary" type="button" id="gPublicar">Publicar fotos</button><button class="btn-outline btn-sm" type="button" id="gLimpar">Limpar</button></div>
-    </div>
-    <span class="status${erro?' error':' ok'}" id="gStatus">${esc(msgTxt)}</span>
-    <p style="margin:0;font-size:12px;color:var(--muted)">Dica: abra uma foto do álbum para editar a legenda, mover de álbum, apagar a foto ou remover comentários. <button type="button" class="link-btn" id="gSair" style="background:none;border:0;padding:0;font:inherit;color:var(--teal2);text-decoration:underline;cursor:pointer;text-transform:none;letter-spacing:normal;height:auto">Sair da área da gestora</button></p>
-    <datalist id="albunsLista">${dados.albuns.map(a=>`<option value="${esc(a.nome)}">`).join('')}</datalist>`;
-  $('gArquivos').onchange=e=>adicionarArquivos([...e.target.files]);
-  $('gSair').onclick=()=>{souGestora=false;chaveG=null;ls.set('vv-gestora',null);renderGest('Você saiu.');if(!$('lb').hidden)renderLb(lista()[atual])};
-  $('gLimpar').onclick=()=>{prevs=[];renderPrevs()};
-  $('gPublicar').onclick=publicar;
-  renderPrevs();
-}
-function carregarImagem(file){
-  if(window.createImageBitmap)return createImageBitmap(file,{imageOrientation:'from-image'}).catch(()=>viaImg(file));
-  return viaImg(file);
-}
-function viaImg(file){return new Promise((ok,erro)=>{const u=URL.createObjectURL(file),i=new Image();i.onload=()=>{ok(i)};i.onerror=()=>{URL.revokeObjectURL(u);erro(new Error('formato'))};i.src=u})}
-function reduzir(img,max,q){
-  const w=img.width,h=img.height,e=Math.min(1,max/Math.max(w,h)),c=document.createElement('canvas');
-  c.width=Math.round(w*e);c.height=Math.round(h*e);const g=c.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,c.width,c.height);g.drawImage(img,0,0,c.width,c.height);
-  return {url:c.toDataURL('image/jpeg',q),w:c.width,h:c.height};
-}
-async function adicionarArquivos(files){
-  const st=$('gStatus');st.className='status';st.textContent='Preparando fotos…';let falhas=0;
-  for(const f of files.slice(0,30)){
-    try{const img=await carregarImagem(f);const g=reduzir(img,1600,0.82),p=reduzir(img,480,0.78);prevs.push({nome:f.name,grande:g.url,mini:p.url,largura:g.w,altura:g.h,legenda:''})}
-    catch{falhas++}
-  }
-  st.className='status'+(falhas?' error':'');st.textContent=falhas?`${falhas} ${falhas===1?'foto não pôde':'fotos não puderam'} ser lida(s). Use JPG, PNG ou WEBP (no iPhone, a câmera em "Mais compatível").`:'';
-  $('gArquivos').value='';renderPrevs();
-}
-function renderPrevs(){
-  const box=$('gPrevs');if(!box)return;
-  box.innerHTML=prevs.map((p,i)=>`<div class="prev"><img src="${p.mini}" alt=""><input data-i="${i}" maxlength="200" placeholder="Legenda (opcional)" value="${esc(p.legenda)}"><button type="button" class="tira" data-t="${i}">remover</button></div>`).join('');
-  $('gPub').hidden=!prevs.length;$('gPub').style.display=prevs.length?'flex':'none';
-  $('gPublicar').textContent=`Publicar ${prevs.length} ${prevs.length===1?'foto':'fotos'}`;
-  box.querySelectorAll('input').forEach(inp=>inp.oninput=()=>{prevs[+inp.dataset.i].legenda=inp.value});
-  box.querySelectorAll('.tira').forEach(b=>b.onclick=()=>{prevs.splice(+b.dataset.t,1);renderPrevs()});
-}
-async function publicar(){
-  const st=$('gStatus'),btn=$('gPublicar'),album=$('gAlbum').value.trim();btn.disabled=true;let ok=0;
-  for(let i=0;i<prevs.length;i++){
-    st.className='status';st.textContent=`Enviando ${i+1} de ${prevs.length}…`;
-    try{const p=prevs[i];const r=await fetch('/api/album/gestora/fotos',{method:'POST',headers:{'Content-Type':'application/json','x-gestora-key':chaveG},body:JSON.stringify({imagem:p.grande,miniatura:p.mini,legenda:p.legenda,album,largura:p.largura,altura:p.altura})});
-      const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error||'Falhou.');p.feita=true;ok++}
-    catch(e){st.className='status error';st.textContent=`Parou na foto ${i+1}: ${e.message}`;break}
-  }
-  prevs=prevs.filter(p=>!p.feita);btn.disabled=false;await carregar();
-  renderGest(ok?`${ok} ${ok===1?'foto publicada':'fotos publicadas'} ✓`:'',!ok);
+  $('gestAviso').hidden=!souGestora;
+  if(!$('lb').hidden)renderLb(lista()[atual]);
 }
 
 addEventListener('vv-tema',()=>{});

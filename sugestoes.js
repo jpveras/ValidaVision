@@ -171,7 +171,7 @@ sugestoesRouter.post("/", async (req, res) => {
 // ---------------- Gestora ----------------
 
 sugestoesRouter.get("/gestora", async (req, res) => {
-  if (!exigeGestora(req, res)) return;
+  if (!(await exigeGestora(req, res))) return;
   try {
     const itens = (await todas(true))
       .slice()
@@ -185,7 +185,7 @@ sugestoesRouter.get("/gestora", async (req, res) => {
 });
 
 sugestoesRouter.put("/gestora/:id", async (req, res) => {
-  if (!exigeGestora(req, res)) return;
+  if (!(await exigeGestora(req, res))) return;
   try {
     const id = String(req.params.id);
     const status = STATUS.includes(req.body?.status) ? req.body.status : null;
@@ -216,7 +216,7 @@ sugestoesRouter.put("/gestora/:id", async (req, res) => {
 });
 
 sugestoesRouter.delete("/gestora/:id", async (req, res) => {
-  if (!exigeGestora(req, res)) return;
+  if (!(await exigeGestora(req, res))) return;
   try {
     const id = String(req.params.id);
     let tinha = false;
