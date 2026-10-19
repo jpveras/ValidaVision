@@ -1,0 +1,14 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "br.com.jpveras.bughunters",
+      "sha256_cert_fingerprints": [
+        "7F:F2:3A:CA:40:CA:89:81:00:05:AC:9F:A5:D1:BD:CD:14:6A:3E:59:C3:56:36:94:47:A2:34:CD:21:AC:40:83"
+      ]
+    }
+  }
+]

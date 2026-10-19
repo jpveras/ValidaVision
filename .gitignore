@@ -3,3 +3,7 @@ node_modules/
 npm-debug.log*
 .DS_Store
 data/
+android/*.keystore
+android/app/
+android/build/
+android/gradle*

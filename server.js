@@ -95,6 +95,9 @@ app.get(["/", "/index.html", "/inicio"], (_req, res) => res.redirect(302, analis
 app.get("/sentimento-gestora.html", (_req, res) => res.redirect(302, "/gestora.html#sentimento"));
 app.get(["/gestora", "/painel", "/chefa"], (_req, res) => res.redirect(302, "/gestora.html"));
 
+// App Android (TWA): o Android confere este arquivo para abrir a Toca em tela cheia, sem barra de endereço.
+app.get("/.well-known/assetlinks.json", (_req, res) => res.type("application/json").sendFile(path.join(__dirname, "public", ".well-known", "assetlinks.json")));
+
 app.use(express.static(path.join(__dirname, "public")));
 
 // Elogie um Colega (rotas próprias, não interferem na análise de tela)
