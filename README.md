@@ -42,6 +42,14 @@ Os elogios ficam visíveis para quem abrir a página (é a ideia da dinâmica). 
 A chave fica só no `.env` e nunca vai para o browser. Não compartilhe o `.env`.
 Antes de enviar telas reais da empresa, valide as políticas internas de dados e PII.
 
+## Novidades da v0.32.3
+
+- **Menos operações na Vercel Blob** (sem mudar nada para quem usa):
+  - `colecao.js` guarda a última versão lida de cada arquivo; se o `head` mostra a mesma versão (ETag), não baixa de novo → cada leitura cai de 2 para 1 operação simples.
+  - Memória no servidor por mais tempo: elogios 15 s (config 60 s), álbum 20 s, sugestões 20 s, recado 60 s, senha da gestora 2 min. Quem grava atualiza a memória na hora.
+  - Painel da gestora: a lista de semanas (operação avançada) é guardada por 10 min.
+- **v0.32.2:** primeira gravação de um arquivo novo (ex.: 1ª foto do álbum) voltou a funcionar — a @vercel/blob passou a dizer "does not exist" em vez de "not found".
+
 ## Novidades da v0.32.1
 
 - Boas-vindas fica **10 s** no navegador (PC ou celular). No **app instalado** aparece só na primeira vez que a pessoa abre o app depois de instalar (`localStorage` `vv-bv-app`).

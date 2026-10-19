@@ -128,14 +128,20 @@ const fileStore = {
 // Leitura = 1 operação simples; escrita segura contra envios simultâneos.
 const docSemana = (semana) => `${PREFIX}${semana}.json`;
 
+let listaSemanas = { at: 0, docs: null };
 const blobStore = {
   kind: () => "vercel-blob",
   // Só o painel da gestora usa (lista os arquivos uma vez ao abrir).
   async semanas() {
     const c = {};
-    const docs = (await listarDocs(PREFIX))
-      .map((b) => b.pathname.slice(PREFIX.length).replace(/\.json$/, ""))
-      .filter((s) => SEMANA_RE.test(s));
+    // A lista de semanas (operação avançada) só muda quando começa uma semana nova:
+    // guardamos por 10 min. A semana atual sempre entra (o painel completa).
+    if (!listaSemanas.docs || Date.now() - listaSemanas.at > 10 * 60_000)
+      listaSemanas = {
+        at: Date.now(),
+        docs: (await listarDocs(PREFIX)).map((b) => b.pathname.slice(PREFIX.length).replace(/\.json$/, "")).filter((s) => SEMANA_RE.test(s)),
+      };
+    const docs = [...new Set([...listaSemanas.docs, semanaDe()])];
     await Promise.all(docs.map(async (s) => (c[s] = (await this.daSemana(s)).length)));
     return c;
   },

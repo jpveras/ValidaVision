@@ -32,6 +32,11 @@ const naoExiste = (e) =>
 
 const semAspas = (t) => String(t || "").replace(/^W\//, "").replace(/"/g, "");
 
+// Última versão lida de cada arquivo (por instância). Se o head mostra a mesma versão,
+// devolvemos a cópia guardada e pulamos o get: cada leitura passa de 2 operações simples para 1.
+const versoes = new Map(); // pathname -> { etag, json }
+const copia = (json) => (json == null ? null : JSON.parse(json));
+
 // Leitura sempre da versão atual.
 // Em produção vimos o get devolver uma cópia antiga (cache), e aí a gravação com ifMatch
 // era recusada em todas as tentativas ("Precondition failed") — por isso apagar não funcionava.
@@ -49,6 +54,8 @@ async function lerBlob(pathname) {
     throw e;
   }
   const atual = semAspas(h.etag);
+  const guardada = versoes.get(pathname);
+  if (atual && guardada && guardada.etag === atual) return { data: copia(guardada.json), etag: h.etag };
   for (let i = 0; i < 5; i++) {
     const u = new URL(h.url);
     u.searchParams.set("v", atual || String(Date.now()));
@@ -63,7 +70,10 @@ async function lerBlob(pathname) {
     }
     // Usa sempre o ETag do head (o "oficial" da API). O que vem no get pode vir em outro
     // formato (ex.: W/"..." pela CDN) e aí o ifMatch nunca bate.
-    if (!atual || !r.etag || semAspas(r.etag) === atual) return { data: r.data, etag: h.etag || r.etag };
+    if (!atual || !r.etag || semAspas(r.etag) === atual) {
+      if (atual) versoes.set(pathname, { etag: atual, json: JSON.stringify(r.data) });
+      return { data: r.data, etag: h.etag || r.etag };
+    }
     await espera(200 * (i + 1));
   }
   throw new Error("A Blob ainda está devolvendo uma versão antiga do arquivo. Tente de novo em alguns segundos.");
@@ -124,6 +134,7 @@ export async function atualizarDoc(pathname, fn, tentativas = 4) {
     const novo = fn(data);
     try {
       await gravarBlob(pathname, novo, etag);
+      versoes.delete(pathname);
       return novo;
     } catch (e) {
       if (!conflito(e)) throw e;
@@ -137,6 +148,7 @@ export async function atualizarDoc(pathname, fn, tentativas = 4) {
   const { data } = await lerBlob(pathname);
   const novo = fn(data);
   await gravarDocDireto(pathname, novo);
+  versoes.delete(pathname);
   console.warn(`Blob: ${pathname} gravado sem conferência de versão (plano B).`);
   return novo;
 }
@@ -146,6 +158,7 @@ export async function atualizarDoc(pathname, fn, tentativas = 4) {
  * Para documentos com um só "dono" que podem ser substituídos sem perda (ex.: análise da semana).
  */
 export async function gravarDocDireto(pathname, data) {
+  versoes.delete(pathname);
   const { put } = await sdk();
   let ultimo;
   for (const access of ordemAcesso()) {
@@ -183,6 +196,7 @@ export async function listarDocs(prefix) {
 /** Apaga documentos (operação avançada). */
 export async function apagarDocs(pathnames) {
   if (!pathnames.length) return;
+  for (const p of pathnames) versoes.delete(p);
   const { del } = await sdk();
   for (let i = 0; i < pathnames.length; i += 500) await del(pathnames.slice(i, i + 500));
 }
@@ -224,4 +238,4 @@ export async function lerArquivo(pathname) {
 }
 
 // Usado nos testes
-export const _colecao = { setSdk: (m) => { blobSdk = m; blobAccess = null; } };
+export const _colecao = { setSdk: (m) => { blobSdk = m; blobAccess = null; versoes.clear(); } };

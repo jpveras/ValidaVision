@@ -40,7 +40,7 @@ const localFotos = () => path.join(localDir(), "album");
 const caminhoFoto = (id, tam) => `album/fotos/${id}-${tam}.jpg`;
 
 // ---------------- Dados ----------------
-const TTL = 8_000;
+const TTL = 20_000;
 let cache = { at: 0, doc: null };
 async function ler(force = false) {
   if (!force && cache.doc && Date.now() - cache.at < TTL) return cache.doc;

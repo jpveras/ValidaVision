@@ -59,7 +59,7 @@ const blobStore = {
 const store = () => (process.env.BLOB_READ_WRITE_TOKEN ? blobStore : fileStore);
 
 // Cache curto: várias pessoas com a tela aberta não geram uma leitura cada.
-const TTL = 10_000;
+const TTL = 20_000;
 let cache = { at: 0, itens: null };
 async function todas(force = false) {
   if (!force && cache.itens && Date.now() - cache.at < TTL) return cache.itens;
