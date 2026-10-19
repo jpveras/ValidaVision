@@ -44,7 +44,6 @@ jobs:
           keytool -list -v -keystore android.keystore -alias bughunters -storepass "$(grep KS_PW "$GITHUB_ENV" | tail -1 | cut -d= -f2-)" | grep SHA256
       - name: Gerar projeto e APK
         working-directory: android
-        env:
         run: |
           export BUBBLEWRAP_KEYSTORE_PASSWORD="$KS_PW" BUBBLEWRAP_KEY_PASSWORD="$KS_PW"
           bubblewrap update --skipVersionUpgrade --manifest=./twa-manifest.json < /dev/null
