@@ -42,6 +42,14 @@ Os elogios ficam visíveis para quem abrir a página (é a ideia da dinâmica). 
 A chave fica só no `.env` e nunca vai para o browser. Não compartilhe o `.env`.
 Antes de enviar telas reais da empresa, valide as políticas internas de dados e PII.
 
+## App Android (APK)
+
+- **Trusted Web Activity** (a Toca em tela cheia pelo Chrome, com notificações): pacote `br.com.jpveras.bughunters`, abre `/inicio.html?app=1`. Android 7.0+.
+- Gerado no GitHub Actions (`.github/workflows/apk.yml`, roda ao mudar `android/twa-manifest.json` ou manualmente em Actions → "APK Android (TWA)"): Bubblewrap gera o projeto, Gradle compila, `apksigner` assina. O APK vai para **Releases** (`app-v<versão>`; sem o segredo vira `app-teste`, com chave provisória).
+- Chave de assinatura: `android/chave-app.jks.enc` (criptografada, AES-256 + PBKDF2); a senha fica no segredo **`ANDROID_KEYSTORE_PASSWORD`** do repositório. Sem a chave oficial o Android não reconhece o app como da Toca e mostra a barra de endereço.
+- `/.well-known/assetlinks.json` (rota no `server.js`) tem a impressão digital SHA-256 da chave oficial.
+- Nova versão do app: aumente `appVersionCode` e `appVersionName` em `android/twa-manifest.json`.
+
 ## Novidades da v0.33
 
 - **📷 Álbum separado por momentos.** Na aba Álbum da Área da Gestora, o passo 1 é escolher ou **criar um momento** (nome, data, descrição opcional); só depois dá para escolher as fotos. Card "🗂️ Momentos" para editar ou remover (remover não apaga as fotos: vão para "Outras fotos"). No visualizador do álbum a gestora troca o momento de uma foto.
