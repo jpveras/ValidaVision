@@ -10,6 +10,9 @@ on:
       - "android/twa-manifest.json"
       - ".github/workflows/apk.yml"
 
+permissions:
+  contents: write
+
 jobs:
   apk:
     runs-on: ubuntu-latest
@@ -29,19 +32,19 @@ jobs:
       - name: Chave de assinatura
         working-directory: android
         env:
-          KS_B64: ${{ secrets.ANDROID_KEYSTORE_B64 }}
-          KS_PW: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KS_PW_SECRET: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
         run: |
-          if [ -n "$KS_B64" ]; then
-            echo "$KS_B64" | base64 -d > android.keystore
-            echo "KS_PW=$KS_PW" >> "$GITHUB_ENV"
+          if [ -n "$KS_PW_SECRET" ]; then
+            # A chave fica no repositório CRIPTOGRAFADA (chave-app.jks.enc); só abre com a senha do segredo.
+            openssl enc -d -aes-256-cbc -pbkdf2 -iter 200000 -in chave-app.jks.enc -out android.keystore -pass env:KS_PW_SECRET
+            echo "KS_PW=$KS_PW_SECRET" >> "$GITHUB_ENV"
+            echo "OFICIAL=1" >> "$GITHUB_ENV"
           else
-            # Sem os segredos: chave PROVISÓRIA só para teste (o app abre com barra de endereço).
-            echo "::warning::Segredos ANDROID_KEYSTORE_* não configurados — usando chave provisória (só para teste)."
+            echo "::warning::Segredo ANDROID_KEYSTORE_PASSWORD não configurado — APK com chave PROVISÓRIA (abre com barra de endereço)."
             keytool -genkeypair -keystore android.keystore -alias bughunters -keyalg RSA -keysize 2048 -validity 365 -storepass provisoria -keypass provisoria -dname "CN=Teste"
             echo "KS_PW=provisoria" >> "$GITHUB_ENV"
+            echo "OFICIAL=0" >> "$GITHUB_ENV"
           fi
-          keytool -list -v -keystore android.keystore -alias bughunters -storepass "$(grep KS_PW "$GITHUB_ENV" | tail -1 | cut -d= -f2-)" | grep SHA256
       - name: Gerar projeto e APK
         working-directory: android
         run: |
@@ -59,3 +62,12 @@ jobs:
         with:
           name: toca-bug-hunters-apk
           path: android/toca-bug-hunters.apk
+      - name: Publicar no GitHub (Releases)
+        working-directory: android
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          VER=$(python3 -c "import json;print(json.load(open('twa-manifest.json'))['appVersionName'])")
+          if [ "$OFICIAL" = "1" ]; then TAG="app-v$VER"; TITULO="App Android $VER"; PRE=""; else TAG="app-teste"; TITULO="App Android (teste, chave provisória)"; PRE="--prerelease"; fi
+          gh release delete "$TAG" --yes --cleanup-tag 2>/dev/null || true
+          gh release create "$TAG" toca-bug-hunters.apk --title "$TITULO" --notes "APK da Toca dos Bug Hunters (abre https://bughunters-time.vercel.app em tela cheia). Instale no Android permitindo 'fontes desconhecidas'." --target "$GITHUB_SHA" $PRE
