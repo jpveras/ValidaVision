@@ -1,7 +1,8 @@
 // Recado da Chefa: pop-up com a mensagem que a gestora configurou no painel.
 // Aparece ao abrir a Toca (PC ou app), conforme a frequência escolhida:
 //   uma-vez (até o recado mudar) · diario · sempre.
-// Não aparece no telão (modo apresentação), na moderação nem no painel da gestora.
+// Não aparece no telão (modo apresentação), na moderação nem na Área da Gestora.
+// No Início, espera a mensagem de boas-vindas sair (evento vv-bv-fim).
 (function () {
   var K = "vv-recado";
   var recado = null, aberto = false, anterior = null;
@@ -67,7 +68,9 @@
 
   carregar().then(function (r) {
     if (!r || semAuto || !deveMostrar(r)) return;
-    // espera a página assentar um pouco antes de abrir
-    setTimeout(function () { if (!document.body.classList.contains("present")) mostrar(r, false); }, 600);
+    // espera a página assentar um pouco antes de abrir (e, no Início, a mensagem de boas-vindas sair)
+    var abre = function () { setTimeout(function () { if (!document.body.classList.contains("present")) mostrar(r, false); }, 600); };
+    if (document.documentElement.classList.contains("vv-bv")) window.addEventListener("vv-bv-fim", abre, { once: true });
+    else abre();
   });
 })();

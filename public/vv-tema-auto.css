@@ -118,4 +118,10 @@ html[data-tema="escuro"][data-pagina="album"] .lb-fechar,html[data-tema="escuro"
 html[data-tema="escuro"][data-pagina="album"] .lb-fechar:hover,html[data-tema="escuro"][data-pagina="album"] .lb-nav:hover{background:rgba(255,255,255,.26)}
 html[data-tema="escuro"][data-pagina="album"] .lb-gest input{background:#1c3134}
 html[data-tema="escuro"][data-pagina="album"] .gest-aviso{background:#1c3134}
+html[data-tema="escuro"][data-pagina="inicio"] .bloco::after{background:linear-gradient(180deg,rgba(255,255,255,.12),rgba(0,0,0,.06))}
+html[data-tema="escuro"][data-pagina="inicio"] .bloco:focus-visible{outline:3px solid #3b575b}
+html[data-tema="escuro"][data-pagina="inicio"] .bv-caixa{border:1px solid rgba(59,87,91,.16)}
+html[data-tema="escuro"][data-pagina="inicio"] .bv-entrar{color:#cdf8f2}
+html[data-tema="escuro"][data-pagina="inicio"] .bv-entrar:focus-visible{outline:3px solid #3b575b}
+html[data-tema="escuro"][data-pagina="inicio"] .bv-barra{background:rgba(255,255,255,.18)}
 }

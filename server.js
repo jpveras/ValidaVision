@@ -87,7 +87,8 @@ const upload = multer({
 //   1) defina ANALISE_TELA_VISIVEL=true (na Vercel ou no .env) — a página inicial volta a ser a análise;
 //   2) comente a regra [data-recurso="analise"] no fim de public/vv-tema.css — o item volta ao menu.
 const analiseVisivel = () => /^(1|true|sim)$/i.test(String(process.env.ANALISE_TELA_VISIVEL || "").trim());
-app.get(["/", "/index.html"], (_req, res) => res.redirect(302, analiseVisivel() ? "/analise.html" : "/elogios.html"));
+// Página inicial: o Início com os menus em blocos (v0.32). Antes era o Elogie um Colega.
+app.get(["/", "/index.html", "/inicio"], (_req, res) => res.redirect(302, analiseVisivel() ? "/analise.html" : "/inicio.html"));
 
 // O antigo painel da gestora (dentro do Sentimento) virou a Área da Gestora.
 // O endereço antigo continua funcionando e cai na aba do Sentimento.

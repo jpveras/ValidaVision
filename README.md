@@ -1,4 +1,4 @@
-# Toca dos Bug Hunters — v0.31
+# Toca dos Bug Hunters — v0.32
 
 > Antes chamado **Valida Vision** (o repositório e o endereço `valida-vision.vercel.app` continuam com o nome antigo).
 
@@ -40,6 +40,12 @@ Os elogios ficam visíveis para quem abrir a página (é a ideia da dinâmica). 
 
 A chave fica só no `.env` e nunca vai para o browser. Não compartilhe o `.env`.
 Antes de enviar telas reais da empresa, valide as políticas internas de dados e PII.
+
+## Novidades da v0.32
+
+- **🏠 Início com menus em blocos coloridos** (`/inicio.html`; `/` e `/inicio` levam para lá). Antes o site abria direto no Elogie um Colega. Blocos: Elogie um Colega, Sentimento da Semana, Álbum do time, Caixa de sugestões e App e lembrete (abre o painel do sino); Análise de Tela e Pergunta continuam ocultas (`data-recurso`).
+- **Boas-vindas "Seja Bem-Vindo(a), Caçador(a)!"**: ao abrir a Toca, uma mensagem aparece por cima com o fundo embaçado (`backdrop-filter`); some sozinha em ~3,5 s ou em "Entrar na Toca"/Esc/toque fora, e os blocos entram animados. Não aparece quando a pessoa volta ao Início vindo de outra tela (`?bv=1` força, `?bv=0` desliga). O Recado da Chefa espera a boas-vindas sair (evento `vv-bv-fim`).
+- Item **Início** no topo do menu lateral de todas as telas; o logo leva ao Início. O app instalado passa a abrir no Início (`start_url`, com `id` antigo mantido).
 
 ## Novidades da v0.31
 
