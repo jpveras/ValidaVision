@@ -45,13 +45,17 @@ jobs:
       - name: Gerar projeto e APK
         working-directory: android
         run: |
-          export BUBBLEWRAP_KEYSTORE_PASSWORD="$KS_PW" BUBBLEWRAP_KEY_PASSWORD="$KS_PW"
+          # O Bubblewrap gera o projeto Android a partir do twa-manifest.json...
           bubblewrap update --skipVersionUpgrade --manifest=./twa-manifest.json < /dev/null
-          bubblewrap build --skipPwaValidation --manifest=./twa-manifest.json < /dev/null
-          ls -la
+          # ...e compilamos com o Gradle + ferramentas do SDK do próprio runner.
+          chmod +x gradlew
+          ./gradlew assembleRelease --no-daemon -q
+          BT=$(ls -d "$ANDROID_HOME"/build-tools/* | sort -V | tail -1)
+          "$BT/zipalign" -p -f 4 app/build/outputs/apk/release/app-release-unsigned.apk alinhado.apk
+          "$BT/apksigner" sign --ks android.keystore --ks-key-alias bughunters --ks-pass env:KS_PW --key-pass env:KS_PW --out toca-bug-hunters.apk alinhado.apk
+          "$BT/apksigner" verify --print-certs toca-bug-hunters.apk
+          ls -la toca-bug-hunters.apk
       - uses: actions/upload-artifact@v4
         with:
           name: toca-bug-hunters-apk
-          path: |
-            android/app-release-signed.apk
-            android/app-release-bundle.aab
+          path: android/toca-bug-hunters.apk
