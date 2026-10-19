@@ -1,6 +1,7 @@
 # Toca dos Bug Hunters — v0.32
 
-> Antes chamado **Valida Vision** (o repositório e o endereço `valida-vision.vercel.app` continuam com o nome antigo).
+> Endereço: **https://bughunters-time.vercel.app** (desde 19/10/2026). O antigo `valida-vision.vercel.app` redireciona para ele (307, configurado em Vercel → Domains), então links e QR Codes antigos continuam funcionando.
+> Antes chamado **Valida Vision** (o repositório e o projeto da Vercel continuam com o nome antigo).
 
 ## Rodar
 
