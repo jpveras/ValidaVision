@@ -86,6 +86,23 @@ datalist{display:none}
 .al-grade a{position:relative;display:block;border-radius:8px;overflow:hidden;aspect-ratio:1/1;background:var(--panel)}
 .al-grade img{width:100%;height:100%;object-fit:cover;display:block}
 .al-grade span{position:absolute;left:0;right:0;bottom:0;padding:14px 6px 5px;font-size:11px;color:#fff;background:linear-gradient(transparent,rgba(0,0,0,.65))}
+/* Momentos (álbum) */
+.mo-passo{display:flex;flex-direction:column;gap:8px}
+.mo-passo>b{font-size:13px;letter-spacing:.6px;text-transform:uppercase;color:var(--teal2)}
+.mo-passo select,.mo-form input,.mo-form textarea{width:100%;box-sizing:border-box;border:1px solid #cfd8d6;border-radius:6px;padding:9px 10px;font:inherit;font-size:15px;background:#fff;color:var(--ink)}
+.mo-form{display:grid;grid-template-columns:2fr 1fr;gap:10px;padding:14px;border:1px dashed var(--teal);border-radius:10px;background:var(--teal-soft)}
+.mo-form .tudo{grid-column:1/-1}
+.mo-form .linha{grid-column:1/-1;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.escolher.off{opacity:.45;pointer-events:none}
+.mo-lista{display:flex;flex-direction:column;gap:8px}
+.mo-item{display:flex;align-items:center;gap:12px;border:1px solid var(--line);border-radius:8px;padding:8px 10px;background:#fff}
+.mo-item img,.mo-item .sem{width:48px;height:48px;border-radius:6px;object-fit:cover;flex:none;background:var(--panel);display:grid;place-items:center;font-size:20px}
+.mo-item .t{flex:1;min-width:0}
+.mo-item .t b{display:block;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mo-item .t span{font-size:12px;color:var(--muted)}
+.mo-item .a{display:flex;gap:6px;flex:none}
+@media(max-width:560px){.mo-form{grid-template-columns:1fr}.mo-item{flex-wrap:wrap}.mo-item .a{width:100%;justify-content:flex-end}}
+@media screen{html[data-tema="escuro"][data-pagina] .mo-passo select,html[data-tema="escuro"][data-pagina] .mo-form input,html[data-tema="escuro"][data-pagina] .mo-form textarea,html[data-tema="escuro"][data-pagina] .mo-item{background:var(--card);border-color:var(--line);color:var(--ink)}html[data-tema="escuro"][data-pagina] .mo-form{background:#12302c}}
 /* Senha */
 .sn-form{display:flex;flex-direction:column;gap:8px;max-width:460px}
 .sn-ver{display:flex;gap:8px;align-items:center;font-size:13px;cursor:pointer;color:var(--text)}
@@ -260,7 +277,7 @@ html[data-tema="escuro"] .ev-tip{background:#e4efed;color:#0f1a1c}
   .sug li{break-inside:avoid}
 }
 </style>
-<link rel="stylesheet" href="/vv-tema-auto.css?v=33">
+<link rel="stylesheet" href="/vv-tema-auto.css?v=34">
 <link rel="stylesheet" href="/vv-tema.css?v=34">
 <script src="/vv-tema.js?v=23"></script>
 <link rel="manifest" href="/manifest.webmanifest?v=3">
@@ -278,7 +295,7 @@ html[data-tema="escuro"] .ev-tip{background:#e4efed;color:#0f1a1c}
   <a class="logo" href="/inicio.html">
     <img id="brandLogo" src="/logo.png" alt="" hidden onload="this.hidden=false;this.nextElementSibling.setAttribute('hidden','')">
     <svg width="28" height="24" viewBox="0 0 28 24" aria-hidden="true"><path d="M1 2h9l4 9 4-9h9L14 23z" fill="#2fc28f"/><path d="M10 2h8l-4 9z" fill="#1a8f6a"/></svg>
-    <b>Toca dos <span>Bug Hunters</span></b><span class="ver">v0.32</span>
+    <b>Toca dos <span>Bug Hunters</span></b><span class="ver">v0.33</span>
   </a>
   <div class="spacer"></div>
   <span class="env">Área da Gestora</span>
@@ -373,7 +390,7 @@ html[data-tema="escuro"] .ev-tip{background:#e4efed;color:#0f1a1c}
             <li><b>😊 Sentimento</b>: escolha a semana e veja a palavra da semana, a nuvem, o ranking e as respostas (anônimas). Gere a <kbd>💡 Análise da semana</kbd> com IA, acompanhe a <kbd>📈 Evolução</kbd>, <kbd>Baixe o PDF</kbd> ou <kbd>Copie o resumo</kbd>. Remova só respostas impróprias.</li>
             <li><b>📣 Recado</b>: escreva a mensagem (ex.: “Bem-vindos à Toca! Que seja uma semana abençoada! 🙏”), escolha a frequência e marque <b>Mostrar o recado</b>. Ele abre numa janelinha para todo mundo que entrar na Toca. Use <kbd>Pré-visualizar</kbd>.</li>
             <li><b>💚 Elogios</b>: acompanhe os elogios chegando (com nome), aprove ou remova. Ligue <b>Aprovar antes de mostrar no telão</b> se quiser conferir tudo antes.</li>
-            <li><b>📷 Álbum</b>: escolha as fotos, dê legendas e publique. Para editar a legenda, apagar uma foto ou remover comentários, abra a foto no álbum — com você conectada, os botões de gestora aparecem lá.</li>
+            <li><b>📷 Álbum</b>: primeiro escolha ou crie o <b>momento</b> (ex.: “Confraternização de outubro”, com data), depois escolha as fotos, dê legendas e publique. No álbum, a equipe vê as fotos separadas por momento. Para editar a legenda, apagar uma foto ou remover comentários, abra a foto no álbum — com você conectada, os botões de gestora aparecem lá.</li>
             <li><b>📮 Sugestões</b>: mude o status, responda e marque <b>“Mostrar para a equipe”</b> para a resposta aparecer no mural “Ouvimos você”.</li>
             <li><b>🔔 Lembrete</b>: veja quantas pessoas ativaram o aviso de sexta (9h) e, se precisar, envie um lembrete na hora.</li>
             <li><b>🔑 Senha</b>: escolha uma senha só sua quando quiser.</li>
@@ -485,6 +502,10 @@ html[data-tema="escuro"] .ev-tip{background:#e4efed;color:#0f1a1c}
       <section class="card gest-card">
         <div class="card-head"><span>📷 Publicar fotos no Álbum do time</span><span class="counter"><a href="/album.html" target="_blank" rel="noopener">Ver o álbum ↗</a></span></div>
         <div class="card-body" id="gestCorpo"><span class="carregando"></span></div>
+      </section>
+      <section class="card">
+        <div class="card-head"><span>🗂️ Momentos</span><span class="counter" id="moSub"></span></div>
+        <div class="card-body" id="moLista"><span class="carregando"></span></div>
       </section>
       <section class="card">
         <div class="card-head"><span>Fotos mais recentes</span><span class="counter" id="alSub"></span></div>
@@ -1020,31 +1041,85 @@ async function carregarAlbum(){
 }
 function renderAlbum(msgTxt,erro){
   if(!$('gPrevs')||msgTxt!==undefined)renderGest(msgTxt||'',erro);
+  renderMomentos();
   const f=albumDados?albumDados.fotos:[];
   const cur=f.reduce((a,x)=>a+x.curtidas,0),com=f.reduce((a,x)=>a+x.comentarios.length,0);
   $('alSub').textContent=f.length?`${f.length} ${f.length===1?'foto':'fotos'} · ${cur} ${cur===1?'curtida':'curtidas'} · ${com} ${com===1?'comentário':'comentários'}`:'';
   $('alRecentes').innerHTML=f.length
     ?`<div class="al-grade">${f.slice(0,12).map(x=>`<a href="/album.html" target="_blank" rel="noopener" title="${esc(x.legenda||'Abrir no álbum')}"><img src="/api/album/foto/${esc(x.id)}?t=p" alt="${esc(x.legenda)}" loading="lazy"><span>♥ ${x.curtidas} · 💬 ${x.comentarios.length}</span></a>`).join('')}</div>
-      <p class="ev-nota" style="margin:12px 0 0">Para editar a legenda, mover de álbum, apagar uma foto ou remover comentários, abra a foto no álbum — com você conectada, os botões de gestora aparecem lá.</p>`
+      <p class="ev-nota" style="margin:12px 0 0">Para editar a legenda, trocar o momento, apagar uma foto ou remover comentários, abra a foto no álbum — com você conectada, os botões de gestora aparecem lá.</p>`
     :'<p class="vazio">O álbum ainda está vazio. Publique as primeiras fotos acima 📷</p>';
 }
+let momSel='',moEditando=null;
+const hojeISO=()=>new Intl.DateTimeFormat('en-CA',{timeZone:'America/Sao_Paulo'}).format(new Date());
+const dataMo=d=>d?new Date(d+'T12:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric'}):'';
+function formMomento(m){
+  return `<form class="mo-form" id="moForm" novalidate>
+    <div><label class="label" for="moNome"><span>Nome do momento</span></label><input id="moNome" maxlength="60" placeholder="Ex.: Confraternização de outubro" value="${esc(m?.nome||'')}"></div>
+    <div><label class="label" for="moData"><span>Data</span></label><input id="moData" type="date" value="${esc(m?.data||hojeISO())}"></div>
+    <div class="tudo"><label class="label" for="moDesc"><span>Descrição (opcional)</span></label><input id="moDesc" maxlength="140" placeholder="Ex.: Almoço do time no jardim 🌿" value="${esc(m?.descricao||'')}"></div>
+    <div class="linha"><button class="btn-primary btn-sm" type="submit">${m?'Salvar momento':'Criar momento'}</button><button class="btn-outline btn-sm" type="button" id="moCancelar">Cancelar</button><span class="msgsg" id="moMsg"></span></div>
+  </form>`;
+}
 function renderGest(msgTxt='',erro=false){
+  const ms=albumDados?.momentos||[];
+  if(momSel&&momSel!=='_novo'&&!ms.some(m=>m.id===momSel))momSel='';
+  const pronto=momSel&&momSel!=='_novo';
   $('gestCorpo').innerHTML=`
-    <label class="escolher" for="gArquivos"><span style="font-size:28px">📷</span><b>Escolher fotos</b><span>Pode escolher várias de uma vez. Elas são reduzidas automaticamente antes de enviar.</span></label>
-    <input type="file" id="gArquivos" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" multiple hidden>
-    <div class="prevs" id="gPrevs"></div>
-    <div id="gPub" style="display:none;flex-direction:column;gap:8px">
-      <label class="label" for="gAlbum"><span>Álbum (opcional)</span></label>
-      <input class="input" id="gAlbum" maxlength="60" list="albunsLista" placeholder="Ex.: Confraternização de outubro">
-      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><button class="btn-primary" type="button" id="gPublicar">Publicar fotos</button><button class="btn-outline btn-sm" type="button" id="gLimpar">Limpar</button></div>
+    <div class="mo-passo"><b>1. Momento</b>
+      <select id="gMomento" aria-label="Momento das fotos">
+        <option value="">Escolha o momento das fotos…</option>
+        ${ms.map(m=>`<option value="${esc(m.id)}" ${m.id===momSel?'selected':''}>${esc(m.nome)}${m.data?' · '+dataMo(m.data):''} (${m.total} ${m.total===1?'foto':'fotos'})</option>`).join('')}
+        <option value="_novo" ${momSel==='_novo'?'selected':''}>➕ Criar novo momento…</option>
+      </select>
+      ${momSel==='_novo'&&!moEditando?formMomento(null):''}
     </div>
-    <span class="status${erro?' error':' ok'}" id="gStatus">${esc(msgTxt)}</span>
-    <datalist id="albunsLista">${(albumDados?.albuns||[]).map(a=>`<option value="${esc(a.nome)}">`).join('')}</datalist>`;
+    <div class="mo-passo"><b>2. Fotos</b>
+      <label class="escolher${pronto?'':' off'}" for="gArquivos"><span style="font-size:28px">📷</span><b>Escolher fotos</b><span>${pronto?'Pode escolher várias de uma vez. Elas são reduzidas automaticamente antes de enviar.':'Primeiro escolha ou crie o momento acima.'}</span></label>
+      <input type="file" id="gArquivos" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" multiple hidden ${pronto?'':'disabled'}>
+      <div class="prevs" id="gPrevs"></div>
+      <div id="gPub" style="display:none;flex-direction:column;gap:8px">
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><button class="btn-primary" type="button" id="gPublicar">Publicar fotos</button><button class="btn-outline btn-sm" type="button" id="gLimpar">Limpar</button></div>
+      </div>
+    </div>
+    <span class="status${erro?' error':' ok'}" id="gStatus">${esc(msgTxt)}</span>`;
+  $('gMomento').onchange=e=>{momSel=e.target.value;moEditando=null;renderGest();if(momSel==='_novo')$('moNome').focus()};
   $('gArquivos').onchange=e=>adicionarArquivos([...e.target.files]);
   $('gLimpar').onclick=()=>{prevs=[];renderPrevs()};
   $('gPublicar').onclick=publicar;
   renderPrevs();
 }
+function renderMomentos(){
+  const ms=albumDados?.momentos||[];
+  $('moSub').textContent=ms.length?`${ms.length} ${ms.length===1?'momento':'momentos'}`:'';
+  $('moLista').innerHTML=(ms.length?`<div class="mo-lista">${ms.map(m=>moEditando===m.id?formMomento(m):`<div class="mo-item" data-mo="${esc(m.id)}">${m.capa?`<img src="/api/album/foto/${esc(m.capa)}?t=p" alt="" loading="lazy">`:'<span class="sem">🗂️</span>'}<div class="t"><b>${esc(m.nome)}</b><span>${dataMo(m.data)} · ${m.total} ${m.total===1?'foto':'fotos'}${m.descricao?' · '+esc(m.descricao):''}</span></div><div class="a"><button class="btn-outline btn-sm" type="button" data-mo-editar>Editar</button><button class="btn-danger btn-sm" type="button" data-mo-remover>Remover</button></div></div>`).join('')}</div>`
+    :'<p class="vazio">Nenhum momento ainda. Crie o primeiro no passo 1 acima.</p>')+'<p class="ev-nota" style="margin:10px 0 0">Remover um momento não apaga as fotos: elas passam para “Outras fotos”, e você pode trocar o momento de cada foto abrindo-a no álbum.</p>';
+}
+async function salvarMomento(e){
+  e.preventDefault();
+  const id=moEditando,m=$('moMsg'),body={nome:$('moNome').value,data:$('moData').value,descricao:$('moDesc').value};
+  if(body.nome.trim().length<2){m.className='msgsg err';m.textContent='Dê um nome ao momento.';return $('moNome').focus()}
+  m.className='msgsg';m.textContent='Salvando…';
+  try{
+    const d=await api(id?'/api/album/gestora/momentos/'+encodeURIComponent(id):'/api/album/gestora/momentos',{method:id?'PUT':'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    if(!id)momSel=d.momento.id;moEditando=null;
+    await carregarAlbum();
+    renderAlbum(id?'Momento atualizado ✓':`Momento “${d.momento.nome}” criado ✓ Agora escolha as fotos.`);
+  }catch(err){if(err.status===401)return expirou();m.className='msgsg err';m.textContent=err.message}
+}
+document.querySelector('[data-painel="album"]').addEventListener('submit',e=>{if(e.target.id==='moForm')salvarMomento(e)});
+document.querySelector('[data-painel="album"]').addEventListener('click',async e=>{
+  if(e.target.closest('#moCancelar')){if(moEditando){moEditando=null;renderMomentos()}else{momSel='';renderGest()}return}
+  const item=e.target.closest('[data-mo]');if(!item)return;const id=item.dataset.mo;
+  if(e.target.closest('[data-mo-editar]')){moEditando=id;if(momSel==='_novo')momSel='';renderGest();renderMomentos();$('moNome')?.focus();return}
+  const rm=e.target.closest('[data-mo-remover]');
+  if(rm){
+    if(!rm.classList.contains('armed')){rm.classList.add('armed');rm.textContent='Confirmar';setTimeout(()=>{rm.classList.remove('armed');rm.textContent='Remover'},3500);return}
+    rm.disabled=true;
+    try{await api('/api/album/gestora/momentos/'+encodeURIComponent(id),{method:'DELETE'});if(momSel===id)momSel='';await carregarAlbum();renderAlbum('Momento removido. As fotos dele foram para “Outras fotos”.')}
+    catch(err){if(err.status===401)return expirou();rm.disabled=false;$('gStatus').className='status error';$('gStatus').textContent=err.message}
+  }
+});
 function carregarImagem(file){
   if(window.createImageBitmap)return createImageBitmap(file,{imageOrientation:'from-image'}).catch(()=>viaImg(file));
   return viaImg(file);
@@ -1073,10 +1148,11 @@ function renderPrevs(){
   box.querySelectorAll('.tira').forEach(b=>b.onclick=()=>{prevs.splice(+b.dataset.t,1);renderPrevs()});
 }
 async function publicar(){
-  const st=$('gStatus'),btn=$('gPublicar'),album=$('gAlbum').value.trim();btn.disabled=true;let ok=0,parou='';
+  const st=$('gStatus'),btn=$('gPublicar');if(!momSel||momSel==='_novo'){st.className='status error';st.textContent='Escolha o momento das fotos.';return}
+  btn.disabled=true;let ok=0,parou='';
   for(let i=0;i<prevs.length;i++){
     st.className='status';st.textContent=`Enviando ${i+1} de ${prevs.length}…`;
-    try{const p=prevs[i];const d=await api('/api/album/gestora/fotos',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({imagem:p.grande,miniatura:p.mini,legenda:p.legenda,album,largura:p.largura,altura:p.altura})});
+    try{const p=prevs[i];const d=await api('/api/album/gestora/fotos',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({imagem:p.grande,miniatura:p.mini,legenda:p.legenda,momentoId:momSel,largura:p.largura,altura:p.altura})});
       p.feita=true;ok++}
     catch(e){if(e.status===401)return expirou();parou=`Parou na foto ${i+1}: ${e.message}`;break}
   }

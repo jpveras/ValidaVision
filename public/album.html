@@ -18,6 +18,14 @@
 .foto:focus-visible{outline:3px solid var(--teal);outline-offset:2px}
 .foto .info{position:absolute;left:0;right:0;bottom:0;display:flex;gap:10px;align-items:center;padding:22px 10px 8px;background:linear-gradient(transparent,rgba(0,0,0,.6));color:#fff;font-size:13px;font-weight:700;text-align:left}
 .foto .info .leg{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:500}
+/* Momentos */
+.momento{margin:0 0 30px}
+.momento-cab{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin:0 0 12px;padding-bottom:8px;border-bottom:1px solid var(--line)}
+.momento-cab h2{margin:0;font-size:20px;font-weight:500;color:var(--ink);display:flex;align-items:center;gap:8px}
+.momento-cab h2::before{content:"";width:10px;height:10px;border-radius:50%;background:var(--teal);flex:none}
+.momento-cab .quando{font-size:13px;color:var(--muted)}
+.momento-cab .n{margin-left:auto;font-size:12px;color:var(--muted);white-space:nowrap}
+.momento-desc{margin:-4px 0 12px;font-size:14px;color:var(--text);line-height:1.45}
 .vazio-album{text-align:center;padding:40px 16px;color:var(--muted)}
 .vazio-album b{display:block;font-size:18px;color:var(--ink);font-weight:500;margin-bottom:6px}
 /* Visualizador */
@@ -74,7 +82,7 @@ html[data-tema="escuro"] .curtir.on{background:#3a1a18;border-color:#6b2b26;colo
 }
 </style>
 
-<link rel="stylesheet" href="/vv-tema-auto.css?v=33">
+<link rel="stylesheet" href="/vv-tema-auto.css?v=34">
 <link rel="stylesheet" href="/vv-tema.css?v=34">
 <script src="/vv-tema.js?v=23"></script>
 <link rel="manifest" href="/manifest.webmanifest?v=3">
@@ -93,7 +101,7 @@ html[data-tema="escuro"] .curtir.on{background:#3a1a18;border-color:#6b2b26;colo
   <a class="logo" href="/inicio.html">
     <img id="brandLogo" src="/logo.png" alt="" hidden onload="this.hidden=false;this.nextElementSibling.setAttribute('hidden','')">
     <svg width="28" height="24" viewBox="0 0 28 24" aria-hidden="true"><path d="M1 2h9l4 9 4-9h9L14 23z" fill="#2fc28f"/><path d="M10 2h8l-4 9z" fill="#1a8f6a"/></svg>
-    <b>Toca dos <span>Bug Hunters</span></b><span class="ver">v0.32</span>
+    <b>Toca dos <span>Bug Hunters</span></b><span class="ver">v0.33</span>
   </a>
   <div class="spacer"></div>
   <span class="env" id="envBadge">Protótipo local</span>
@@ -148,9 +156,9 @@ html[data-tema="escuro"] .curtir.on{background:#3a1a18;border-color:#6b2b26;colo
   <p class="page-sub">Os momentos dos Bug Hunters 🐞 — curta e comente as fotos! Quem publica as fotos é a gestora.</p>
   <div class="divider"></div>
 
-  <div class="gest-aviso" id="gestAviso" hidden>🛡️ <span><b>Você está como gestora.</b> Abra uma foto para editar a legenda, apagar a foto ou remover comentários. Para publicar fotos novas, use a <a href="/gestora.html#album">Área da Gestora</a>.</span></div>
+  <div class="gest-aviso" id="gestAviso" hidden>🛡️ <span><b>Você está como gestora.</b> Abra uma foto para editar a legenda, trocar o momento, apagar a foto ou remover comentários. Para criar momentos e publicar fotos, use a <a href="/gestora.html#album">Área da Gestora</a>.</span></div>
   <div class="filtros" id="filtros"></div>
-  <div class="grade" id="grade"><p class="vazio-album">Carregando…</p></div>
+  <div id="grade"><p class="vazio-album">Carregando…</p></div>
 
 
 </div></div></main>
@@ -191,27 +199,39 @@ const ls={get(k){try{return localStorage.getItem(k)}catch{return null}},set(k,v)
 let leitor=ls.get('vv-leitor');if(!leitor||!/^[a-f0-9]{32}$/.test(leitor)){leitor=[...crypto.getRandomValues(new Uint8Array(16))].map(b=>b.toString(16).padStart(2,'0')).join('');ls.set('vv-leitor',leitor)}
 const chavesCom=()=>{try{return JSON.parse(ls.get('vv-album-coment')||'{}')}catch{return{}}};
 let chaveG=ls.get('vv-gestora'),souGestora=false;
-let dados={fotos:[],albuns:[]},filtro='',atual=-1;
+let dados={fotos:[],momentos:[]},filtro='',atual=-1;
+const OUTRAS='_outras';
 const dataBR=iso=>new Date(iso).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric'});
 const quando=iso=>{const s=(Date.now()-new Date(iso))/1000;if(s<60)return'agora';if(s<3600)return`há ${Math.floor(s/60)} min`;if(s<86400)return`há ${Math.floor(s/3600)} h`;return dataBR(iso)};
-const lista=()=>dados.fotos.filter(f=>!filtro||f.album===filtro);
+// Fotos separadas por momento (mais recente primeiro); sem momento vão para "Outras fotos".
+function grupos(){
+  const g=(dados.momentos||[]).filter(m=>m.total).map(m=>({id:m.id,nome:m.nome,data:m.data,descricao:m.descricao,fotos:dados.fotos.filter(f=>f.momentoId===m.id)}));
+  const soltas=dados.fotos.filter(f=>!f.momentoId||!g.some(x=>x.id===f.momentoId));
+  if(soltas.length)g.push({id:OUTRAS,nome:g.length?'Outras fotos':'Fotos do time',data:'',descricao:'',fotos:soltas});
+  return g.filter(x=>!filtro||x.id===filtro);
+}
+const lista=()=>grupos().flatMap(g=>g.fotos);
+const dataMomento=d=>d?new Date(d+'T12:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'}):'';
 const urlFoto=(f,t)=>`/api/album/foto/${f.id}${t==='p'?'?t=p':''}`;
 
 async function carregar(){
   try{
     const r=await fetch('/api/album',{cache:'no-store',headers:{'x-leitor':leitor}});const d=await r.json();if(!r.ok)throw new Error(d.error);
     dados=d;$('storageWarn').hidden=d.armazenamento!=='temporario';
-    if(filtro&&!d.albuns.some(a=>a.nome===filtro))filtro='';
+    dados.momentos=d.momentos||[];
+    if(filtro&&filtro!==OUTRAS&&!dados.momentos.some(m=>m.id===filtro&&m.total))filtro='';
     renderGrade();if(!$('lb').hidden){const f=dados.fotos.find(x=>x.id===$('lb').dataset.id);if(f)renderLb(f);else fecharLb()}
   }catch(e){$('grade').innerHTML=`<p class="vazio-album">${esc(e.message||'Não consegui carregar.')}</p>`}
 }
 function renderGrade(){
-  $('filtros').innerHTML=dados.albuns.length?[`<button type="button" data-a="" class="${!filtro?'on':''}">Todas (${dados.fotos.length})</button>`,...dados.albuns.map(a=>`<button type="button" data-a="${esc(a.nome)}" class="${a.nome===filtro?'on':''}">${esc(a.nome)} (${a.total})</button>`)].join(''):'';
-  const l=lista();
-  $('grade').innerHTML=l.length?l.map((f,i)=>`<button type="button" class="foto" data-i="${i}" aria-label="${esc(f.legenda||'Foto do time')}"><img src="${urlFoto(f,'p')}" alt="" loading="lazy" decoding="async"><span class="info"><span class="leg">${esc(f.legenda)}</span><span>${f.curti?'❤️':'🤍'} ${f.curtidas}</span><span>💬 ${f.comentarios.length}</span></span></button>`).join('')
-    :`<div class="vazio-album" style="grid-column:1/-1"><b>O álbum ainda está vazio 📷</b>Assim que a gestora publicar as primeiras fotos do time, elas aparecem aqui.</div>`;
+  const todos=(()=>{const f=filtro;filtro='';const g=grupos();filtro=f;return g})();
+  $('filtros').innerHTML=todos.length>1?[`<button type="button" data-a="" class="${!filtro?'on':''}">Todos os momentos (${dados.fotos.length})</button>`,...todos.map(g=>`<button type="button" data-a="${esc(g.id)}" class="${g.id===filtro?'on':''}">${esc(g.nome)} (${g.fotos.length})</button>`)].join(''):'';
+  let i=0;
+  const gs=grupos();
+  $('grade').innerHTML=gs.length?gs.map(g=>`<section class="momento"><div class="momento-cab"><h2>${esc(g.nome)}</h2>${g.data?`<span class="quando">${esc(dataMomento(g.data))}</span>`:''}<span class="n">${g.fotos.length} ${g.fotos.length===1?'foto':'fotos'}</span></div>${g.descricao?`<p class="momento-desc">${esc(g.descricao)}</p>`:''}<div class="grade">${g.fotos.map(f=>`<button type="button" class="foto" data-i="${i++}" aria-label="${esc(f.legenda||'Foto do time')}"><img src="${urlFoto(f,'p')}" alt="" loading="lazy" decoding="async"><span class="info"><span class="leg">${esc(f.legenda)}</span><span>${f.curti?'❤️':'🤍'} ${f.curtidas}</span><span>💬 ${f.comentarios.length}</span></span></button>`).join('')}</div></section>`).join('')
+    :`<div class="vazio-album"><b>O álbum ainda está vazio 📷</b>Assim que a gestora publicar as primeiras fotos do time, elas aparecem aqui.</div>`;
 }
-$('filtros').addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(!b)return;filtro=b.dataset.a;renderGrade()});
+$('filtros').addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(!b)return;filtro=b.dataset.a;renderGrade();$('filtros').scrollIntoView({block:'nearest'})});
 $('grade').addEventListener('click',e=>{const b=e.target.closest('.foto');if(b)abrirLb(+b.dataset.i)});
 
 // ---------- Visualizador ----------
@@ -222,7 +242,8 @@ function renderLb(f){
   if($('lbImg').dataset.id!==f.id){$('lbImg').src=urlFoto(f,'g');$('lbImg').dataset.id=f.id}
   $('lbImg').alt=f.legenda||'Foto do time';
   $('lbLeg').textContent=f.legenda||'';$('lbLeg').hidden=!f.legenda;
-  $('lbMeta').textContent=[f.album,dataBR(f.criadaEm)].filter(Boolean).join(' · ');
+  const mo=(dados.momentos||[]).find(m=>m.id===f.momentoId);
+  $('lbMeta').textContent=[mo?mo.nome:'',mo&&mo.data?dataMomento(mo.data):dataBR(f.criadaEm)].filter(Boolean).join(' · ');
   $('lbCurtir').classList.toggle('on',f.curti);$('lbCurtir').querySelector('.cor').textContent=f.curti?'❤️':'🤍';$('lbCurtidas').textContent=f.curtidas;
   $('lbCurtir').setAttribute('aria-pressed',String(f.curti));$('lbCurtir').setAttribute('aria-label',f.curti?'Descurtir':'Curtir');
   $('lbComN').textContent=f.comentarios.length?`${f.comentarios.length} ${f.comentarios.length===1?'comentário':'comentários'}`:'';
@@ -230,7 +251,7 @@ function renderLb(f){
   $('lbComs').innerHTML=f.comentarios.length?f.comentarios.map(c=>`<div class="com"><b>${esc(c.nome)}</b><span class="q">${quando(c.criadoEm)}</span>${minhas[c.id]||souGestora?`<button type="button" class="apagar" data-c="${esc(c.id)}">${minhas[c.id]?'apagar':'remover'}</button>`:''}<br>${esc(c.texto)}</div>`).join(''):'<p class="meta" style="margin:0;color:var(--muted);font-size:13px">Seja a primeira pessoa a comentar 💬</p>';
   const l=lista();$('lbAnt').hidden=atual<=0;$('lbProx').hidden=atual>=l.length-1;
   $('lbGest').hidden=!souGestora;
-  if(souGestora)$('lbGest').innerHTML=`<input id="gLeg" maxlength="200" value="${esc(f.legenda)}" placeholder="Legenda"><input id="gAlb" maxlength="60" value="${esc(f.album)}" placeholder="Álbum" list="albunsLista"><div class="linha"><button class="btn-outline btn-sm" type="button" id="gSalvar">Salvar legenda</button><button class="btn-danger btn-sm" type="button" id="gApagar">Apagar foto</button></div><span class="status" id="gMsg"></span>`;
+  if(souGestora)$('lbGest').innerHTML=`<input id="gLeg" maxlength="200" value="${esc(f.legenda)}" placeholder="Legenda"><select id="gMom" aria-label="Momento" style="width:100%;box-sizing:border-box;border:1px solid var(--line);border-radius:6px;padding:6px 8px;font:inherit;font-size:13px;background:var(--card,#fff);color:var(--ink)"><option value="">Sem momento (Outras fotos)</option>${(dados.momentos||[]).map(m=>`<option value="${esc(m.id)}" ${m.id===f.momentoId?'selected':''}>${esc(m.nome)}</option>`).join('')}</select><div class="linha"><button class="btn-outline btn-sm" type="button" id="gSalvar">Salvar</button><button class="btn-danger btn-sm" type="button" id="gApagar">Apagar foto</button></div><span class="status" id="gMsg"></span>`;
 }
 $('lbFechar').onclick=fecharLb;
 $('lb').addEventListener('click',e=>{if(e.target===$('lb')||e.target.classList.contains('lb-img'))fecharLb()});
@@ -277,8 +298,8 @@ $('lbComs').addEventListener('click',async e=>{
 $('lbGest').addEventListener('click',async e=>{
   const f=lista()[atual];if(!f)return;const msg=$('gMsg');
   if(e.target.closest('#gSalvar')){
-    try{const r=await fetch(`/api/album/gestora/fotos/${f.id}`,{method:'PUT',headers:{'Content-Type':'application/json','x-gestora-key':chaveG},body:JSON.stringify({legenda:$('gLeg').value,album:$('gAlb').value})});const d=await r.json();if(!r.ok)throw new Error(d.error);
-      Object.assign(f,{legenda:d.foto.legenda,album:d.foto.album});await carregar();msg.className='status ok';msg.textContent='Salvo ✓'}catch(err){msg.className='status error';msg.textContent=err.message}
+    try{const r=await fetch(`/api/album/gestora/fotos/${f.id}`,{method:'PUT',headers:{'Content-Type':'application/json','x-gestora-key':chaveG},body:JSON.stringify({legenda:$('gLeg').value,momentoId:$('gMom').value})});const d=await r.json();if(!r.ok)throw new Error(d.error);
+      Object.assign(f,{legenda:d.foto.legenda,momentoId:d.foto.momentoId});await carregar();msg.className='status ok';msg.textContent='Salvo ✓'}catch(err){msg.className='status error';msg.textContent=err.message}
   }
   const ap=e.target.closest('#gApagar');
   if(ap){
