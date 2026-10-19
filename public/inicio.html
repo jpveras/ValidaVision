@@ -87,12 +87,21 @@ html.vv-bv{overflow:hidden}
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Bug Hunters">
 <script>
-// Boas-vindas: aparece ao abrir a Toca (link, app, favorito ou recarregar).
-// Não aparece quando a pessoa só voltou ao Início vindo de outra tela da Toca.
+// Boas-vindas "Seja Bem-Vindo(a), Caçador(a)!"
+// - No navegador (PC ou celular): aparece ao abrir a Toca (link, favorito ou recarregar) e fica 10 s.
+//   Não aparece quando a pessoa só voltou ao Início vindo de outra tela da Toca.
+// - No app instalado: aparece só na PRIMEIRA vez que a pessoa abre o app depois de instalar.
+// ?bv=1 força (para testar), ?bv=0 desliga.
 (function(){
-  var p=new URLSearchParams(location.search),veioDeDentro=false;
-  try{veioDeDentro=!!document.referrer&&new URL(document.referrer).origin===location.origin&&!/\/inicio(\.html)?$|\/$/.test(new URL(document.referrer).pathname)}catch(e){}
-  if(p.get('bv')==='1'||(!veioDeDentro&&p.get('bv')!=='0'))document.documentElement.classList.add('vv-bv');
+  var p=new URLSearchParams(location.search),html=document.documentElement,mostrar=false;
+  var app=p.get('app')==='1'||(window.matchMedia&&matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true;
+  if(app){var visto=null;try{visto=localStorage.getItem('vv-bv-app')}catch(e){}mostrar=!visto;if(mostrar)html.dataset.bvApp='1'}
+  else{var veioDeDentro=false;
+    try{veioDeDentro=!!document.referrer&&new URL(document.referrer).origin===location.origin&&!/\/inicio(\.html)?$|\/$/.test(new URL(document.referrer).pathname)}catch(e){}
+    mostrar=!veioDeDentro}
+  if(p.get('bv')==='1')mostrar=true;
+  if(p.get('bv')==='0')mostrar=false;
+  if(mostrar)html.classList.add('vv-bv');
 })();
 </script>
 <script src="/vv-app.js?v=2" defer></script>
@@ -105,7 +114,7 @@ html.vv-bv{overflow:hidden}
   <a class="logo" href="/inicio.html">
     <img id="brandLogo" src="/logo.png" alt="" hidden onload="this.hidden=false;this.nextElementSibling.setAttribute('hidden','')">
     <svg width="28" height="24" viewBox="0 0 28 24" aria-hidden="true"><path d="M1 2h9l4 9 4-9h9L14 23z" fill="#2fc28f"/><path d="M10 2h8l-4 9z" fill="#1a8f6a"/></svg>
-    <b>Toca dos <span>Bug Hunters</span></b><span class="ver">v0.32</span>
+    <b>Toca dos <span>Bug Hunters</span></b><span class="ver">v0.32.1</span>
   </a>
   <div class="spacer"></div>
 </header>
@@ -197,7 +206,7 @@ html.vv-bv{overflow:hidden}
 <script>
 (function(){
   var html=document.documentElement,menu=document.getElementById('menu'),bv=document.getElementById('bv');
-  var TEMPO=3200,timer,fechado=false;
+  var TEMPO=10000,timer,fechado=false;
   function entrarMenus(){menu.classList.remove('entrar');void menu.offsetWidth;menu.classList.add('entrar')}
   function fechar(){
     if(fechado)return;fechado=true;clearTimeout(timer);
@@ -209,6 +218,7 @@ html.vv-bv{overflow:hidden}
   }
   function tecla(e){if(e.key==='Escape'||e.key==='Enter')fechar()}
   if(html.classList.contains('vv-bv')){
+    if(html.dataset.bvApp)try{localStorage.setItem('vv-bv-app',new Date().toISOString())}catch(e){}
     bv.hidden=false;bv.style.setProperty('--bv-ms',TEMPO+'ms');
     bv.addEventListener('click',function(e){if(e.target===bv||e.target.closest('#bvEntrar'))fechar()});
     document.addEventListener('keydown',tecla);
