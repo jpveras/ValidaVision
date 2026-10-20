@@ -14,6 +14,8 @@ import { lembretesRouter } from "./lembretes.js";
 import { albumRouter } from "./album.js";
 import { recadoRouter } from "./recado.js";
 import { gestoraRouter } from "./gestora.js";
+import { timeRouter } from "./time.js";
+import { desafiosRouter } from "./desafios.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ENV_PATH = path.join(__dirname, ".env");
@@ -129,6 +131,13 @@ app.use("/api/recado", recadoRouter);
 
 // Área da Gestora (entrada e troca de senha; cada área tem a própria API)
 app.use("/api/gestora", gestoraRouter);
+
+// Aniversários, tempo de casa e agenda do time (a gestora cadastra; o Início mostra)
+app.use("/api/time", timeRouter);
+
+// Desafio da semana (quiz do time com ranking do mês)
+app.use("/api/desafios", desafiosRouter);
+app.get(["/desafio", "/quiz"], (_req, res) => res.redirect(302, "/desafio.html"));
 app.get(["/album", "/fotos"], (_req, res) => res.redirect(302, "/album.html"));
 
 

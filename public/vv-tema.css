@@ -155,3 +155,6 @@ html.vv-recado-aberto { overflow: hidden; }
 .vv-gestora-btn.on::after { content: ""; position: absolute; top: 5px; right: 6px; width: 7px; height: 7px; border-radius: 50%; background: #2fc28f; }
 .vv-gestora-btn.atual { background: rgba(255,255,255,.22); border-color: rgba(255,255,255,.4); }
 @media print { .vv-gestora-btn { display: none !important; } }
+
+/* Status da IA OCULTO no menu (20/10/2026). O endereço /api/health continua funcionando. Para mostrar, comente esta linha. */
+[data-recurso="status-ia"] { display: none !important; }

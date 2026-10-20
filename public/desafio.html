@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Desafio da semana · Toca dos Bug Hunters</title>
+<link rel="icon" type="image/png" href="/favicon.png?v=3">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/vv-base.css">
+<style>
+.desafio-card .card-body{padding:22px}
+.pergunta-dsf{margin:0 0 18px;font-size:21px;line-height:1.4;color:var(--ink);font-weight:500;overflow-wrap:anywhere}
+.ops{display:grid;gap:10px;margin:0 0 16px}
+.op{display:flex;align-items:center;gap:12px;width:100%;min-height:52px;height:auto;padding:12px 14px;border:2px solid var(--line);border-radius:12px;background:#fff;color:var(--text);font:inherit;font-size:16px;text-align:left;cursor:pointer;text-transform:none;letter-spacing:normal;font-weight:500;line-height:1.35;white-space:normal;transition:border-color .15s,background .15s}
+.op:hover:not(:disabled){border-color:var(--teal)}
+.op .l{flex:none;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--panel);color:var(--ink);font-weight:700;font-size:14px}
+.op.sel{border-color:var(--teal);background:var(--teal-soft)}
+.op.sel .l{background:var(--teal);color:#fff}
+.op.certa{border-color:#12a150;background:#e9f8ef}
+.op.certa .l{background:#12a150;color:#fff}
+.op.errada{border-color:#d0453a;background:#fdecec}
+.op.errada .l{background:#d0453a;color:#fff}
+.op .barra{margin-left:auto;font-size:12px;color:var(--muted);white-space:nowrap}
+.op:disabled{cursor:default;opacity:1}
+.resp-linha{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap}
+.resp-linha .campo{flex:1;min-width:200px}
+.resultado{border-radius:12px;padding:16px 18px;margin-top:6px;font-size:15px;line-height:1.5}
+.resultado.ok{background:#e9f8ef;color:#0b5d2e}
+.resultado.nao{background:#fff4e5;color:#7a4f00}
+.resultado b{display:block;font-size:18px;margin-bottom:4px}
+.meta-dsf{font-size:12px;color:var(--muted);margin:10px 0 0}
+.rank{list-style:none;margin:0;padding:0;counter-reset:r}
+.rank li{counter-increment:r;display:flex;align-items:center;gap:12px;padding:10px 4px;border-bottom:1px solid var(--line);font-size:15px}
+.rank li:last-child{border-bottom:0}
+.rank li::before{content:counter(r);width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:var(--panel);color:var(--ink);font-weight:700;font-size:13px;flex:none}
+.rank li:nth-child(1)::before{content:"🥇";background:none;font-size:22px}
+.rank li:nth-child(2)::before{content:"🥈";background:none;font-size:22px}
+.rank li:nth-child(3)::before{content:"🥉";background:none;font-size:22px}
+.rank .n{flex:1;min-width:0;color:var(--ink);font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rank .p{font-weight:700;color:var(--teal2);white-space:nowrap}
+.rank .p small{font-weight:400;color:var(--muted);margin-left:4px}
+.ant{border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:10px;background:#fff}
+.ant p{margin:0 0 6px;color:var(--ink);font-weight:500}
+.ant .c{font-size:14px;color:#0b7a3b}
+.ant .e{font-size:13px;color:var(--text);margin-top:4px}
+.ant .s{font-size:12px;color:var(--muted);margin-top:6px}
+.vazio-dsf{text-align:center;padding:26px 10px;color:var(--muted)}
+.vazio-dsf b{display:block;font-size:18px;color:var(--ink);font-weight:500;margin-bottom:6px}
+.grid-dsf{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:20px;align-items:start}
+@media(max-width:900px){.grid-dsf{grid-template-columns:1fr}}
+@media(max-width:520px){.pergunta-dsf{font-size:18px}.desafio-card .card-body{padding:16px}.op{font-size:15px}}
+@media screen{
+html[data-tema="escuro"][data-pagina] .op,html[data-tema="escuro"][data-pagina] .ant{background:var(--card);border-color:var(--line);color:var(--ink)}
+html[data-tema="escuro"][data-pagina] .op.sel{background:#12302c;border-color:var(--teal)}
+html[data-tema="escuro"][data-pagina] .op.certa{background:#123a26;border-color:#2fbf6a}
+html[data-tema="escuro"][data-pagina] .op.errada{background:#3a1a18;border-color:#e0675d}
+html[data-tema="escuro"][data-pagina] .resultado.ok{background:#123a26;color:#9ff0c0}
+html[data-tema="escuro"][data-pagina] .resultado.nao{background:#2e2412;color:#f0d27a}
+html[data-tema="escuro"][data-pagina] .ant .c{color:#7fe0a8}
+}
+</style>
+<link rel="stylesheet" href="/vv-tema-auto.css?v=35">
+<link rel="stylesheet" href="/vv-tema.css?v=35">
+<script src="/vv-tema.js?v=23"></script>
+<link rel="manifest" href="/manifest.webmanifest?v=3">
+<meta name="theme-color" content="#033a45">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=3">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Bug Hunters">
+<script src="/vv-app.js?v=2" defer></script>
+<script src="/vv-gestora.js?v=1" defer></script>
+<script src="/vv-recado.js?v=2" defer></script>
+</head>
+<body>
+
+<header class="topbar">
+  <a class="logo" href="/inicio.html">
+    <img id="brandLogo" src="/logo.png" alt="" hidden onload="this.hidden=false;this.nextElementSibling.setAttribute('hidden','')">
+    <svg width="28" height="24" viewBox="0 0 28 24" aria-hidden="true"><path d="M1 2h9l4 9 4-9h9L14 23z" fill="#2fc28f"/><path d="M10 2h8l-4 9z" fill="#1a8f6a"/></svg>
+    <b>Toca dos <span>Bug Hunters</span></b><span class="ver">v0.34</span>
+  </a>
+  <div class="spacer"></div>
+  
+</header>
+
+<nav class="side" aria-label="Menu">
+  <a class="nav" href="/inicio.html">
+    <svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-5h4v5"/></svg>
+    <span>Início</span>
+  </a>
+  <a class="nav" href="/analise.html" data-recurso="analise">
+    <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4"/><circle cx="12" cy="10.5" r="2.5"/></svg>
+    <span>Análise de Tela</span>
+  </a>
+  <a class="nav" href="/elogios.html">
+    <svg viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.5 1-1.1a5.5 5.5 0 0 0 0-7.8z"/></svg>
+    <span>Elogie um Colega</span>
+  </a>
+  <a class="nav" href="/sentimento.html">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 14.5s1.5 2 4 2 4-2 4-2"/><path d="M9 9.5h.01M15 9.5h.01"/></svg>
+    <span>Sentimento da Semana</span>
+  </a>
+  <a class="nav" href="/pergunta.html" data-recurso="pergunta">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.3a2.6 2.6 0 0 1 5 .9c0 1.7-2.5 2.2-2.5 3.8"/><path d="M12 17h.01"/></svg>
+    <span>Pergunta da semana</span>
+  </a>
+  <a class="nav active" href="/desafio.html" aria-current="page">
+    <svg viewBox="0 0 24 24"><path d="M10 3h4v3a2 2 0 1 0 4 0h3v5h-3a2 2 0 1 0 0 4h3v6h-6v-3a2 2 0 1 0-4 0v3H3v-6h3a2 2 0 1 0 0-4H3V6h7z"/></svg>
+    <span>Desafio da semana</span>
+  </a>
+  <a class="nav" href="/album.html">
+    <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="15" rx="2"/><circle cx="9" cy="10.5" r="1.8"/><path d="M21 16l-5-5-8 8"/></svg>
+    <span>Álbum do time</span>
+  </a>
+  <a class="nav" href="/sugestoes.html">
+    <svg viewBox="0 0 24 24"><path d="M4 7h16v11a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M4 7l2.5-3h11L20 7"/><path d="M9 12h6"/></svg>
+    <span>Caixa de sugestões</span>
+  </a>
+  <a class="nav" href="/api/health" target="_blank" rel="noopener" data-recurso="status-ia">
+    <svg viewBox="0 0 24 24"><path d="M3 12h4l3-7 4 14 3-7h4"/></svg>
+    <span>Status da IA</span>
+  </a>
+</nav>
+
+<main class="content"><div class="panel"><div class="wrap">
+
+  <div class="page-head">
+    <div class="page-icon"><svg viewBox="0 0 24 24"><path d="M10 3h4v3a2 2 0 1 0 4 0h3v5h-3a2 2 0 1 0 0 4h3v6h-6v-3a2 2 0 1 0-4 0v3H3v-6h3a2 2 0 1 0 0-4H3V6h7z"/></svg></div>
+    <h1 class="grow">Desafio da semana</h1>
+  </div>
+  <p class="page-sub">Uma pergunta por semana para testar o olhar de caçador(a) 🐞. Responda, veja na hora se acertou e suba no ranking do mês!</p>
+  <div class="divider"></div>
+
+  <div class="grid-dsf">
+    <section class="card desafio-card">
+      <div class="card-head"><span>🧩 Desafio atual</span><span class="counter" id="dsfTotal"></span></div>
+      <div class="card-body" id="dsfCorpo"><p class="vazio-dsf">Carregando…</p></div>
+    </section>
+    <section class="card">
+      <div class="card-head"><span>🏆 Ranking de <span id="rkMes">—</span></span></div>
+      <div class="card-body" id="rkCorpo"><p class="vazio-dsf" style="padding:10px">Carregando…</p></div>
+    </section>
+  </div>
+
+  <section class="card" id="antCard" hidden style="margin-top:20px">
+    <div class="card-head"><span>📜 Desafios anteriores</span></div>
+    <div class="card-body" id="antCorpo"></div>
+  </section>
+
+</div></div></main>
+
+<script>
+const $=id=>document.getElementById(id);
+const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+const ls={get(k){try{return localStorage.getItem(k)}catch{return null}},set(k,v){try{v==null?localStorage.removeItem(k):localStorage.setItem(k,v)}catch{}}};
+let leitor=ls.get('vv-leitor');if(!leitor||!/^[a-f0-9]{32}$/.test(leitor)){leitor=[...crypto.getRandomValues(new Uint8Array(16))].map(b=>b.toString(16).padStart(2,'0')).join('');ls.set('vv-leitor',leitor)}
+const LETRAS='ABCD';
+let dados=null,escolha=null,enviando=false;
+const dataBR=iso=>new Date(iso).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
+
+async function carregar(){
+  try{const r=await fetch('/api/desafios',{cache:'no-store',headers:{'x-leitor':leitor}});const d=await r.json();if(!r.ok)throw new Error(d.error);dados=d;render()}
+  catch(e){$('dsfCorpo').innerHTML=`<p class="vazio-dsf">${esc(e.message||'Não consegui carregar.')}</p>`}
+}
+function render(){
+  const a=dados.atual;
+  $('rkMes').textContent=dados.rotuloMes;
+  if(!a){
+    $('dsfTotal').textContent='';
+    $('dsfCorpo').innerHTML='<div class="vazio-dsf"><b>Nenhum desafio aberto agora 🧩</b>Assim que a gestora publicar o próximo, ele aparece aqui. Enquanto isso, veja os anteriores abaixo.</div>';
+  }else if(a.minha){
+    const pct=a.total?Math.round(a.acertos/a.total*100):0;
+    $('dsfTotal').textContent=`${a.total} ${a.total===1?'resposta':'respostas'}`;
+    $('dsfCorpo').innerHTML=`<p class="pergunta-dsf">${esc(a.pergunta)}</p>
+      <div class="ops">${a.opcoes.map((o,i)=>`<button class="op ${i===a.correta?'certa':i===a.minha.opcao?'errada':''}" disabled><span class="l">${LETRAS[i]}</span><span>${esc(o)}</span><span class="barra">${a.porOpcao?.[i]??0} ${(a.porOpcao?.[i]??0)===1?'voto':'votos'}</span></button>`).join('')}</div>
+      <div class="resultado ${a.minha.certo?'ok':'nao'}"><b>${a.minha.certo?'Acertou, '+esc(a.minha.nome.split(' ')[0])+'! 🎯':'Quase! A certa é a '+LETRAS[a.correta]+'.'}</b>${a.explicacao?esc(a.explicacao):''}</div>
+      <p class="meta-dsf">${pct}% do time acertou até agora · ${a.minha.certo?'+1 ponto para você no ranking do mês':'na próxima você pontua!'}</p>`;
+  }else{
+    $('dsfTotal').textContent=a.total?`${a.total} ${a.total===1?'pessoa já respondeu':'pessoas já responderam'}`:'seja a primeira pessoa!';
+    $('dsfCorpo').innerHTML=`<p class="pergunta-dsf">${esc(a.pergunta)}</p>
+      <div class="ops" role="radiogroup" aria-label="Alternativas">${a.opcoes.map((o,i)=>`<button type="button" class="op ${escolha===i?'sel':''}" role="radio" aria-checked="${escolha===i}" data-op="${i}"><span class="l">${LETRAS[i]}</span><span>${esc(o)}</span></button>`).join('')}</div>
+      <form class="resp-linha" id="respForm" novalidate>
+        <div class="campo"><label class="label" for="nomeDsf"><span>Seu nome (para o ranking)</span></label><input class="input" id="nomeDsf" maxlength="40" autocomplete="name" placeholder="Ex.: Carla" value="${esc(ls.get('vv-nome')||ls.get('vv-album-nome')||'')}"></div>
+        <button class="btn-primary" type="submit" id="responder" ${escolha==null?'disabled':''}>Responder</button>
+      </form>
+      <div class="status" id="dsfMsg" role="status"></div>`;
+  }
+  const rk=dados.ranking;
+  $('rkCorpo').innerHTML=rk.length?`<ol class="rank">${rk.map(r=>`<li><span class="n">${esc(r.nome)}</span><span class="p">${r.pontos} ${r.pontos===1?'ponto':'pontos'}<small>${r.respostas} ${r.respostas===1?'resposta':'respostas'}</small></span></li>`).join('')}</ol><p class="meta-dsf">1 ponto por acerto. O ranking recomeça todo mês.</p>`
+    :'<p class="vazio-dsf" style="padding:10px">Ninguém pontuou neste mês ainda. Acerte o desafio e seja o primeiro nome aqui! 🏁</p>';
+  const ant=dados.anteriores;
+  $('antCard').hidden=!ant.length;
+  $('antCorpo').innerHTML=ant.map(d=>`<div class="ant"><p>${esc(d.pergunta)}</p><div class="c">✅ ${LETRAS[d.correta]}) ${esc(d.opcoes[d.correta])}</div>${d.explicacao?`<div class="e">${esc(d.explicacao)}</div>`:''}<div class="s">${d.total} ${d.total===1?'resposta':'respostas'} · ${d.total?Math.round(d.acertos/d.total*100):0}% acertaram · encerrado em ${dataBR(d.encerradoEm)}</div></div>`).join('');
+}
+$('dsfCorpo').addEventListener('click',e=>{const b=e.target.closest('[data-op]');if(!b||b.disabled)return;escolha=+b.dataset.op;const nome=$('nomeDsf')?.value;render();if(nome!=null)$('nomeDsf').value=nome});
+$('dsfCorpo').addEventListener('submit',async e=>{
+  e.preventDefault();if(enviando||escolha==null)return;
+  const nome=$('nomeDsf').value.trim(),msg=$('dsfMsg');
+  if(nome.length<2){msg.className='status error';msg.textContent='Escreva o seu nome para entrar no ranking.';return $('nomeDsf').focus()}
+  enviando=true;$('responder').disabled=true;msg.className='status';msg.textContent='Enviando…';
+  try{
+    const r=await fetch(`/api/desafios/${dados.atual.id}/responder`,{method:'POST',headers:{'Content-Type':'application/json','x-leitor':leitor},body:JSON.stringify({nome,opcao:escolha})});
+    const d=await r.json();if(!r.ok)throw new Error(d.error);
+    ls.set('vv-nome',nome);escolha=null;await carregar();
+  }catch(err){msg.className='status error';msg.textContent=err.message;$('responder').disabled=false}
+  finally{enviando=false}
+});
+carregar();
+setInterval(()=>{if(!document.hidden&&!(dados?.atual&&!dados.atual.minha))carregar()},60000);
+</script>
+</body>
+</html>
