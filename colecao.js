@@ -34,7 +34,12 @@ const semAspas = (t) => String(t || "").replace(/^W\//, "").replace(/"/g, "");
 
 // Última versão lida de cada arquivo (por instância). Se o head mostra a mesma versão,
 // devolvemos a cópia guardada e pulamos o get: cada leitura passa de 2 operações simples para 1.
-const versoes = new Map(); // pathname -> { etag, json }
+const versoes = new Map(); // pathname -> { etag, json, at }
+// Economia (20/10): a mesma instancia confia na copia guardada por alguns segundos sem
+// perguntar a Blob de novo (cada pergunta e uma operacao "simples"). Gravacoes sempre
+// conferem a versao atual, entao nada se perde; outra pessoa so ve uma mudanca alguns
+// segundos depois. Ajustavel por BLOB_CACHE_S (0 desliga).
+const CACHE_MS = Math.max(0, Number(process.env.BLOB_CACHE_S ?? 30)) * 1000;
 const copia = (json) => (json == null ? null : JSON.parse(json));
 
 // Leitura sempre da versão atual.
@@ -43,7 +48,11 @@ const copia = (json) => (json == null ? null : JSON.parse(json));
 // Agora: o head (consulta direta à API, sem cache) diz qual é a versão atual (ETag);
 // o get pede o arquivo com essa versão na URL (endereço novo = sem cópia velha) e confere
 // se veio mesmo a versão certa. Head e get são operações "simples" no plano gratuito.
-async function lerBlob(pathname) {
+async function lerBlob(pathname, { fresco = false } = {}) {
+  const recente = versoes.get(pathname);
+  if (!fresco && recente && CACHE_MS && Date.now() - recente.at < CACHE_MS) {
+    return { data: copia(recente.json), etag: recente.etag };
+  }
   const m = await sdk();
   if (typeof m.head !== "function") return lerBlobDireto(pathname);
   let h;
@@ -55,7 +64,10 @@ async function lerBlob(pathname) {
   }
   const atual = semAspas(h.etag);
   const guardada = versoes.get(pathname);
-  if (atual && guardada && guardada.etag === atual) return { data: copia(guardada.json), etag: h.etag };
+  if (atual && guardada && guardada.etag === atual) {
+    guardada.at = Date.now();
+    return { data: copia(guardada.json), etag: h.etag };
+  }
   for (let i = 0; i < 5; i++) {
     const u = new URL(h.url);
     u.searchParams.set("v", atual || String(Date.now()));
@@ -71,7 +83,7 @@ async function lerBlob(pathname) {
     // Usa sempre o ETag do head (o "oficial" da API). O que vem no get pode vir em outro
     // formato (ex.: W/"..." pela CDN) e aí o ifMatch nunca bate.
     if (!atual || !r.etag || semAspas(r.etag) === atual) {
-      if (atual) versoes.set(pathname, { etag: atual, json: JSON.stringify(r.data) });
+      if (atual) versoes.set(pathname, { etag: atual, json: JSON.stringify(r.data), at: Date.now() });
       return { data: r.data, etag: h.etag || r.etag };
     }
     await espera(200 * (i + 1));
@@ -130,7 +142,7 @@ export async function lerDoc(pathname) {
  */
 export async function atualizarDoc(pathname, fn, tentativas = 4) {
   for (let i = 0; i < tentativas; i++) {
-    const { data, etag } = await lerBlob(pathname);
+    const { data, etag } = await lerBlob(pathname, { fresco: true });
     const novo = fn(data);
     try {
       await gravarBlob(pathname, novo, etag);
@@ -145,7 +157,7 @@ export async function atualizarDoc(pathname, fn, tentativas = 4) {
   // Plano B: a Blob continuou recusando a versão. Relê a versão atual e grava por cima.
   // A equipe é pequena e os envios são raros, então o risco de duas gravações no mesmo
   // instante é mínimo — e é melhor do que a pessoa não conseguir enviar ou apagar.
-  const { data } = await lerBlob(pathname);
+  const { data } = await lerBlob(pathname, { fresco: true });
   const novo = fn(data);
   await gravarDocDireto(pathname, novo);
   versoes.delete(pathname);
