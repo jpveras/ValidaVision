@@ -16,6 +16,7 @@ import { recadoRouter } from "./recado.js";
 import { gestoraRouter } from "./gestora.js";
 import { timeRouter } from "./time.js";
 import { desafiosRouter } from "./desafios.js";
+import { situacaoArmazenamento } from "./colecao.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ENV_PATH = path.join(__dirname, ".env");
@@ -134,6 +135,15 @@ app.use("/api/gestora", gestoraRouter);
 
 // Aniversários, tempo de casa e agenda do time (a gestora cadastra; o Início mostra)
 app.use("/api/time", timeRouter);
+// Onde os dados estão guardados (sem segredos), para conferir a migração para o Redis.
+app.get("/api/armazenamento", async (_req, res) => {
+  res.set("Cache-Control", "no-store");
+  try {
+    res.json(await situacaoArmazenamento());
+  } catch (e) {
+    res.status(500).json({ erro: String(e?.message || e) });
+  }
+});
 
 // Desafio da semana (quiz do time com ranking do mês)
 app.use("/api/desafios", desafiosRouter);
