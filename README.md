@@ -1,4 +1,4 @@
-# Toca dos Bug Hunters — v0.34
+# Toca dos Bug Hunters — v0.35
 
 > Endereço: **https://bughunters-time.vercel.app** (desde 19/10/2026). O antigo `valida-vision.vercel.app` redireciona para ele (307, configurado em Vercel → Domains), então links e QR Codes antigos continuam funcionando.
 > Antes chamado **Valida Vision** (o repositório e o projeto da Vercel continuam com o nome antigo).
@@ -41,6 +41,12 @@ Os elogios ficam visíveis para quem abrir a página (é a ideia da dinâmica). 
 
 A chave fica só no `.env` e nunca vai para o browser. Não compartilhe o `.env`.
 Antes de enviar telas reais da empresa, valide as políticas internas de dados e PII.
+
+## Novidades da v0.35
+
+- **📣 Até 3 recados da chefa:** `recado/_dados.json` = `{ recados: [r1, r2, r3] }` (o formato antigo de um recado vira o Recado 1). Cada um com liga/desliga e frequência. O pop-up mostra os que devem aparecer em sequência ("1 de 3" → Próximo/Anterior, setas do teclado); "já vi" por recado em `localStorage` `vv-recados`. Rotas: `PUT /api/recado/gestora/:n` (0–2); `GET /api/recado` devolve `recados[]` (+ campos do primeiro, para telas antigas). Na Área da Gestora: abas Recado 1/2/3 e "Ver todos como o time vê".
+- **🆕 Últimas atualizações com 5 itens** e mais fontes: recados no ar, último comentário do álbum, resposta do desafio anterior, líder do ranking, convite a elogiar quando o mural está vazio.
+- **Scan do Elogie e do Sentimento:** o Elogie passou a **recusar links** (como o Sentimento e os comentários). Demais fluxos testados ok (envio, validações, frases prontas, `?para=`, 3 respostas/semana, apagar a própria resposta, nuvem, celular escuro).
 
 ## Novidades da v0.34
 

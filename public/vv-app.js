@@ -100,7 +100,7 @@
     pop.hidden = true;
     pop.setAttribute("role", "dialog");
     pop.setAttribute("aria-label", "App e lembrete de sexta");
-    pop.innerHTML = '<div class="vv-app-item vv-app-rec" hidden><b>📣 Recado da Chefa</b><span>Rever o recado que a chefa deixou para o time.</span><button type="button" class="btn-outline btn-sm" data-acao="recado">Ver recado</button></div><div class="vv-app-item vv-app-inst"></div><div class="vv-app-item vv-app-lem"></div><p class="vv-app-msg" role="status"></p>';
+    pop.innerHTML = '<div class="vv-app-item vv-app-rec" hidden><b>📣 Recado da Chefa</b><span>Rever os recados que a chefa deixou para o time.</span><button type="button" class="btn-outline btn-sm" data-acao="recado">Ver recado</button></div><div class="vv-app-item vv-app-inst"></div><div class="vv-app-item vv-app-lem"></div><p class="vv-app-msg" role="status"></p>';
     document.body.appendChild(pop);
 
     btn.addEventListener("click", function (e) { e.stopPropagation(); abrir(); });

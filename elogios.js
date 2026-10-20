@@ -282,6 +282,9 @@ elogiosRouter.post("/", async (req, res) => {
     const texto = limpa(req.body?.texto, TEXTO_MAX);
     if (nome.length < 2) return res.status(400).json({ error: "Informe o nome do colega." });
     if (texto.length < 3) return res.status(400).json({ error: "Escreva o elogio." });
+    // Os elogios aparecem no telão: sem links (como no Sentimento e nos comentários do álbum).
+    if (/https?:\/\/|www\.|\b[a-z0-9-]+\.(com|net|org|br|io|app|dev|me|ly)(\/|\b)/i.test(nome + " " + texto))
+      return res.status(400).json({ error: "Não use links no elogio." });
 
     const ip = String(req.get("x-forwarded-for") || req.ip || "").split(",")[0].trim();
     const agora = Date.now();
