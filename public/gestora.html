@@ -103,6 +103,45 @@ datalist{display:none}
 .mo-item .a{display:flex;gap:6px;flex:none}
 @media(max-width:560px){.mo-form{grid-template-columns:1fr}.mo-item{flex-wrap:wrap}.mo-item .a{width:100%;justify-content:flex-end}}
 @media screen{html[data-tema="escuro"][data-pagina] .mo-passo select,html[data-tema="escuro"][data-pagina] .mo-form input,html[data-tema="escuro"][data-pagina] .mo-form textarea,html[data-tema="escuro"][data-pagina] .mo-item{background:var(--card);border-color:var(--line);color:var(--ink)}html[data-tema="escuro"][data-pagina] .mo-form{background:#12302c}}
+/* Aniversários, Agenda e Desafio */
+.ag-form,.dz-form{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px;border:1px dashed var(--teal);border-radius:10px;background:var(--teal-soft);margin:0 0 16px}
+.dz-form{grid-template-columns:1fr}
+.ag-form .tudo{grid-column:1/-1}
+.ag-form .linha,.dz-form .linha{grid-column:1/-1;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.ag-form input,.ag-form select,.dz-form textarea,.dz-form input[type=text]{width:100%;box-sizing:border-box;border:1px solid #cfd8d6;border-radius:6px;padding:9px 10px;font:inherit;font-size:15px;background:#fff;color:var(--ink)}
+.dz-form textarea{min-height:64px;resize:vertical;line-height:1.45}
+.dm{display:grid;grid-template-columns:1fr 1.4fr;gap:8px}
+.ag-lista{display:flex;flex-direction:column;gap:8px}
+.ag-item{display:flex;align-items:center;gap:12px;border:1px solid var(--line);border-radius:8px;padding:8px 10px;background:#fff}
+.ag-item.editando{border-color:var(--teal);box-shadow:0 0 0 2px var(--teal-soft)}
+.ag-item .ic{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;flex:none;font-size:18px;background:var(--panel)}
+.ag-item .t{flex:1;min-width:0}
+.ag-item .t b{display:block;color:var(--ink)}
+.ag-item .t span{font-size:12px;color:var(--muted)}
+.ag-item .a{display:flex;gap:6px;flex:none}
+.ag-pass{margin-top:6px}.ag-pass summary{cursor:pointer;font-size:13px;color:var(--muted);padding:6px 0}.ag-pass .ag-item{opacity:.7;margin-top:8px}
+.ag-ideia,.dz-ideia{border:1px dashed var(--line);background:transparent;color:var(--text);border-radius:99px;padding:5px 10px;font:inherit;font-size:12px;cursor:pointer;white-space:normal;text-transform:none;letter-spacing:normal;height:auto;font-weight:400;line-height:1.35;text-align:left}
+.ag-ideia:hover,.dz-ideia:hover{border-color:var(--teal);color:var(--teal2)}
+.dz-ops{display:grid;gap:8px}
+.dz-op{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:8px;padding:6px 8px;background:#fff;cursor:pointer}
+.dz-op.certa{border-color:#12a150;box-shadow:0 0 0 2px #e9f8ef}
+.dz-op input[type=radio]{accent-color:#12a150;width:18px;height:18px;flex:none;margin:0}
+.dz-op .l{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;background:var(--panel);font-weight:700;font-size:12px;flex:none;color:var(--ink)}
+.dz-op.certa .l{background:#12a150;color:#fff}
+.dz-op .dz-txt{border:0!important;padding:6px 4px!important;background:transparent!important;flex:1;min-width:0}
+.dz-op .ok{display:none;font-size:11px;font-weight:700;color:#12a150;white-space:nowrap}
+.dz-op.certa .ok{display:inline}
+.dz-dist{display:grid;gap:6px;margin:4px 0 6px}
+.dz-bar{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr) 30px;gap:10px;align-items:center;font-size:13px}
+.dz-bar .t{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dz-bar .b{height:10px;border-radius:99px;background:var(--panel);overflow:hidden}.dz-bar .b i{display:block;height:100%;background:var(--teal);border-radius:99px}
+.dz-bar.certa .t{font-weight:700;color:#0b7a3b}.dz-bar.certa .b i{background:#12a150}
+.dz-bar .n{text-align:right;font-variant-numeric:tabular-nums}
+.dz-h{margin:14px 0 8px;font-size:11px;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);font-weight:500}
+.dz-rank{margin:0;padding-left:22px}.dz-rank li{display:flex;justify-content:space-between;gap:10px;padding:5px 0;border-bottom:1px solid var(--line);font-size:14px}.dz-rank li b{color:var(--teal2)}
+.dz-hist{border:1px solid var(--line);border-radius:8px;padding:10px;margin-bottom:8px;background:#fff}.dz-hist p{margin:0 0 4px;color:var(--ink);font-size:14px}.dz-hist span{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}
+@media(max-width:560px){.ag-form{grid-template-columns:1fr}.ag-item{flex-wrap:wrap}.ag-item .a{width:100%;justify-content:flex-end}.dz-bar{grid-template-columns:1fr 30px}.dz-bar .b{grid-column:1/-1;grid-row:2}}
+@media screen{html[data-tema="escuro"][data-pagina] .ag-form input,html[data-tema="escuro"][data-pagina] .ag-form select,html[data-tema="escuro"][data-pagina] .dz-form textarea,html[data-tema="escuro"][data-pagina] .dz-op,html[data-tema="escuro"][data-pagina] .ag-item,html[data-tema="escuro"][data-pagina] .dz-hist{background:var(--card);border-color:var(--line);color:var(--ink)}html[data-tema="escuro"][data-pagina] .ag-form,html[data-tema="escuro"][data-pagina] .dz-form{background:#12302c}html[data-tema="escuro"][data-pagina] .dz-op.certa{box-shadow:0 0 0 2px #123a26}html[data-tema="escuro"][data-pagina] .dz-bar.certa .t{color:#7fe0a8}}
 /* Senha */
 .sn-form{display:flex;flex-direction:column;gap:8px;max-width:460px}
 .sn-ver{display:flex;gap:8px;align-items:center;font-size:13px;cursor:pointer;color:var(--text)}
@@ -277,8 +316,8 @@ html[data-tema="escuro"] .ev-tip{background:#e4efed;color:#0f1a1c}
   .sug li{break-inside:avoid}
 }
 </style>
-<link rel="stylesheet" href="/vv-tema-auto.css?v=34">
-<link rel="stylesheet" href="/vv-tema.css?v=34">
+<link rel="stylesheet" href="/vv-tema-auto.css?v=35">
+<link rel="stylesheet" href="/vv-tema.css?v=35">
 <script src="/vv-tema.js?v=23"></script>
 <link rel="manifest" href="/manifest.webmanifest?v=3">
 <meta name="theme-color" content="#033a45">
@@ -295,7 +334,7 @@ html[data-tema="escuro"] .ev-tip{background:#e4efed;color:#0f1a1c}
   <a class="logo" href="/inicio.html">
     <img id="brandLogo" src="/logo.png" alt="" hidden onload="this.hidden=false;this.nextElementSibling.setAttribute('hidden','')">
     <svg width="28" height="24" viewBox="0 0 28 24" aria-hidden="true"><path d="M1 2h9l4 9 4-9h9L14 23z" fill="#2fc28f"/><path d="M10 2h8l-4 9z" fill="#1a8f6a"/></svg>
-    <b>Toca dos <span>Bug Hunters</span></b><span class="ver">v0.33</span>
+    <b>Toca dos <span>Bug Hunters</span></b><span class="ver">v0.34</span>
   </a>
   <div class="spacer"></div>
   <span class="env">Área da Gestora</span>
@@ -322,6 +361,10 @@ html[data-tema="escuro"] .ev-tip{background:#e4efed;color:#0f1a1c}
     <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.3a2.6 2.6 0 0 1 5 .9c0 1.7-2.5 2.2-2.5 3.8"/><path d="M12 17h.01"/></svg>
     <span>Pergunta da semana</span>
   </a>
+  <a class="nav" href="/desafio.html">
+    <svg viewBox="0 0 24 24"><path d="M10 3h4v3a2 2 0 1 0 4 0h3v5h-3a2 2 0 1 0 0 4h3v6h-6v-3a2 2 0 1 0-4 0v3H3v-6h3a2 2 0 1 0 0-4H3V6h7z"/></svg>
+    <span>Desafio da semana</span>
+  </a>
   <a class="nav" href="/album.html">
     <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="15" rx="2"/><circle cx="9" cy="10.5" r="1.8"/><path d="M21 16l-5-5-8 8"/></svg>
     <span>Álbum do time</span>
@@ -330,7 +373,7 @@ html[data-tema="escuro"] .ev-tip{background:#e4efed;color:#0f1a1c}
     <svg viewBox="0 0 24 24"><path d="M4 7h16v11a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M4 7l2.5-3h11L20 7"/><path d="M9 12h6"/></svg>
     <span>Caixa de sugestões</span>
   </a>
-  <a class="nav" href="/api/health" target="_blank" rel="noopener">
+  <a class="nav" href="/api/health" target="_blank" rel="noopener" data-recurso="status-ia">
     <svg viewBox="0 0 24 24"><path d="M3 12h4l3-7 4 14 3-7h4"/></svg>
     <span>Status da IA</span>
   </a>
@@ -373,6 +416,9 @@ html[data-tema="escuro"] .ev-tip{background:#e4efed;color:#0f1a1c}
       <button type="button" role="tab" data-aba="recado"><span aria-hidden="true">📣</span>Recado</button>
       <button type="button" role="tab" data-aba="elogios"><span aria-hidden="true">💚</span>Elogios<i class="gt-n" id="nElogios" hidden></i></button>
       <button type="button" role="tab" data-aba="album"><span aria-hidden="true">📷</span>Álbum</button>
+      <button type="button" role="tab" data-aba="pessoas"><span aria-hidden="true">🎂</span>Aniversários</button>
+      <button type="button" role="tab" data-aba="agenda"><span aria-hidden="true">📅</span>Agenda</button>
+      <button type="button" role="tab" data-aba="desafio"><span aria-hidden="true">🧩</span>Desafio</button>
       <button type="button" role="tab" data-aba="sugestoes"><span aria-hidden="true">📮</span>Sugestões<i class="gt-n" id="nSug" hidden></i></button>
       <button type="button" role="tab" data-aba="lembrete"><span aria-hidden="true">🔔</span>Lembrete</button>
       <button type="button" role="tab" data-aba="pergunta" data-recurso="pergunta"><span aria-hidden="true">❓</span>Pergunta</button>
@@ -393,6 +439,9 @@ html[data-tema="escuro"] .ev-tip{background:#e4efed;color:#0f1a1c}
             <li><b>📷 Álbum</b>: primeiro escolha ou crie o <b>momento</b> (ex.: “Confraternização de outubro”, com data), depois escolha as fotos, dê legendas e publique. No álbum, a equipe vê as fotos separadas por momento. Para editar a legenda, apagar uma foto ou remover comentários, abra a foto no álbum — com você conectada, os botões de gestora aparecem lá.</li>
             <li><b>📮 Sugestões</b>: mude o status, responda e marque <b>“Mostrar para a equipe”</b> para a resposta aparecer no mural “Ouvimos você”.</li>
             <li><b>🔔 Lembrete</b>: veja quantas pessoas ativaram o aviso de sexta (9h) e, se precisar, envie um lembrete na hora.</li>
+            <li><b>🎂 Aniversários</b>: cadastre cada pessoa do time com o dia e o mês do aniversário (o ano não é pedido) e, se quiser, a data de entrada no time. No dia, o Início da Toca mostra “Hoje é aniversário de…” com o botão <kbd>Dar parabéns</kbd>; os próximos 7 dias também aparecem.</li>
+            <li><b>📅 Agenda</b>: marque confraternizações, entregas, feriados, férias e treinamentos. Use as ideias prontas, escolha a data (e a data final, para férias) e salve. O Início mostra a contagem regressiva — “faltam 3 dias”.</li>
+            <li><b>🧩 Desafio</b>: escreva uma pergunta (ou use uma ideia pronta), de 2 a 4 alternativas, marque a certa e uma explicação curta. Cada pessoa responde uma vez, vê na hora se acertou e ganha 1 ponto por acerto no ranking do mês. Publicar um novo encerra o anterior e revela a resposta.</li>
             <li><b>🔑 Senha</b>: escolha uma senha só sua quando quiser.</li>
             <li><b>Para sair</b>, clique em <kbd>Sair</kbd> — principalmente em computador compartilhado. Para voltar, toque no escudo 🛡️ ao lado do sino, no topo de qualquer página.</li>
           </ol>
@@ -513,6 +562,74 @@ html[data-tema="escuro"] .ev-tip{background:#e4efed;color:#0f1a1c}
       </section>
     </section>
 
+    <section class="gt-aba" data-painel="pessoas" role="tabpanel">
+      <section class="card">
+        <div class="card-head"><span>🎂 Aniversários e tempo de time</span><span class="counter" id="psSub"></span></div>
+        <div class="card-body">
+          <p class="ev-nota" style="margin:0 0 12px">Cadastre cada pessoa do time uma vez. No dia, o Início mostra “Hoje é aniversário de…” com um botão de <b>Dar parabéns</b> (que abre o Elogie já com o nome). Os aniversários e “anos de time” dos próximos 7 dias também aparecem. <b>Não pedimos o ano de nascimento</b>, e a data de entrada nunca aparece para a equipe, só os anos completos.</p>
+          <form class="ag-form" id="psForm" novalidate>
+            <div class="tudo"><label class="label" for="psNome"><span>Nome</span></label><input id="psNome" maxlength="60" placeholder="Ex.: Carla Souza"></div>
+            <div><label class="label" for="psDia"><span>Aniversário</span></label><div class="dm"><select id="psDia" aria-label="Dia"><option value="">Dia</option></select><select id="psMes" aria-label="Mês"><option value="">Mês</option></select></div></div>
+            <div><label class="label" for="psEntrada"><span>Entrada no time (opcional)</span></label><input id="psEntrada" type="date"></div>
+            <div class="linha"><button class="btn-primary btn-sm" type="submit" id="psSalvar">Adicionar pessoa</button><button class="btn-outline btn-sm" type="button" id="psCancelar" hidden>Cancelar edição</button><span class="msgsg" id="psMsg" role="status"></span></div>
+          </form>
+          <div class="ag-lista" id="psLista"><span class="carregando"></span></div>
+        </div>
+      </section>
+    </section>
+
+    <section class="gt-aba" data-painel="agenda" role="tabpanel">
+      <section class="card">
+        <div class="card-head"><span>📅 Agenda do time</span><span class="counter" id="agSub"></span></div>
+        <div class="card-body">
+          <p class="ev-nota" style="margin:0 0 12px">Os próximos eventos aparecem no Início, em “Esta semana na Toca”, com contagem regressiva (“faltam 3 dias”). Eventos que já passaram somem sozinhos do Início.</p>
+          <div class="pq-ideias" id="agIdeias"></div>
+          <form class="ag-form" id="agForm" novalidate>
+            <div class="tudo"><label class="label" for="agTitulo"><span>Título</span></label><input id="agTitulo" maxlength="80" placeholder="Ex.: Confraternização de fim de ano"></div>
+            <div><label class="label" for="agTipo"><span>Tipo</span></label><select id="agTipo"></select></div>
+            <div><label class="label" for="agHora"><span>Horário (opcional)</span></label><input id="agHora" type="time"></div>
+            <div><label class="label" for="agData"><span>Data</span></label><input id="agData" type="date"></div>
+            <div><label class="label" for="agFim"><span>Até (opcional, para férias/eventos de vários dias)</span></label><input id="agFim" type="date"></div>
+            <div class="tudo"><label class="label" for="agDesc"><span>Detalhe (opcional)</span></label><input id="agDesc" maxlength="140" placeholder="Ex.: Restaurante do térreo, 17h 🎉"></div>
+            <div class="linha"><button class="btn-primary btn-sm" type="submit" id="agSalvar">Adicionar à agenda</button><button class="btn-outline btn-sm" type="button" id="agCancelar" hidden>Cancelar edição</button><span class="msgsg" id="agMsg" role="status"></span></div>
+          </form>
+          <div class="ag-lista" id="agLista"><span class="carregando"></span></div>
+        </div>
+      </section>
+    </section>
+
+    <section class="gt-aba" data-painel="desafio" role="tabpanel">
+      <section class="card">
+        <div class="card-head"><span>🧩 Desafio da semana</span><span class="counter"><a href="/desafio.html" target="_blank" rel="noopener">Ver como a equipe vê ↗</a></span></div>
+        <div class="card-body" id="dzAtual"><span class="carregando"></span></div>
+      </section>
+      <section class="card">
+        <div class="card-head"><span>✏️ Publicar novo desafio</span></div>
+        <div class="card-body">
+          <p class="ev-nota" style="margin:0 0 10px">Escreva a pergunta, de 2 a 4 alternativas e marque a certa. Ao publicar, o desafio anterior é encerrado e a resposta dele fica visível para todos. Cada acerto vale 1 ponto no ranking do mês.</p>
+          <div class="pq-ideias" id="dzIdeias"></div>
+          <form class="dz-form" id="dzForm" novalidate>
+            <label class="label" for="dzPergunta"><span>Pergunta</span><span class="counter" id="dzCnt">0/200</span></label>
+            <textarea id="dzPergunta" maxlength="200" placeholder="Ex.: Um campo aceita idades de 18 a 60. Quais valores a análise de valor limite manda testar?"></textarea>
+            <div class="dz-ops" id="dzOps"></div>
+            <label class="label" for="dzExp"><span>Explicação (aparece depois que a pessoa responde)</span></label>
+            <textarea id="dzExp" maxlength="300" placeholder="Ex.: Testamos logo abaixo, no limite e logo acima de cada ponta: 17, 18, 60 e 61."></textarea>
+            <div class="linha"><button class="btn-primary btn-sm" type="submit" id="dzPublicar">Publicar desafio</button><span class="msgsg" id="dzMsg" role="status"></span></div>
+          </form>
+        </div>
+      </section>
+      <div class="grid2">
+        <section class="card">
+          <div class="card-head"><span>🏆 Ranking de <span id="dzMes">—</span></span></div>
+          <div class="card-body" id="dzRanking"><span class="carregando"></span></div>
+        </section>
+        <section class="card">
+          <div class="card-head"><span>📜 Desafios anteriores</span></div>
+          <div class="card-body" id="dzHist"><span class="carregando"></span></div>
+        </section>
+      </div>
+    </section>
+
     <section class="gt-aba" data-painel="sugestoes" role="tabpanel">
     <section class="card no-print" id="sugestoes">
       <div class="card-head"><span>📮 Caixa de sugestões<span class="sg-badge" id="sgBadge" hidden></span></span><span class="counter"><a href="/sugestoes.html" target="_blank" rel="noopener">Ver como a equipe vê ↗</a></span></div>
@@ -558,7 +675,7 @@ html[data-tema="escuro"] .ev-tip{background:#e4efed;color:#0f1a1c}
 
 <script src="/vendor/wordcloud2.js"></script>
 <script src="/vv-nuvem.js"></script>
-<script src="/vv-emojis.js?v=22"></script>
+<script src="/vv-emojis.js?v=24"></script>
 <script>
 const $=id=>document.getElementById(id);
 const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
@@ -570,7 +687,7 @@ guia.addEventListener('toggle',()=>ls.set('vv-gestora-guia',guia.open?null:'fech
 const msg=(t,e=false)=>{$('msg').textContent=t;$('msg').className='status'+(e?' error':'')};
 
 // ---------- Abas ----------
-const ABAS=['inicio','sentimento','recado','elogios','album','sugestoes','lembrete','pergunta','senha'];
+const ABAS=['inicio','sentimento','recado','elogios','album','pessoas','agenda','desafio','sugestoes','lembrete','pergunta','senha'];
 const ALIAS={perguntas:'pergunta',lembretes:'lembrete',evCard:'sentimento',analiseCard:'sentimento'};
 let aba='inicio';
 const R={}; // números do resumo (Início)
@@ -593,6 +710,8 @@ function aoMostrar(nome){
   if(nome==='inicio'){renderResumo();carregarElogios()}
   if(nome==='album'&&!albumDados)carregarAlbum();
   if(nome==='senha')renderSenhaEstado();
+  if((nome==='pessoas'||nome==='agenda')&&!timeDados)carregarTime();
+  if(nome==='desafio')carregarDesafios();
 }
 document.querySelector('.gt-abas').addEventListener('click',e=>{const b=e.target.closest('[data-aba]');if(b)irPara(b.dataset.aba)});
 document.querySelector('.gt-abas').addEventListener('keydown',e=>{
@@ -628,6 +747,17 @@ function renderResumo(){
   const lb=R.lembrete;
   if(!lb)c.push(card('lembrete','🔔','Lembrete de sexta',sp,'carregando…'));
   else c.push(card('lembrete','🔔','Com lembrete de sexta',lb.inscritos,lb.ultimoEnvio?`Último envio: ${new Date(lb.ultimoEnvio).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}`:'Toda sexta às 9h'));
+  const tm=R.time;
+  if(!tm)c.push(card('agenda','📅','Agenda do time',sp,'carregando…'));
+  else{const prox=tm.eventos.filter(e=>(e.fim||e.data)>=tm.hoje).sort((a,b)=>a.data.localeCompare(b.data))[0];
+    const tp=prox?(tm.tipos[prox.tipo]||tm.tipos.outro):null,f=prox?diasAte(tm.hoje,prox.data):0;
+    c.push(card('agenda',tp?tp.emoji:'📅','Próximo evento',prox?(prox.data<=tm.hoje?'Hoje':f===1?'Amanhã':`Em ${f} dias`):'—',prox?esc(prox.titulo):'Nada marcado — adicione na Agenda'));
+    const niver=tm.pessoas.filter(p=>p.aniversario&&diasAte(tm.hoje,proxAniv(p.aniversario,tm.hoje))<=7);
+    const hoje=niver.filter(p=>proxAniv(p.aniversario,tm.hoje)===tm.hoje);
+    c.push(card('pessoas','🎂',hoje.length?'Aniversário hoje!':'Aniversários (7 dias)',hoje.length?esc(hoje.map(p=>p.nome.split(' ')[0]).join(', ')):niver.length,tm.pessoas.length?`${tm.pessoas.length} ${tm.pessoas.length===1?'pessoa cadastrada':'pessoas cadastradas'}`:'Cadastre o time em Aniversários',hoje.length>0))}
+  const dz=R.desafio;
+  if(!dz)c.push(card('desafio','🧩','Desafio da semana',sp,'carregando…'));
+  else{const ab=dz.desafios.find(x=>!x.encerradoEm);c.push(card('desafio','🧩',ab?'Respostas no desafio':'Desafio da semana',ab?ab.total:'Nenhum',ab?`${ab.total?Math.round(ab.acertos/ab.total*100):0}% de acerto`:'Publique um desafio para o time',!ab))}
   $('gtResumo').innerHTML=c.join('');
 }
 function expirou(){chave=null;clearTimeout(elTimer);ls.set('vv-gestora',null);mostrarLogin('Sua sessão expirou. Entre novamente.',true)}
@@ -661,6 +791,8 @@ async function abrirPainel(){
   carregarRecado();
   carregarLembretes();
   carregarAlbum();
+  carregarTime();
+  carregarDesafios();
   if(infoG)renderSenhaEstado();else carregarInfoGestora();
   irPara(abaDoHash(),{hist:false});
   await carregarSemana(atual&&semanas.some(s=>s.semana===atual)?atual:d.atual);
@@ -1190,6 +1322,150 @@ $('snForm').addEventListener('submit',async e=>{
     m.className='msgsg ok';m.textContent='Senha trocada ✓ Da próxima vez, entre com a nova senha (vale no PC e no celular).';
   }catch(err){erro(err.message)}
   finally{b.disabled=false}
+});
+
+// ---------- Aniversários e tempo de time ----------
+const MESES=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+let timeDados=null,psEditando=null,agEditando=null;
+async function carregarTime(){
+  try{timeDados=await api('/api/time/gestora');R.time=timeDados;renderPessoas();renderAgenda();renderResumo()}
+  catch(e){if(e.status===401)return expirou();$('psLista').innerHTML=$('agLista').innerHTML=`<p class="vazio">${esc(e.message)}</p>`}
+}
+(function(){
+  $('psDia').innerHTML+=Array.from({length:31},(_,i)=>`<option value="${String(i+1).padStart(2,'0')}">${i+1}</option>`).join('');
+  $('psMes').innerHTML+=MESES.map((m,i)=>`<option value="${String(i+1).padStart(2,'0')}">${m}</option>`).join('');
+})();
+const proxAniv=(md,hoje)=>{let a=+hoje.slice(0,4),d=`${a}-${md}`;if(d<hoje)d=`${a+1}-${md}`;return d};
+const diasAte=(a,b)=>Math.round((Date.UTC(+b.slice(0,4),+b.slice(5,7)-1,+b.slice(8,10))-Date.UTC(+a.slice(0,4),+a.slice(5,7)-1,+a.slice(8,10)))/864e5);
+function renderPessoas(){
+  const t=timeDados;if(!t)return;
+  const ps=t.pessoas.map(p=>({...p,prox:p.aniversario?proxAniv(p.aniversario,t.hoje):'9999'})).sort((a,b)=>a.prox.localeCompare(b.prox)||a.nome.localeCompare(b.nome,'pt-BR'));
+  $('psSub').textContent=ps.length?`${ps.length} ${ps.length===1?'pessoa':'pessoas'}`:'';
+  $('psLista').innerHTML=ps.length?ps.map(p=>{
+    const f=p.aniversario?diasAte(t.hoje,p.prox):null;
+    const anos=p.entrada?(+t.hoje.slice(0,4)-+p.entrada.slice(0,4)-(t.hoje.slice(5)<p.entrada.slice(5)?1:0)):null;
+    return `<div class="ag-item${psEditando===p.id?' editando':''}" data-ps="${esc(p.id)}"><span class="ic">${f===0?'🎉':'🎂'}</span><div class="t"><b>${esc(p.nome)}</b><span>${p.aniversario?`🎂 ${p.aniversario.slice(3)}/${p.aniversario.slice(0,2)} · ${f===0?'<b>é hoje!</b>':f===1?'amanhã':`em ${f} dias`}`:'sem aniversário'}${p.entrada?` · 🏅 no time desde ${p.entrada.slice(5,7)}/${p.entrada.slice(0,4)}${anos>=1?` (${anos} ${anos===1?'ano':'anos'})`:''}`:''}</span></div><div class="a"><button class="btn-outline btn-sm" type="button" data-ps-editar>Editar</button><button class="btn-danger btn-sm" type="button" data-ps-remover>Remover</button></div></div>`}).join('')
+    :'<p class="vazio">Ninguém cadastrado ainda. Comece pelo seu próprio nome 😉</p>';
+}
+function limparPs(){psEditando=null;$('psForm').reset();$('psSalvar').textContent='Adicionar pessoa';$('psCancelar').hidden=true;renderPessoas()}
+$('psCancelar').onclick=limparPs;
+$('psForm').addEventListener('submit',async e=>{
+  e.preventDefault();const m=$('psMsg');
+  const dia=$('psDia').value,mes=$('psMes').value;
+  if((dia&&!mes)||(!dia&&mes)){m.className='msgsg err';m.textContent='Escolha o dia e o mês do aniversário.';return}
+  const body={nome:$('psNome').value,aniversario:dia&&mes?`${mes}-${dia}`:'',entrada:$('psEntrada').value};
+  m.className='msgsg';m.textContent='Salvando…';
+  try{
+    await api(psEditando?'/api/time/gestora/pessoas/'+encodeURIComponent(psEditando):'/api/time/gestora/pessoas',{method:psEditando?'PUT':'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const era=psEditando;limparPs();m.className='msgsg ok';m.textContent=era?'Pessoa atualizada ✓':'Pessoa adicionada ✓';await carregarTime();$('psNome').focus();
+  }catch(err){if(err.status===401)return expirou();m.className='msgsg err';m.textContent=err.message}
+});
+$('psLista').addEventListener('click',async e=>{
+  const it=e.target.closest('[data-ps]');if(!it)return;const p=timeDados.pessoas.find(x=>x.id===it.dataset.ps);if(!p)return;
+  if(e.target.closest('[data-ps-editar]')){
+    psEditando=p.id;$('psNome').value=p.nome;$('psDia').value=p.aniversario?p.aniversario.slice(3):'';$('psMes').value=p.aniversario?p.aniversario.slice(0,2):'';$('psEntrada').value=p.entrada||'';
+    $('psSalvar').textContent='Salvar alterações';$('psCancelar').hidden=false;renderPessoas();$('psForm').scrollIntoView({block:'center',behavior:'smooth'});$('psNome').focus();return}
+  const rm=e.target.closest('[data-ps-remover]');
+  if(rm){if(!rm.classList.contains('armed')){rm.classList.add('armed');rm.textContent='Confirmar';setTimeout(()=>{rm.classList.remove('armed');rm.textContent='Remover'},3500);return}
+    rm.disabled=true;try{await api('/api/time/gestora/pessoas/'+encodeURIComponent(p.id),{method:'DELETE'});if(psEditando===p.id)limparPs();await carregarTime()}catch(err){if(err.status===401)return expirou();rm.disabled=false;$('psMsg').className='msgsg err';$('psMsg').textContent=err.message}}
+});
+
+// ---------- Agenda do time ----------
+const AG_IDEIAS=[['confra','Confraternização de fim de ano'],['entrega','Entrega da sprint'],['feriado','Feriado'],['ferias','Férias de '],['treinamento','Treinamento de automação'],['reuniao','Retrospectiva do time']];
+$('agIdeias').innerHTML=AG_IDEIAS.map(([t,x])=>`<button type="button" class="ag-ideia" data-tipo="${t}">${esc(x)}</button>`).join('');
+$('agIdeias').addEventListener('click',e=>{const b=e.target.closest('.ag-ideia');if(!b)return;$('agTitulo').value=b.textContent;$('agTipo').value=b.dataset.tipo;$('agTitulo').focus();const v=$('agTitulo').value;$('agTitulo').setSelectionRange(v.length,v.length)});
+function renderAgenda(){
+  const t=timeDados;if(!t)return;
+  if(!$('agTipo').options.length)$('agTipo').innerHTML=Object.entries(t.tipos).map(([k,v])=>`<option value="${k}">${v.emoji} ${esc(v.nome)}</option>`).join('');
+  if(!$('agData').value&&!agEditando)$('agData').value=t.hoje;
+  const ev=t.eventos.slice().sort((a,b)=>a.data.localeCompare(b.data)||String(a.hora||'').localeCompare(String(b.hora||'')));
+  const prox=ev.filter(e=>(e.fim||e.data)>=t.hoje),pass=ev.filter(e=>(e.fim||e.data)<t.hoje).reverse().slice(0,15);
+  $('agSub').textContent=prox.length?`${prox.length} ${prox.length===1?'próximo':'próximos'}`:'';
+  const linha=e=>{const tp=t.tipos[e.tipo]||t.tipos.outro,f=diasAte(t.hoje,e.data);
+    return `<div class="ag-item${agEditando===e.id?' editando':''}" data-ag="${esc(e.id)}"><span class="ic">${tp.emoji}</span><div class="t"><b>${esc(e.titulo)}</b><span>${dataMo(e.data)}${e.fim?' a '+dataMo(e.fim):''}${e.hora?' · '+esc(e.hora):''} · ${esc(tp.nome)}${(e.fim||e.data)>=t.hoje?` · ${e.data<=t.hoje?'<b>acontecendo</b>':f===1?'amanhã':`faltam ${f} dias`}`:''}${e.descricao?' · '+esc(e.descricao):''}</span></div><div class="a"><button class="btn-outline btn-sm" type="button" data-ag-editar>Editar</button><button class="btn-danger btn-sm" type="button" data-ag-remover>Remover</button></div></div>`};
+  $('agLista').innerHTML=(prox.length?prox.map(linha).join(''):'<p class="vazio">Nenhum evento futuro. Que tal marcar a próxima confra? 🎉</p>')
+    +(pass.length?`<details class="ag-pass"><summary>Eventos que já passaram (${pass.length})</summary>${pass.map(linha).join('')}</details>`:'');
+}
+function limparAg(){agEditando=null;$('agForm').reset();$('agData').value=timeDados?.hoje||'';$('agSalvar').textContent='Adicionar à agenda';$('agCancelar').hidden=true;renderAgenda()}
+$('agCancelar').onclick=limparAg;
+$('agForm').addEventListener('submit',async e=>{
+  e.preventDefault();const m=$('agMsg');
+  const body={titulo:$('agTitulo').value,tipo:$('agTipo').value,data:$('agData').value,fim:$('agFim').value,hora:$('agHora').value,descricao:$('agDesc').value};
+  m.className='msgsg';m.textContent='Salvando…';
+  try{
+    await api(agEditando?'/api/time/gestora/eventos/'+encodeURIComponent(agEditando):'/api/time/gestora/eventos',{method:agEditando?'PUT':'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const era=agEditando;limparAg();m.className='msgsg ok';m.textContent=era?'Evento atualizado ✓':'Evento na agenda ✓ Já aparece no Início.';await carregarTime();
+  }catch(err){if(err.status===401)return expirou();m.className='msgsg err';m.textContent=err.message}
+});
+$('agLista').addEventListener('click',async e=>{
+  const it=e.target.closest('[data-ag]');if(!it)return;const ev=timeDados.eventos.find(x=>x.id===it.dataset.ag);if(!ev)return;
+  if(e.target.closest('[data-ag-editar]')){
+    agEditando=ev.id;$('agTitulo').value=ev.titulo;$('agTipo').value=ev.tipo;$('agData').value=ev.data;$('agFim').value=ev.fim||'';$('agHora').value=ev.hora||'';$('agDesc').value=ev.descricao||'';
+    $('agSalvar').textContent='Salvar alterações';$('agCancelar').hidden=false;renderAgenda();$('agForm').scrollIntoView({block:'center',behavior:'smooth'});$('agTitulo').focus();return}
+  const rm=e.target.closest('[data-ag-remover]');
+  if(rm){if(!rm.classList.contains('armed')){rm.classList.add('armed');rm.textContent='Confirmar';setTimeout(()=>{rm.classList.remove('armed');rm.textContent='Remover'},3500);return}
+    rm.disabled=true;try{await api('/api/time/gestora/eventos/'+encodeURIComponent(ev.id),{method:'DELETE'});if(agEditando===ev.id)limparAg();await carregarTime()}catch(err){if(err.status===401)return expirou();rm.disabled=false;$('agMsg').className='msgsg err';$('agMsg').textContent=err.message}}
+});
+
+// ---------- Desafio da semana ----------
+const LETRAS='ABCD';
+const DZ_IDEIAS=[
+  {p:'Um campo aceita idades de 18 a 60. Quais valores a análise de valor limite manda testar?',o:['17, 18, 60 e 61','Só 18 e 60','0 e 100','30 e 45'],c:0,e:'Testamos logo abaixo, exatamente no limite e logo acima de cada ponta: 17, 18, 60 e 61.'},
+  {p:'Um bug que já tinha sido corrigido voltou depois de outra mudança no sistema. Que teste teria pego isso?',o:['Teste de regressão','Teste de fumaça','Teste de usabilidade','Teste de carga'],c:0,e:'O teste de regressão confirma que o que já funcionava continua funcionando depois de mudanças.'},
+  {p:'Qual técnica divide as entradas em grupos que o sistema deveria tratar do mesmo jeito?',o:['Particionamento de equivalência','Tabela de decisão','Teste exploratório','Teste de mutação'],c:0,e:'No particionamento de equivalência, um valor de cada grupo representa todos os outros do grupo.'},
+  {p:'O botão de pagar está com a cor errada, mas paga normalmente. Como fica esse bug?',o:['Severidade baixa','Severidade crítica','Não é bug','Bloqueante'],c:0,e:'Não impede o uso nem causa perda: severidade baixa (a prioridade pode ser outra, conforme o negócio).'},
+];
+let dzDados=null,dzCorreta=0;
+$('dzIdeias').innerHTML=DZ_IDEIAS.map((d,i)=>`<button type="button" class="dz-ideia" data-i="${i}">💡 ${esc(d.p.length>70?d.p.slice(0,69)+'…':d.p)}</button>`).join('');
+function renderDzOps(vals){
+  $('dzOps').innerHTML=[0,1,2,3].map(i=>`<label class="dz-op${i===dzCorreta?' certa':''}"><input type="radio" name="dzCerta" value="${i}" ${i===dzCorreta?'checked':''} aria-label="Marcar ${LETRAS[i]} como certa"><span class="l">${LETRAS[i]}</span><input type="text" class="dz-txt" data-i="${i}" maxlength="100" placeholder="Alternativa ${LETRAS[i]}${i>1?' (opcional)':''}" value="${esc(vals?.[i]||'')}"><span class="ok">✓ certa</span></label>`).join('');
+}
+renderDzOps();
+const valsDz=()=>[...document.querySelectorAll('.dz-txt')].map(x=>x.value);
+$('dzOps').addEventListener('change',e=>{if(e.target.name==='dzCerta'){dzCorreta=+e.target.value;renderDzOps(valsDz())}});
+$('dzIdeias').addEventListener('click',e=>{const b=e.target.closest('.dz-ideia');if(!b)return;const d=DZ_IDEIAS[+b.dataset.i];$('dzPergunta').value=d.p;$('dzExp').value=d.e;dzCorreta=d.c;renderDzOps(d.o);$('dzPergunta').dispatchEvent(new Event('input'))});
+$('dzPergunta').addEventListener('input',()=>$('dzCnt').textContent=`${$('dzPergunta').value.length}/200`);
+async function carregarDesafios(){
+  try{dzDados=await api('/api/desafios/gestora');R.desafio=dzDados;renderDesafios();renderResumo()}
+  catch(e){if(e.status===401)return expirou();$('dzAtual').innerHTML=`<p class="vazio">${esc(e.message)}</p>`}
+}
+function renderDesafios(){
+  const d=dzDados;if(!d)return;
+  const aberto=d.desafios.find(x=>!x.encerradoEm);
+  if(!aberto)$('dzAtual').innerHTML='<p class="vazio">Nenhum desafio aberto. Publique um abaixo — pode usar uma das ideias prontas. 💡</p>';
+  else{const pct=aberto.total?Math.round(aberto.acertos/aberto.total*100):0;
+    $('dzAtual').innerHTML=`<p class="pq-atual">${esc(aberto.pergunta)}</p><p class="pq-meta"><b style="color:var(--teal2)">● Aberto</b> desde ${dataMo(aberto.criadoEm.slice(0,10))} · ${aberto.total} ${aberto.total===1?'resposta':'respostas'} · ${pct}% de acerto</p>
+      <div class="dz-dist">${aberto.opcoes.map((o,i)=>{const n=aberto.porOpcao[i]||0,w=aberto.total?Math.round(n/aberto.total*100):0;return `<div class="dz-bar${i===aberto.correta?' certa':''}"><span class="t">${LETRAS[i]}) ${esc(o)}${i===aberto.correta?' ✓':''}</span><span class="b"><i style="width:${w}%"></i></span><span class="n">${n}</span></div>`}).join('')}</div>
+      ${aberto.explicacao?`<p class="ev-nota" style="margin:8px 0 12px">💬 ${esc(aberto.explicacao)}</p>`:''}
+      <div class="pq-acoes"><button class="btn-outline btn-sm" type="button" id="dzEncerrar">Encerrar e mostrar a resposta</button><span class="grow"></span><button class="btn-danger btn-sm" type="button" id="dzApagar" data-id="${esc(aberto.id)}">Apagar desafio</button></div>
+      ${aberto.respostas.length?`<h4 class="dz-h">Quem respondeu</h4><div class="respostas">${aberto.respostas.slice().reverse().map(r=>`<div class="resp"><span class="txt">${r.certo?'✅':'❌'} <b>${esc(r.nome)}</b> · ${LETRAS[r.opcao]} · ${new Date(r.em).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}</span><button class="btn-danger rm dz-rm" type="button" data-id="${esc(aberto.id)}" data-rid="${esc(r.id)}">Remover</button></div>`).join('')}</div>`:'<p class="ev-nota">Ainda ninguém respondeu. Divulgue o link <b>'+esc(location.host)+'/desafio</b>.</p>'}`}
+  $('dzMes').textContent=d.rotuloMes;
+  $('dzRanking').innerHTML=d.ranking.length?`<ol class="dz-rank">${d.ranking.map(r=>`<li><span>${esc(r.nome)}</span><b>${r.pontos} ${r.pontos===1?'ponto':'pontos'}</b></li>`).join('')}</ol><p class="ev-nota" style="margin:8px 0 0">1 ponto por acerto; recomeça todo mês.</p>`:'<p class="vazio">Ninguém pontuou neste mês ainda.</p>';
+  const hist=d.desafios.filter(x=>x.encerradoEm);
+  $('dzHist').innerHTML=hist.length?hist.slice(0,10).map(x=>`<div class="dz-hist"><p>${esc(x.pergunta)}</p><span>✅ ${LETRAS[x.correta]}) ${esc(x.opcoes[x.correta])} · ${x.total} ${x.total===1?'resposta':'respostas'} · ${x.total?Math.round(x.acertos/x.total*100):0}% acertaram</span><button class="btn-danger btn-sm dz-del" type="button" data-id="${esc(x.id)}">Apagar</button></div>`).join(''):'<p class="vazio">Nenhum desafio encerrado ainda.</p>';
+}
+const armar=(b,acao,rot)=>{if(!b.classList.contains('armed')){b.classList.add('armed');b.dataset.r=b.textContent;b.textContent=rot||'Confirmar';setTimeout(()=>{b.classList.remove('armed');b.textContent=b.dataset.r},3500);return}acao()};
+document.querySelector('[data-painel="desafio"]').addEventListener('click',e=>{
+  const enc=e.target.closest('#dzEncerrar'),ap=e.target.closest('#dzApagar,.dz-del'),rm=e.target.closest('.dz-rm');
+  const falha=err=>{if(err.status===401)return expirou();$('dzMsg').className='msgsg err';$('dzMsg').textContent=err.message};
+  if(enc)return armar(enc,async()=>{try{await api(`/api/desafios/gestora/${dzDados.desafios.find(x=>!x.encerradoEm).id}/encerrar`,{method:'POST'});await carregarDesafios()}catch(err){falha(err)}},'Confirmar: encerrar');
+  if(ap)return armar(ap,async()=>{try{await api('/api/desafios/gestora/'+encodeURIComponent(ap.dataset.id),{method:'DELETE'});await carregarDesafios()}catch(err){falha(err)}},'Confirmar: apagar');
+  if(rm)return armar(rm,async()=>{try{await api(`/api/desafios/gestora/${encodeURIComponent(rm.dataset.id)}/resposta/${encodeURIComponent(rm.dataset.rid)}`,{method:'DELETE'});await carregarDesafios()}catch(err){falha(err)}});
+});
+$('dzForm').addEventListener('submit',async e=>{
+  e.preventDefault();const m=$('dzMsg'),b=$('dzPublicar');
+  const vals=valsDz().map(v=>v.trim());
+  if(!vals[dzCorreta]){m.className='msgsg err';m.textContent='A alternativa marcada como certa está vazia.';return}
+  const opcoes=[],idx=[];vals.forEach((v,i)=>{if(v){idx.push(i);opcoes.push(v)}});
+  const publicar=async()=>{
+    m.className='msgsg';m.textContent='Publicando…';b.disabled=true;
+    try{await api('/api/desafios/gestora',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({pergunta:$('dzPergunta').value,opcoes,correta:idx.indexOf(dzCorreta),explicacao:$('dzExp').value})});
+      $('dzForm').reset();dzCorreta=0;renderDzOps();$('dzCnt').textContent='0/200';m.className='msgsg ok';m.textContent='Desafio publicado ✓ A equipe já pode responder em /desafio.';await carregarDesafios()}
+    catch(err){if(err.status===401)return expirou();m.className='msgsg err';m.textContent=err.message}
+    finally{b.disabled=false}
+  };
+  if(dzDados?.desafios.some(x=>!x.encerradoEm))return armar(b,publicar,'Confirmar (encerra o atual)');
+  publicar();
 });
 
 addEventListener('vv-tema',()=>{if(dados&&!$('painel').hidden&&aba==='sentimento')vvNuvem($('cloudBox'),$('cloud'),$('fallback'),dados.palavras)});

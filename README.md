@@ -1,4 +1,4 @@
-# Toca dos Bug Hunters — v0.33
+# Toca dos Bug Hunters — v0.34
 
 > Endereço: **https://bughunters-time.vercel.app** (desde 19/10/2026). O antigo `valida-vision.vercel.app` redireciona para ele (307, configurado em Vercel → Domains), então links e QR Codes antigos continuam funcionando.
 > Antes chamado **Valida Vision** (o repositório e o projeto da Vercel continuam com o nome antigo).
@@ -41,6 +41,15 @@ Os elogios ficam visíveis para quem abrir a página (é a ideia da dinâmica). 
 
 A chave fica só no `.env` e nunca vai para o browser. Não compartilhe o `.env`.
 Antes de enviar telas reais da empresa, valide as políticas internas de dados e PII.
+
+## Novidades da v0.34
+
+- **🎂 Aniversários e tempo de time** (`time.js`, `/api/time`): a gestora cadastra nome + dia/mês do aniversário (sem ano) + entrada no time (opcional) na aba **Aniversários**. O Início mostra "Hoje é aniversário de…" / "completa N anos de time" com **Dar parabéns** (abre `/elogiar.html?para=Nome`) e os próximos 7 dias. A data de entrada nunca sai para o público.
+- **📅 Agenda do time** (mesmo módulo): aba **Agenda** com tipos (confra, entrega, reunião, feriado, férias, treinamento, outro), data, data final, horário e detalhe. O Início mostra "📅 Esta semana na Toca" com contagem regressiva.
+- **🧩 Desafio da semana** (`desafios.js`, `/api/desafios`, página `/desafio.html`, atalhos `/desafio` e `/quiz`): a gestora publica pergunta com 2–4 alternativas + explicação (ideias prontas de QA). Cada pessoa responde uma vez (navegador + nome), vê na hora se acertou e a distribuição; **ranking do mês** (1 ponto por acerto). Publicar um novo encerra o anterior. Novo bloco no Início e item no menu.
+- **Elogie um Colega:** frases prontas ("Mandou muito bem! 👏", "Salvou a sprint 🚀"…) para quem só quer tocar (`vvTags` em `vv-emojis.js`).
+- **Status da IA** oculto no menu (`data-recurso="status-ia"`); `/api/health` continua funcionando.
+- Tudo o que é da gestora fica na Área da Gestora (abas novas + cartões no Início do painel + guia atualizado).
 
 ## App Android (APK)
 
