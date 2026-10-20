@@ -50,6 +50,8 @@
 .lb-form{border-top:1px solid var(--line);padding:12px 16px;display:flex;flex-direction:column;gap:8px}
 .lb-form input,.lb-form textarea{width:100%;box-sizing:border-box;border:1px solid var(--line);border-radius:6px;padding:8px 10px;font:inherit;font-size:15px;background:#fff;color:var(--ink)}
 .lb-form textarea{min-height:56px;max-height:120px;resize:vertical}
+.lb-form .vv-emojis{margin:0}
+.lb-form .vv-emojis button{width:32px;height:32px;font-size:17px;border-radius:8px}
 .lb-form .linha{display:flex;gap:8px;align-items:center}
 .lb-form .linha .status{flex:1;margin:0;font-size:12px}
 .lb-fechar,.lb-nav{position:absolute;z-index:2;width:44px;height:44px;border-radius:50%;border:0;background:rgba(255,255,255,.14);color:#fff;font-size:22px;cursor:pointer;display:grid;place-items:center;padding:0}
@@ -82,7 +84,7 @@ html[data-tema="escuro"] .curtir.on{background:#3a1a18;border-color:#6b2b26;colo
 }
 </style>
 
-<link rel="stylesheet" href="/vv-tema-auto.css?v=35">
+<link rel="stylesheet" href="/vv-tema-auto.css?v=36">
 <link rel="stylesheet" href="/vv-tema.css?v=36">
 <script src="/vv-tema.js?v=23"></script>
 <link rel="manifest" href="/manifest.webmanifest?v=3">
@@ -101,7 +103,7 @@ html[data-tema="escuro"] .curtir.on{background:#3a1a18;border-color:#6b2b26;colo
   <a class="logo" href="/inicio.html">
     <img id="brandLogo" src="/logo.png" alt="" hidden onload="this.hidden=false;this.nextElementSibling.setAttribute('hidden','')">
     <svg width="28" height="24" viewBox="0 0 28 24" aria-hidden="true"><path d="M1 2h9l4 9 4-9h9L14 23z" fill="#2fc28f"/><path d="M10 2h8l-4 9z" fill="#1a8f6a"/></svg>
-    <b>Toca dos <span>Bug Hunters</span></b><span class="ver">v0.35</span>
+    <b>Toca dos <span>Bug Hunters</span></b><span class="ver">v0.36</span>
   </a>
   <div class="spacer"></div>
   <span class="env" id="envBadge">Protótipo local</span>
@@ -275,6 +277,8 @@ async function curtir(){
 $('lbCurtir').onclick=curtir;
 
 $('cNome').value=ls.get('vv-album-nome')||'';
+// Emojis no comentário (os mesmos do Elogie um Colega)
+if(window.vvEmojis)vvEmojis($('cTexto'));
 $('lbForm').addEventListener('submit',async e=>{
   e.preventDefault();const f=lista()[atual];if(!f)return;
   const nome=$('cNome').value.trim(),texto=$('cTexto').value.trim(),st=$('cStatus');

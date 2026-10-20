@@ -1,4 +1,4 @@
-# Toca dos Bug Hunters — v0.35
+# Toca dos Bug Hunters — v0.36
 
 > Endereço: **https://bughunters-time.vercel.app** (desde 19/10/2026). O antigo `valida-vision.vercel.app` redireciona para ele (307, configurado em Vercel → Domains), então links e QR Codes antigos continuam funcionando.
 > Antes chamado **Valida Vision** (o repositório e o projeto da Vercel continuam com o nome antigo).
@@ -41,6 +41,11 @@ Os elogios ficam visíveis para quem abrir a página (é a ideia da dinâmica). 
 
 A chave fica só no `.env` e nunca vai para o browser. Não compartilhe o `.env`.
 Antes de enviar telas reais da empresa, valide as políticas internas de dados e PII.
+
+## Novidades da v0.36
+
+- **🎂 Aniversários 7 dias antes:** o quadro "Esta semana na Toca" do Início avisa a partir de 7 dias antes ("Faltam 5 dias para o aniversário de Diego", "Amanhã é aniversário de…"), também para os anos de time; tudo ordenado junto com a agenda pelo que está mais perto. No dia continua o destaque com **Dar parabéns**.
+- **📷 Emojis nos comentários do álbum** (os mesmos do Elogie, `vvEmojis`).
 
 ## Novidades da v0.35
 

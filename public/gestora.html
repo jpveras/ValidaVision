@@ -323,7 +323,7 @@ html[data-tema="escuro"] .ev-tip{background:#e4efed;color:#0f1a1c}
   .sug li{break-inside:avoid}
 }
 </style>
-<link rel="stylesheet" href="/vv-tema-auto.css?v=35">
+<link rel="stylesheet" href="/vv-tema-auto.css?v=36">
 <link rel="stylesheet" href="/vv-tema.css?v=36">
 <script src="/vv-tema.js?v=23"></script>
 <link rel="manifest" href="/manifest.webmanifest?v=3">
@@ -341,7 +341,7 @@ html[data-tema="escuro"] .ev-tip{background:#e4efed;color:#0f1a1c}
   <a class="logo" href="/inicio.html">
     <img id="brandLogo" src="/logo.png" alt="" hidden onload="this.hidden=false;this.nextElementSibling.setAttribute('hidden','')">
     <svg width="28" height="24" viewBox="0 0 28 24" aria-hidden="true"><path d="M1 2h9l4 9 4-9h9L14 23z" fill="#2fc28f"/><path d="M10 2h8l-4 9z" fill="#1a8f6a"/></svg>
-    <b>Toca dos <span>Bug Hunters</span></b><span class="ver">v0.35</span>
+    <b>Toca dos <span>Bug Hunters</span></b><span class="ver">v0.36</span>
   </a>
   <div class="spacer"></div>
   <span class="env">Área da Gestora</span>
@@ -446,7 +446,7 @@ html[data-tema="escuro"] .ev-tip{background:#e4efed;color:#0f1a1c}
             <li><b>📷 Álbum</b>: primeiro escolha ou crie o <b>momento</b> (ex.: “Confraternização de outubro”, com data), depois escolha as fotos, dê legendas e publique. No álbum, a equipe vê as fotos separadas por momento. Para editar a legenda, apagar uma foto ou remover comentários, abra a foto no álbum — com você conectada, os botões de gestora aparecem lá.</li>
             <li><b>📮 Sugestões</b>: mude o status, responda e marque <b>“Mostrar para a equipe”</b> para a resposta aparecer no mural “Ouvimos você”.</li>
             <li><b>🔔 Lembrete</b>: veja quantas pessoas ativaram o aviso de sexta (9h) e, se precisar, envie um lembrete na hora.</li>
-            <li><b>🎂 Aniversários</b>: cadastre cada pessoa do time com o dia e o mês do aniversário (o ano não é pedido) e, se quiser, a data de entrada no time. No dia, o Início da Toca mostra “Hoje é aniversário de…” com o botão <kbd>Dar parabéns</kbd>; os próximos 7 dias também aparecem.</li>
+            <li><b>🎂 Aniversários</b>: cadastre cada pessoa do time com o dia e o mês do aniversário (o ano não é pedido) e, se quiser, a data de entrada no time. A partir de <b>7 dias antes</b>, o Início da Toca já avisa (“Faltam 5 dias para o aniversário da Carla 🎂”, “Amanhã é aniversário…”) e, no dia, mostra “Hoje é aniversário de…” com o botão <kbd>Dar parabéns</kbd>. O mesmo vale para os anos de time.</li>
             <li><b>📅 Agenda</b>: marque confraternizações, entregas, feriados, férias e treinamentos. Use as ideias prontas, escolha a data (e a data final, para férias) e salve. O Início mostra a contagem regressiva — “faltam 3 dias”.</li>
             <li><b>🧩 Desafio</b>: escreva uma pergunta (ou use uma ideia pronta), de 2 a 4 alternativas, marque a certa e uma explicação curta. Cada pessoa responde uma vez, vê na hora se acertou e ganha 1 ponto por acerto no ranking do mês. Publicar um novo encerra o anterior e revela a resposta.</li>
             <li><b>🔑 Senha</b>: escolha uma senha só sua quando quiser.</li>
@@ -573,7 +573,7 @@ html[data-tema="escuro"] .ev-tip{background:#e4efed;color:#0f1a1c}
       <section class="card">
         <div class="card-head"><span>🎂 Aniversários e tempo de time</span><span class="counter" id="psSub"></span></div>
         <div class="card-body">
-          <p class="ev-nota" style="margin:0 0 12px">Cadastre cada pessoa do time uma vez. No dia, o Início mostra “Hoje é aniversário de…” com um botão de <b>Dar parabéns</b> (que abre o Elogie já com o nome). Os aniversários e “anos de time” dos próximos 7 dias também aparecem. <b>Não pedimos o ano de nascimento</b>, e a data de entrada nunca aparece para a equipe, só os anos completos.</p>
+          <p class="ev-nota" style="margin:0 0 12px">Cadastre cada pessoa do time uma vez. No dia, o Início mostra “Hoje é aniversário de…” com um botão de <b>Dar parabéns</b> (que abre o Elogie já com o nome). A partir de <b>7 dias antes</b> o Início já mostra a contagem (“Faltam 5 dias para o aniversário da Carla 🎂”). <b>Não pedimos o ano de nascimento</b>, e a data de entrada nunca aparece para a equipe, só os anos completos.</p>
           <form class="ag-form" id="psForm" novalidate>
             <div class="tudo"><label class="label" for="psNome"><span>Nome</span></label><input id="psNome" maxlength="60" placeholder="Ex.: Carla Souza"></div>
             <div><label class="label" for="psDia"><span>Aniversário</span></label><div class="dm"><select id="psDia" aria-label="Dia"><option value="">Dia</option></select><select id="psMes" aria-label="Mês"><option value="">Mês</option></select></div></div>
