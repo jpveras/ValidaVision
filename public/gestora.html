@@ -1207,7 +1207,9 @@ function formMomento(m){
 function renderGest(msgTxt='',erro=false){
   const ms=albumDados?.momentos||[];
   if(momSel&&momSel!=='_novo'&&!ms.some(m=>m.id===momSel))momSel='';
-  const pronto=momSel&&momSel!=='_novo';
+  const pausa=albumDados?.envioPausadoAte;
+  const pronto=momSel&&momSel!=='_novo'&&!pausa;
+  const pausaTxt=pausa?`⏸️ Envio de fotos pausado até ${pausa.split('-').reverse().join('/')} para poupar o armazenamento. As fotos já publicadas continuam no álbum.`:'';
   $('gestCorpo').innerHTML=`
     <div class="mo-passo"><b>1. Momento</b>
       <select id="gMomento" aria-label="Momento das fotos">
@@ -1218,7 +1220,7 @@ function renderGest(msgTxt='',erro=false){
       ${momSel==='_novo'&&!moEditando?formMomento(null):''}
     </div>
     <div class="mo-passo"><b>2. Fotos</b>
-      <label class="escolher${pronto?'':' off'}" for="gArquivos"><span style="font-size:28px">📷</span><b>Escolher fotos</b><span>${pronto?'Pode escolher várias de uma vez. Elas são reduzidas automaticamente antes de enviar.':'Primeiro escolha ou crie o momento acima.'}</span></label>
+      <label class="escolher${pronto?'':' off'}" for="gArquivos"><span style="font-size:28px">📷</span><b>Escolher fotos</b><span>${pausa?pausaTxt:pronto?'Pode escolher várias de uma vez. Elas são reduzidas automaticamente antes de enviar.':'Primeiro escolha ou crie o momento acima.'}</span></label>
       <input type="file" id="gArquivos" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" multiple hidden ${pronto?'':'disabled'}>
       <div class="prevs" id="gPrevs"></div>
       <div id="gPub" style="display:none;flex-direction:column;gap:8px">

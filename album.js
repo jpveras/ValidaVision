@@ -163,6 +163,17 @@ function freio(req, chave, max, janelaMs = 60_000) {
 }
 
 // ---------------- Rotas ----------------
+// Envio de fotos pausado para poupar a cota da Vercel Blob (operações avançadas
+// estouraram em out/2026; a janela de 30 dias folga por volta de 11/11).
+// TOCA_FOTOS_PAUSADAS_ATE=AAAA-MM-DD muda a data; "0" libera na hora.
+const PAUSA_PADRAO = "2026-11-11";
+export function fotosPausadasAte() {
+  const ate = String(process.env.TOCA_FOTOS_PAUSADAS_ATE ?? PAUSA_PADRAO).trim();
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(ate)) return null;
+  const hoje = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Sao_Paulo" }).format(new Date());
+  return hoje < ate ? ate : null;
+}
+
 export const albumRouter = express.Router();
 const json = express.json({ limit: "8kb" });
 const sem_cache = (_req, res, next) => (res.set("Cache-Control", "no-store"), next());
@@ -177,7 +188,7 @@ albumRouter.get("/", sem_cache, async (req, res) => {
       .sort((a, b) => b.data.localeCompare(a.data) || String(b.atualizadoEm).localeCompare(String(a.atualizadoEm)));
     const nomes = Object.fromEntries(doc.momentos.map((m) => [m.id, m.nome]));
     for (const f of fotos) f.album = nomes[f.momentoId] || "";
-    res.json({ fotos, momentos, albuns: momentos.filter((m) => m.total).map((m) => ({ nome: m.nome, total: m.total })), armazenamento: usaBlob() ? "vercel-blob" : process.env.VERCEL ? "temporario" : "arquivo-local" });
+    res.json({ fotos, momentos, albuns: momentos.filter((m) => m.total).map((m) => ({ nome: m.nome, total: m.total })), envioPausadoAte: fotosPausadasAte(), armazenamento: usaBlob() ? "vercel-blob" : process.env.VERCEL ? "temporario" : "arquivo-local" });
   } catch (e) {
     console.error("Erro ao ler álbum:", e);
     res.status(500).json({ error: "Não consegui carregar o álbum agora." });
@@ -276,6 +287,8 @@ albumRouter.delete("/:id/comentario/:cid", sem_cache, async (req, res) => {
 // ---------------- Gestora ----------------
 albumRouter.post("/gestora/fotos", sem_cache, express.json({ limit: "4400kb" }), async (req, res) => {
   if (!(await exigeGestora(req, res))) return;
+  const pausa = fotosPausadasAte();
+  if (pausa) return res.status(423).json({ error: `Envio de fotos pausado até ${pausa.split("-").reverse().join("/")} para poupar o armazenamento.` });
   try {
     const momentoId = String(req.body?.momentoId || "");
     if (momentoId && !(await ler()).momentos.some((m) => m.id === momentoId) && !(await ler(true)).momentos.some((m) => m.id === momentoId))
