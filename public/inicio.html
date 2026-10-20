@@ -48,10 +48,12 @@ button.bloco{border-radius:0}
 .sm-lista .qd{flex:none;font-size:12px;font-weight:700;color:var(--teal2);background:var(--teal-soft);border-radius:99px;padding:4px 10px;white-space:nowrap}
 .sm-lista li.festa{background:linear-gradient(90deg,#fff6e0,#fff);}
 .sm-lista li.festa .ic{background:#ffe7a8}
+.sm-lista li.breve .ic{background:#fde8f1}
+.sm-lista li.breve .qd{background:#fde8f1;color:#a3245e}
 .sm-lista .parabens{flex:none;height:32px;padding:0 12px;border-radius:99px;background:var(--teal);color:#fff;font-size:12px;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;white-space:nowrap}
 .sm-lista .parabens:hover{background:var(--teal2)}
 @media(max-width:560px){.sm-lista li{padding:10px 14px;gap:10px;flex-wrap:wrap}.sm-lista .tx{flex-basis:calc(100% - 52px)}.sm-lista .qd,.sm-lista .parabens{margin-left:42px}.semana h2{padding:12px 14px}}
-@media screen{html[data-tema="escuro"][data-pagina] .semana{background:var(--card);border-color:var(--line)}html[data-tema="escuro"][data-pagina] .sm-lista .ic{background:#20393c}html[data-tema="escuro"][data-pagina] .sm-lista li.festa{background:linear-gradient(90deg,#2e2412,transparent)}html[data-tema="escuro"][data-pagina] .sm-lista li.festa .ic{background:#4a3a14}html[data-tema="escuro"][data-pagina] .sm-lista .parabens{color:#fff}}
+@media screen{html[data-tema="escuro"][data-pagina] .semana{background:var(--card);border-color:var(--line)}html[data-tema="escuro"][data-pagina] .sm-lista .ic{background:#20393c}html[data-tema="escuro"][data-pagina] .sm-lista li.festa{background:linear-gradient(90deg,#2e2412,transparent)}html[data-tema="escuro"][data-pagina] .sm-lista li.festa .ic{background:#4a3a14}html[data-tema="escuro"][data-pagina] .sm-lista li.breve .ic,html[data-tema="escuro"][data-pagina] .sm-lista li.breve .qd{background:#3d1a2c;color:#f6a8cb}html[data-tema="escuro"][data-pagina] .sm-lista .parabens{color:#fff}}
 /* Últimas atualizações */
 .novidades{margin:30px 0 0;border:1px solid var(--line);border-radius:14px;background:#fff;overflow:hidden}
 .novidades h2{margin:0;padding:14px 18px;font-size:15px;font-weight:700;color:var(--ink);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px}
@@ -113,7 +115,7 @@ html.vv-bv{overflow:hidden}
 @media(max-width:560px){.bv h1{font-size:26px}.bv h1 span{font-size:31px}.bv-caixa{padding:28px 20px 22px}.bv-ico{width:78px;height:78px}}
 @media(prefers-reduced-motion:reduce){.bv,.bv-caixa,.bv-ico,.menu.entrar .bloco,.bv-barra i{animation:none!important}}
 </style>
-<link rel="stylesheet" href="/vv-tema-auto.css?v=35">
+<link rel="stylesheet" href="/vv-tema-auto.css?v=36">
 <link rel="stylesheet" href="/vv-tema.css?v=36">
 <script src="/vv-tema.js?v=23"></script>
 <link rel="manifest" href="/manifest.webmanifest?v=3">
@@ -149,7 +151,7 @@ html.vv-bv{overflow:hidden}
   <a class="logo" href="/inicio.html">
     <img id="brandLogo" src="/logo.png" alt="" hidden onload="this.hidden=false;this.nextElementSibling.setAttribute('hidden','')">
     <svg width="28" height="24" viewBox="0 0 28 24" aria-hidden="true"><path d="M1 2h9l4 9 4-9h9L14 23z" fill="#2fc28f"/><path d="M10 2h8l-4 9z" fill="#1a8f6a"/></svg>
-    <b>Toca dos <span>Bug Hunters</span></b><span class="ver">v0.35</span>
+    <b>Toca dos <span>Bug Hunters</span></b><span class="ver">v0.36</span>
   </a>
   <div class="spacer"></div>
 </header>
@@ -289,14 +291,24 @@ html.vv-bv{overflow:hidden}
   var DIAS=['dom','seg','ter','qua','qui','sex','sáb'];
   function quandoFalta(f){return f===0?'hoje':f===1?'amanhã':'em '+f+' dias'}
   function dataEvento(e){var d=new Date(e.data+'T12:00:00');var t=DIAS[d.getDay()]+' '+e.data.slice(8,10)+'/'+e.data.slice(5,7);if(e.fim)t+=' a '+e.fim.slice(8,10)+'/'+e.fim.slice(5,7);if(e.hora)t+=' · '+e.hora.replace(':00','h').replace(':','h');return t}
+  // Aniversários e "anos de time" entram no quadro a partir de 7 dias antes (o servidor manda a janela de 7 dias),
+  // misturados com a agenda e ordenados pelo que está mais perto. No dia, ganham destaque e o botão Dar parabéns.
   pega('/api/time').then(function(t){
-    if(!t)return;var li=[];
+    if(!t)return;var hoje=[],prox=[];
     var parabens=function(n){return '<a class="parabens" href="/elogiar.html?para='+encodeURIComponent(n)+'">💚 Dar parabéns</a>'};
-    t.aniversarios.filter(function(a){return a.falta===0}).forEach(function(a){li.push('<li class="festa"><span class="ic">🎂</span><span class="tx">Hoje é aniversário de <b>'+esc(a.nome)+'</b>! 🎉<span>Deixe um elogio de parabéns</span></span>'+parabens(a.nome)+'</li>')});
-    t.casa.filter(function(a){return a.falta===0}).forEach(function(a){li.push('<li class="festa"><span class="ic">🏅</span><span class="tx"><b>'+esc(a.nome)+'</b> completa '+a.anos+' '+(a.anos===1?'ano':'anos')+' de time hoje!<span>Obrigado por fazer parte da Toca</span></span>'+parabens(a.nome)+'</li>')});
-    t.eventos.forEach(function(e){li.push('<li><span class="ic">'+e.emoji+'</span><span class="tx"><b>'+esc(e.titulo)+'</b><span>'+esc(dataEvento(e))+(e.descricao?' · '+esc(e.descricao):'')+'</span></span><span class="qd">'+(e.acontecendo?(e.fim?'acontecendo':'hoje'):(e.falta>1?'faltam '+e.falta+' dias':quandoFalta(e.falta)))+'</span></li>')});
-    t.aniversarios.filter(function(a){return a.falta>0}).forEach(function(a){li.push('<li><span class="ic">🎂</span><span class="tx">Aniversário de <b>'+esc(a.nome)+'</b><span>'+a.dia+'</span></span><span class="qd">'+quandoFalta(a.falta)+'</span></li>')});
-    t.casa.filter(function(a){return a.falta>0}).forEach(function(a){li.push('<li><span class="ic">🏅</span><span class="tx"><b>'+esc(a.nome)+'</b> faz '+a.anos+' '+(a.anos===1?'ano':'anos')+' de time<span>'+a.dia+'</span></span><span class="qd">'+quandoFalta(a.falta)+'</span></li>')});
+    var primeiro=function(n){return esc(String(n).split(' ')[0])};
+    t.aniversarios.forEach(function(a){
+      if(a.falta===0)hoje.push('<li class="festa"><span class="ic">🎂</span><span class="tx">Hoje é aniversário de <b>'+esc(a.nome)+'</b>! 🎉<span>Deixe um elogio de parabéns</span></span>'+parabens(a.nome)+'</li>');
+      else prox.push({f:a.falta,h:'<li class="breve"><span class="ic">🎂</span><span class="tx">'+(a.falta===1?'Amanhã é aniversário de <b>'+esc(a.nome)+'</b>! 🎈':'Faltam <b>'+a.falta+' dias</b> para o aniversário de <b>'+esc(a.nome)+'</b>')+'<span>'+a.dia+' · já vai pensando nos parabéns para '+primeiro(a.nome)+' 🎁</span></span><span class="qd">'+(a.falta===1?'amanhã':'em '+a.falta+' dias')+'</span></li>'});
+    });
+    t.casa.forEach(function(a){
+      var anos=a.anos+' '+(a.anos===1?'ano':'anos');
+      if(a.falta===0)hoje.push('<li class="festa"><span class="ic">🏅</span><span class="tx"><b>'+esc(a.nome)+'</b> completa '+anos+' de time hoje!<span>Obrigado por fazer parte da Toca</span></span>'+parabens(a.nome)+'</li>');
+      else prox.push({f:a.falta,h:'<li class="breve"><span class="ic">🏅</span><span class="tx">'+(a.falta===1?'Amanhã <b>'+esc(a.nome)+'</b> completa '+anos+' de time!':'Faltam <b>'+a.falta+' dias</b> para <b>'+esc(a.nome)+'</b> completar '+anos+' de time')+'<span>'+a.dia+'</span></span><span class="qd">'+(a.falta===1?'amanhã':'em '+a.falta+' dias')+'</span></li>'});
+    });
+    t.eventos.forEach(function(e){prox.push({f:e.acontecendo?0:e.falta,h:'<li><span class="ic">'+e.emoji+'</span><span class="tx"><b>'+esc(e.titulo)+'</b><span>'+esc(dataEvento(e))+(e.descricao?' · '+esc(e.descricao):'')+'</span></span><span class="qd">'+(e.acontecendo?(e.fim?'acontecendo':'hoje'):(e.falta>1?'faltam '+e.falta+' dias':quandoFalta(e.falta)))+'</span></li>'})});
+    prox.sort(function(a,b){return a.f-b.f});
+    var li=hoje.concat(prox.map(function(x){return x.h}));
     if(!li.length)return;
     document.getElementById('smLista').innerHTML=li.slice(0,8).join('');
     document.getElementById('semana').hidden=false;
