@@ -114,7 +114,7 @@ html.vv-bv{overflow:hidden}
 @media(prefers-reduced-motion:reduce){.bv,.bv-caixa,.bv-ico,.menu.entrar .bloco,.bv-barra i{animation:none!important}}
 </style>
 <link rel="stylesheet" href="/vv-tema-auto.css?v=35">
-<link rel="stylesheet" href="/vv-tema.css?v=35">
+<link rel="stylesheet" href="/vv-tema.css?v=36">
 <script src="/vv-tema.js?v=23"></script>
 <link rel="manifest" href="/manifest.webmanifest?v=3">
 <meta name="theme-color" content="#033a45">
@@ -139,9 +139,9 @@ html.vv-bv{overflow:hidden}
   if(mostrar)html.classList.add('vv-bv');
 })();
 </script>
-<script src="/vv-app.js?v=2" defer></script>
+<script src="/vv-app.js?v=3" defer></script>
 <script src="/vv-gestora.js?v=1" defer></script>
-<script src="/vv-recado.js?v=2" defer></script>
+<script src="/vv-recado.js?v=3" defer></script>
 </head>
 <body>
 
@@ -149,7 +149,7 @@ html.vv-bv{overflow:hidden}
   <a class="logo" href="/inicio.html">
     <img id="brandLogo" src="/logo.png" alt="" hidden onload="this.hidden=false;this.nextElementSibling.setAttribute('hidden','')">
     <svg width="28" height="24" viewBox="0 0 28 24" aria-hidden="true"><path d="M1 2h9l4 9 4-9h9L14 23z" fill="#2fc28f"/><path d="M10 2h8l-4 9z" fill="#1a8f6a"/></svg>
-    <b>Toca dos <span>Bug Hunters</span></b><span class="ver">v0.34</span>
+    <b>Toca dos <span>Bug Hunters</span></b><span class="ver">v0.35</span>
   </a>
   <div class="spacer"></div>
 </header>
@@ -302,14 +302,21 @@ html.vv-bv{overflow:hidden}
     document.getElementById('semana').hidden=false;
   });
 
-  Promise.all([pega('/api/album'),pega('/api/elogios'),pega('/api/sentimentos'),pega('/api/sugestoes'),pega('/api/desafios')]).then(function(r){
-    var al=r[0],el=r[1],se=r[2],sg=r[3],dz=r[4],itens=[];
+  // Até 5 itens; mais fontes para a lista nunca ficar curta.
+  Promise.all([pega('/api/album'),pega('/api/elogios'),pega('/api/sentimentos'),pega('/api/sugestoes'),pega('/api/desafios'),pega('/api/recado')]).then(function(r){
+    var al=r[0],el=r[1],se=r[2],sg=r[3],dz=r[4],rc=r[5],itens=[];
+    if(rc&&rc.recados&&rc.recados.length){var ult=rc.recados.slice().sort(function(a,b){return String(b.atualizadoEm).localeCompare(String(a.atualizadoEm))})[0];itens.push({em:ult.atualizadoEm,ic:'📣',t:rc.recados.length>1?'<b>'+rc.recados.length+' recados</b> da chefa para o time':'Recado da chefa: <b>'+esc(curto(ult.titulo||'Recado da Chefa!',40))+'</b>',s:esc(curto(ult.mensagem,70)),href:'javascript:void(0)',acao:'recado'})}
+    if(dz&&dz.anteriores&&dz.anteriores.length){var an=dz.anteriores[0];itens.push({em:an.encerradoEm,ic:'✅',t:'Resposta do desafio anterior revelada',s:an.total?(Math.round(an.acertos/an.total*100))+'% acertaram · veja a explicação':'Veja a resposta certa',href:'/desafio.html'})}
+    if(dz&&dz.ranking&&dz.ranking.length){var ld=dz.ranking[0];itens.push({em:null,ic:'🏆',t:'<b>'+esc(ld.nome)+'</b> lidera o ranking do mês',s:ld.pontos+' '+(ld.pontos===1?'ponto':'pontos')+' no Desafio da semana',href:'/desafio.html',fixo:dz.rotuloMes?dz.rotuloMes.split(' ')[0]:''})}
+    if(al&&al.fotos&&al.fotos.length){var cm=null,cf=null;al.fotos.forEach(function(f){(f.comentarios||[]).forEach(function(c){if(!cm||c.criadoEm>cm.criadoEm){cm=c;cf=f}})});
+      if(cm)itens.push({em:cm.criadoEm,ic:'💬',t:'<b>'+esc(curto(cm.nome,24))+'</b> comentou uma foto',s:'“'+esc(curto(cm.texto,60))+'”',href:'/album.html'})}
     if(dz&&dz.atual)itens.push({em:dz.atual.criadoEm,ic:'🧩',t:'Novo <b>Desafio da semana</b> no ar',s:dz.atual.total?dz.atual.total+' '+(dz.atual.total===1?'pessoa já respondeu':'pessoas já responderam'):'Seja a primeira pessoa a responder',href:'/desafio.html'});
     if(al&&al.fotos&&al.fotos.length){
       var f=al.fotos[0],m=(al.momentos||[]).find(function(x){return x.id===f.momentoId}),desde=Date.parse(f.criadaEm)-12*3600e3;
       var n=al.fotos.filter(function(x){return x.momentoId===f.momentoId&&Date.parse(x.criadaEm)>=desde}).length;
       itens.push({em:f.criadaEm,ic:'📷',t:(n>1?n+' fotos novas':'Foto nova')+(m?' em <b>'+esc(m.nome)+'</b>':' no álbum'),s:'Curta e comente no Álbum do time',href:'/album.html'});
     }
+    if(el&&!el.total)itens.push({em:null,ic:'💚',t:'Seja a primeira pessoa a <b>elogiar um colega</b>',s:'Faltam '+el.meta+' elogios para liberar a nuvem',href:'/elogios.html',fixo:'novo'});
     if(el&&el.total){var u=el.elogios&&el.elogios[0];itens.push({em:u&&u.criadoEm,ic:'💚',t:'<b>'+el.total+'</b> '+(el.total===1?'elogio':'elogios')+' no mural',s:el.liberada?'A nuvem de elogios já está liberada!':'Faltam '+Math.max(0,el.meta-el.total)+' para liberar a nuvem',href:'/elogios.html'})}
     if(se){itens.push({em:null,ic:'😊',t:se.total?'<b>'+se.total+'</b> '+(se.total===1?'resposta':'respostas')+' no Sentimento desta semana':'Sentimento da semana aberto',s:se.total&&se.palavraDaSemana?'Palavra mais citada: “'+esc(se.palavraDaSemana)+'”':'Conte em poucas palavras como foi a sua semana',href:'/sentimento.html',fixo:'esta semana'})}
     if(sg&&sg.mural&&sg.mural.length){var x=sg.mural[0];itens.push({em:x.respondidaEm,ic:'📮',t:'Sugestão respondida pela gestora',s:'“'+esc(curto(x.texto,70))+'”',href:'/sugestoes.html'})}
@@ -318,9 +325,10 @@ html.vv-bv{overflow:hidden}
     var semData=itens.filter(function(i){return !i.em});
     var lista=datados.concat(semData).slice(0,5);
     var ul=document.getElementById('nvLista');
-    ul.innerHTML=lista.length?lista.map(function(i){return '<li><a href="'+i.href+'"><span class="ic" aria-hidden="true">'+i.ic+'</span><span class="tx">'+i.t+'<span>'+i.s+'</span></span><span class="qd">'+(i.em?quando(i.em):(i.fixo||''))+'</span></a></li>'}).join('')
+    ul.innerHTML=lista.length?lista.map(function(i){return '<li><a href="'+i.href+'"'+(i.acao?' data-acao="'+i.acao+'"':'')+'><span class="ic" aria-hidden="true">'+i.ic+'</span><span class="tx">'+i.t+'<span>'+i.s+'</span></span><span class="qd">'+(i.em?quando(i.em):(i.fixo||''))+'</span></a></li>'}).join('')
       :'<li><p class="nv-vazio">Por enquanto está tudo calmo por aqui. Que tal mandar um elogio? 💚</p></li>';
   });
+  document.getElementById('nvLista').addEventListener('click',function(e){var a=e.target.closest('[data-acao="recado"]');if(a){e.preventDefault();if(window.vvRecado)window.vvRecado.abrir()}});
 
   // Bloco do app: abre o mesmo painel do sino 🔔 (instalar + lembrete de sexta)
   var app=document.getElementById('blocoApp');

@@ -158,3 +158,11 @@ html.vv-recado-aberto { overflow: hidden; }
 
 /* Status da IA OCULTO no menu (20/10/2026). O endereço /api/health continua funcionando. Para mostrar, comente esta linha. */
 [data-recurso="status-ia"] { display: none !important; }
+
+/* Recado da Chefa com vários recados (v0.35) */
+.vv-recado-cont { display: block; margin-top: 8px; font-size: 12px; font-weight: 700; letter-spacing: .5px; opacity: .85; }
+.vv-recado-pe { flex-wrap: wrap; gap: 8px; align-items: center; }
+.vv-recado-pontos { width: 100%; display: flex; justify-content: center; gap: 6px; margin-bottom: 6px; }
+.vv-recado-pontos i { width: 8px; height: 8px; border-radius: 50%; background: var(--line, #dfe5e3); }
+.vv-recado-pontos i.on { background: var(--teal, #109c8a); width: 20px; border-radius: 99px; }
+.vv-recado-pe .btn-outline { min-width: 120px; justify-content: center; }
