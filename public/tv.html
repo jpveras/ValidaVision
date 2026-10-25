@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TV da Toca · Toca dos Bug Hunters</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#04161a">
+<link rel="icon" type="image/png" href="/favicon.png?v=3">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&family=Comic+Neue:wght@700&display=swap" rel="stylesheet">
+<style>
+/* TV da Toca: modo quiosque para a TV/monitor do time. Sempre escuro, letras grandes, sem menus.
+   Tudo é medido em vmin para caber em qualquer tela (TV 16:9, monitor, notebook). */
+:root{--fundo:#04161a;--fundo2:#082a31;--card:rgba(255,255,255,.06);--linha:rgba(255,255,255,.12);--ink:#f2faf8;--texto:#c9dcd9;--mudo:#8aa5a6;
+  --teal:#1fc2a7;--amber:#f2b440;--rosa:#ef6f8f;--azul:#4fb3e8;--roxo:#9b87f5;--verde:#4cc77f;--dur:12s}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;overflow:hidden;background:var(--fundo);color:var(--ink);font-family:Roboto,system-ui,sans-serif}
+body{background:radial-gradient(120vmax 90vmax at 85% -10%,#0c3d45 0%,transparent 55%),radial-gradient(90vmax 70vmax at -10% 110%,#0b2f3a 0%,transparent 55%),var(--fundo)}
+body.ocioso,body.ocioso *{cursor:none!important}
+.tv{position:fixed;inset:0;display:grid;grid-template-rows:auto 1fr auto;padding:2.6vmin 3.4vmin 2.2vmin;gap:2vmin}
+/* Topo */
+.topo{display:flex;align-items:center;gap:2vmin}
+.topo img{width:6.4vmin;height:6.4vmin;border-radius:1.4vmin;background:#fff;padding:.5vmin}
+.marca b{display:block;font-size:3.2vmin;font-weight:900;letter-spacing:-.02em}
+.marca span{font-size:2vmin;color:var(--teal);font-weight:700;letter-spacing:.3em;text-transform:uppercase}
+.relogio{margin-left:auto;text-align:right}
+.relogio b{display:block;font-size:5.4vmin;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:-.02em;line-height:1}
+.relogio span{font-size:2.1vmin;color:var(--texto);text-transform:capitalize}
+/* Palco dos slides */
+.palco{position:relative;min-height:0}
+.slide{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;opacity:0;transform:translateY(2vmin) scale(.985);transition:opacity .8s ease,transform .8s ease;pointer-events:none}
+.slide.on{opacity:1;transform:none;pointer-events:auto}
+.selo{display:inline-flex;align-items:center;gap:1.2vmin;align-self:flex-start;padding:1vmin 2.2vmin;border-radius:99px;background:var(--cor,var(--teal));color:#04161a;font-size:2.3vmin;font-weight:900;letter-spacing:.12em;text-transform:uppercase;margin-bottom:3vmin}
+.titulo{margin:0 0 2.4vmin;font-size:7vmin;font-weight:900;line-height:1.05;letter-spacing:-.025em;max-width:24ch}
+.grande{font-size:4.6vmin;line-height:1.3;color:var(--ink);margin:0;max-width:40ch;white-space:pre-line}
+.assina{margin-top:3vmin;font-size:3vmin;color:var(--cor,var(--teal));font-family:"Comic Neue","Comic Sans MS",cursive;font-weight:700}
+.sub{font-size:2.8vmin;color:var(--texto);margin:0}
+/* Listas (agenda, news) */
+.lista{display:grid;gap:1.6vmin;margin:0;padding:0;list-style:none}
+.lista li{display:flex;align-items:center;gap:2.2vmin;padding:1.8vmin 2.4vmin;border-radius:2vmin;background:var(--card);border:1px solid var(--linha);font-size:3.3vmin;line-height:1.25}
+.lista li .ico{font-size:4.4vmin;flex:none;width:6vmin;text-align:center}
+.lista li .quando{margin-left:auto;flex:none;font-size:2.4vmin;font-weight:700;color:#04161a;background:var(--cor,var(--teal));padding:.6vmin 1.6vmin;border-radius:99px;white-space:nowrap}
+.lista li.hoje{background:linear-gradient(90deg,rgba(242,180,64,.22),rgba(242,180,64,.06));border-color:rgba(242,180,64,.5)}
+.lista li.hoje .quando{background:var(--amber)}
+.duas{display:grid;grid-template-columns:1fr 1fr;gap:3vmin;align-items:start}
+/* Elogios */
+.aspas{position:relative;margin:0;padding:0 0 0 7vmin;font-size:5vmin;line-height:1.32;font-weight:500;max-width:36ch}
+.aspas::before{content:"“";position:absolute;left:-.5vmin;top:-4vmin;font-size:16vmin;line-height:1;color:var(--rosa);font-family:Georgia,serif}
+.elogio-pe{margin-top:3.4vmin;padding-left:7vmin;font-size:2.6vmin;color:var(--mudo)}
+/* Desafio */
+.desafio{display:grid;grid-template-columns:1fr auto;gap:4vmin;align-items:center}
+.opcoes{display:grid;grid-template-columns:1fr 1fr;gap:1.6vmin;margin-top:1vmin}
+.opcoes div{padding:1.8vmin 2.2vmin;border-radius:1.8vmin;background:var(--card);border:1px solid var(--linha);font-size:3vmin}
+.opcoes b{color:var(--roxo);margin-right:1vmin}
+.qr{background:#fff;border-radius:2.2vmin;padding:1.4vmin;width:26vmin;text-align:center;color:#04161a}
+.qr svg{display:block;width:100%;height:auto}
+.qr span{display:block;font-size:2vmin;font-weight:700;margin-top:.6vmin}
+.podio{display:flex;gap:1.6vmin;margin-top:3vmin;flex-wrap:wrap}
+.podio div{padding:1.2vmin 2.2vmin;border-radius:99px;background:var(--card);border:1px solid var(--linha);font-size:2.6vmin}
+/* Sentimento */
+.palavra{font-size:15vmin;font-weight:900;letter-spacing:-.04em;line-height:1;color:var(--azul);margin:1vmin 0 3vmin;font-family:"Comic Neue","Comic Sans MS",cursive}
+.nuvem{display:flex;flex-wrap:wrap;gap:1.4vmin 2.4vmin;align-items:baseline;max-width:80vw}
+.nuvem span{color:var(--texto);font-weight:700}
+/* Fotos */
+.fotos{display:grid;grid-template-columns:2fr 1fr;grid-template-rows:1fr 1fr;gap:1.6vmin;height:100%;min-height:0}
+.fotos.uma{grid-template-columns:1fr;grid-template-rows:1fr}
+.fotos.duas-f{grid-template-columns:1fr 1fr;grid-template-rows:1fr}
+.fotos figure{margin:0;position:relative;border-radius:2vmin;overflow:hidden;background:#000;min-height:0}
+.fotos figure:first-child{grid-row:1 / span 2}
+.fotos.duas-f figure:first-child,.fotos.uma figure:first-child{grid-row:auto}
+.fotos img{width:100%;height:100%;object-fit:cover;display:block}
+.fotos figcaption{position:absolute;left:0;right:0;bottom:0;padding:5vmin 2.4vmin 1.8vmin;background:linear-gradient(transparent,rgba(0,0,0,.75));font-size:2.6vmin;font-weight:500}
+.slide-fotos{justify-content:flex-start}
+.slide-fotos .cab{display:flex;align-items:center;gap:2vmin;margin-bottom:2vmin}
+.slide-fotos .cab .selo{margin:0}
+.slide-fotos .cab .sub{font-size:3vmin;color:var(--ink);font-weight:700}
+.slide-fotos .fotos{flex:1}
+/* Boas-vindas / QR */
+.boas{display:grid;grid-template-columns:1fr auto;gap:5vmin;align-items:center}
+.boas .titulo span{color:var(--teal);font-family:"Comic Neue","Comic Sans MS",cursive}
+/* Rodapé */
+.pe{display:flex;align-items:center;gap:2.4vmin}
+.barra{flex:1;height:.7vmin;border-radius:99px;background:var(--linha);overflow:hidden}
+.barra i{display:block;height:100%;width:0;background:var(--cor-barra,var(--teal));border-radius:99px}
+.barra i.anda{animation:anda var(--dur) linear forwards}
+body.pausado .barra i.anda{animation-play-state:paused}
+@keyframes anda{to{width:100%}}
+.pontos{display:flex;gap:1vmin}
+.pontos i{width:1.1vmin;height:1.1vmin;border-radius:50%;background:var(--linha)}
+.pontos i.on{background:var(--ink)}
+.endereco{font-size:2vmin;color:var(--mudo);white-space:nowrap}
+.endereco b{color:var(--ink);font-weight:500}
+/* Controles (aparecem ao mexer o mouse) */
+.controles{position:fixed;right:3vmin;bottom:7vmin;display:flex;gap:1vmin;opacity:0;transition:opacity .3s}
+body:not(.ocioso) .controles{opacity:1}
+.controles button{font:500 15px Roboto,sans-serif;color:var(--ink);background:rgba(255,255,255,.1);border:1px solid var(--linha);border-radius:10px;padding:10px 14px;cursor:pointer}
+.controles button:hover{background:rgba(255,255,255,.18)}
+.aviso-pausa{position:fixed;left:50%;top:3vmin;transform:translateX(-50%);background:var(--amber);color:#04161a;font-weight:700;padding:8px 16px;border-radius:99px;font-size:15px;display:none}
+body.pausado .aviso-pausa{display:block}
+@media (max-aspect-ratio:1/1){
+  .duas,.desafio,.boas{grid-template-columns:1fr}
+  .qr{width:34vmin}
+  .titulo{font-size:8vmin}
+}
+@media (prefers-reduced-motion:reduce){.slide{transition:opacity .3s}}
+</style>
+</head>
+<body>
+<div class="tv">
+  <header class="topo">
+    <img src="/logo.png" alt="">
+    <div class="marca"><b>Toca dos Bug Hunters</b><span>TV da Toca</span></div>
+    <div class="relogio" aria-live="off"><b id="hora">--:--</b><span id="data"></span></div>
+  </header>
+  <main class="palco" id="palco" aria-live="polite"></main>
+  <footer class="pe">
+    <div class="pontos" id="pontos"></div>
+    <div class="barra"><i id="barra"></i></div>
+    <div class="endereco">Acesse: <b id="endereco"></b></div>
+  </footer>
+</div>
+<div class="aviso-pausa">⏸ Pausado — aperte espaço para continuar</div>
+<div class="controles">
+  <button type="button" id="bAnt" title="Anterior (←)">‹</button>
+  <button type="button" id="bPausa" title="Pausar (espaço)">⏸</button>
+  <button type="button" id="bProx" title="Próximo (→)">›</button>
+  <button type="button" id="bTela" title="Tela cheia (F)">⛶ Tela cheia</button>
+</div>
+<script src="/vendor/qrcode.js"></script>
+<script>
+(function () {
+  "use strict";
+  var DUR = 12000, ATUALIZA = 10 * 60 * 1000;
+  var $ = function (id) { return document.getElementById(id); };
+  var palco = $("palco"), barra = $("barra"), pontos = $("pontos");
+  var slides = [], atual = -1, timer = null, pausado = false, fotosVez = 0, elogiosVez = 0;
+  var origem = location.origin;
+  $("endereco").textContent = location.host;
+
+  function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (m) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" }[m]; }); }
+  function qr(url, rotulo) {
+    try { var q = qrcode(0, "M"); q.addData(url); q.make(); return '<div class="qr">' + q.createSvgTag({ scalable: true, margin: 1 }) + "<span>" + esc(rotulo) + "</span></div>"; }
+    catch (e) { return ""; }
+  }
+  function pega(url) { return fetch(url, { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; }); }
+  function quando(f) { return f === 0 ? "Hoje!" : f === 1 ? "Amanhã" : "Em " + f + " dias"; }
+  function plural(n, um, v) { return n + " " + (n === 1 ? um : v); }
+
+  // Relógio
+  function relogio() {
+    var d = new Date();
+    $("hora").textContent = d.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+    $("data").textContent = d.toLocaleDateString("pt-BR", { weekday: "long", day: "numeric", month: "long" });
+  }
+  relogio(); setInterval(relogio, 15000);
+
+  // ---------- Montagem dos slides (cada função devolve HTML ou nada) ----------
+  function slideRecados(rec) {
+    return (rec && rec.recados || []).map(function (r) {
+      return { cor: "var(--amber)", html: '<span class="selo">📣 Recado da Chefa</span>' + (r.titulo && r.titulo !== "Recado da Chefa!" ? '<h1 class="titulo">' + esc(r.titulo) + "</h1>" : "") +
+        '<p class="grande">' + esc(r.mensagem) + "</p>" + (r.assinatura ? '<div class="assina">— ' + esc(r.assinatura) + "</div>" : "") };
+    });
+  }
+  function slideNews(n) {
+    var e = n && n.edicoes && n.edicoes[0];
+    if (!e || Date.now() - Date.parse(e.geradaEm) > 8 * 86400000) return [];
+    var itens = (e.destaques || []).slice(0, 5).map(function (d) { return '<li><span class="ico">' + esc(d.emoji) + "</span><span>" + esc(d.texto) + "</span></li>"; }).join("");
+    return [{ cor: "var(--teal)", html: '<span class="selo">📰 Toca News · ' + esc(String(e.rotulo || "").split("·")[0].trim()) + "</span>" +
+      '<h1 class="titulo" style="font-size:5.6vmin">' + esc(e.titulo) + '</h1><ul class="lista">' + itens + "</ul>" }];
+  }
+  function slideAgenda(t) {
+    if (!t) return [];
+    var itens = [];
+    (t.aniversarios || []).forEach(function (a) { itens.push({ f: a.falta, html: '<li class="' + (a.falta === 0 ? "hoje" : "") + '"><span class="ico">🎂</span><span>' + (a.falta === 0 ? "Hoje é aniversário de <b>" + esc(a.nome) + "</b>! Parabéns! 🎉" : "Aniversário de <b>" + esc(a.nome) + "</b> · " + esc(a.dia)) + '</span><span class="quando">' + quando(a.falta) + "</span></li>" }); });
+    (t.casa || []).forEach(function (c) { itens.push({ f: c.falta, html: '<li class="' + (c.falta === 0 ? "hoje" : "") + '"><span class="ico">🏅</span><span><b>' + esc(c.nome) + "</b> completa " + plural(c.anos, "ano", "anos") + " de Toca · " + esc(c.dia) + '</span><span class="quando">' + quando(c.falta) + "</span></li>" }); });
+    (t.eventos || []).forEach(function (e) {
+      var dt = e.data.split("-").reverse().slice(0, 2).join("/");
+      itens.push({ f: e.falta, html: '<li class="' + (e.acontecendo ? "hoje" : "") + '"><span class="ico">' + esc(e.emoji) + "</span><span><b>" + esc(e.titulo) + "</b> · " + dt + (e.hora ? " às " + esc(e.hora) : "") + '</span><span class="quando">' + (e.acontecendo ? "Hoje!" : quando(e.falta)) + "</span></li>" });
+    });
+    if (!itens.length) return [];
+    itens.sort(function (a, b) { return a.f - b.f; });
+    return [{ cor: "var(--amber)", html: '<span class="selo">📅 Esta semana na Toca</span><ul class="lista">' + itens.slice(0, 5).map(function (i) { return i.html; }).join("") + "</ul>" }];
+  }
+  // Elogios: só o texto, nunca o nome (regra do telão). Dois por rodada, alternando.
+  function slideElogios(el) {
+    var l = (el && el.elogios || []).filter(function (e) { return e.texto && e.texto.length <= 260; }).slice(0, 12);
+    if (!l.length) return [];
+    var out = [];
+    for (var k = 0; k < Math.min(2, l.length); k++) {
+      var e = l[(elogiosVez + k) % l.length];
+      out.push({ cor: "var(--rosa)", html: '<span class="selo">💚 Elogios do time</span><blockquote class="aspas">' + esc(e.texto) + '</blockquote><div class="elogio-pe">' + plural(el.total || l.length, "elogio", "elogios") + " no mural · deixe o seu em " + esc(location.host) + "/elogie</div>" });
+    }
+    elogiosVez += 2;
+    return out;
+  }
+  function slideDesafio(d) {
+    if (!d) return [];
+    var podio = (d.ranking || []).slice(0, 3).map(function (p, i) { return "<div>" + ["🥇", "🥈", "🥉"][i] + " " + esc(p.nome) + " · " + p.pontos + "</div>"; }).join("");
+    if (d.atual) {
+      var ops = d.atual.opcoes.map(function (o, i) { return "<div><b>" + "ABCD"[i] + "</b>" + esc(o) + "</div>"; }).join("");
+      return [{ cor: "var(--roxo)", html: '<div class="desafio"><div><span class="selo">🧩 Desafio da semana</span><h1 class="titulo" style="font-size:5.4vmin">' + esc(d.atual.pergunta) + '</h1><div class="opcoes">' + ops + "</div>" +
+        (podio ? '<div class="podio">' + podio + "</div>" : "") + "</div>" + qr(origem + "/desafio.html", "Responda pelo celular") + "</div>" }];
+    }
+    if (podio) return [{ cor: "var(--roxo)", html: '<span class="selo">🏆 Pódio de ' + esc(d.rotuloMes || "") + '</span><h1 class="titulo">Quem mais acertou o Desafio da semana</h1><div class="podio" style="font-size:1.4em">' + podio + "</div>" }];
+    return [];
+  }
+  function slideSentimento(s) {
+    if (!s || !s.total || !s.palavraDaSemana) return [];
+    var outras = (s.palavras || []).slice(1, 10).map(function (p, i) { return '<span style="font-size:' + (4.2 - i * .25).toFixed(2) + 'vmin">' + esc(p[0]) + "</span>"; }).join("");
+    return [{ cor: "var(--azul)", html: '<span class="selo">🌡️ Sentimento da semana</span><p class="sub">' + plural(s.total, "pessoa contou", "pessoas contaram") + " como está a semana. A palavra mais dita é…</p>" +
+      '<div class="palavra">' + esc(s.palavraDaSemana) + '</div><div class="nuvem">' + outras + "</div>" }];
+  }
+  // Fotos: até 3 das mais recentes por slide, girando entre as 12 últimas.
+  function slideFotos(a) {
+    var l = (a && a.fotos || []).slice(0, 12);
+    if (!l.length) return [];
+    var n = Math.min(3, l.length), sel = [];
+    for (var k = 0; k < n; k++) sel.push(l[(fotosVez + k) % l.length]);
+    fotosVez += n;
+    var cls = n === 1 ? "uma" : n === 2 ? "duas-f" : "";
+    var figs = sel.map(function (f) { return '<figure><img src="/api/album/foto/' + encodeURIComponent(f.id) + '?t=g" alt="" loading="eager">' + (f.legenda ? "<figcaption>" + esc(f.legenda) + "</figcaption>" : "") + "</figure>"; }).join("");
+    return [{ cor: "var(--rosa)", cls: "slide-fotos", html: '<div class="cab"><span class="selo">📸 Álbum do time</span><span class="sub">' + esc(sel[0].album || "Momentos da Toca") + '</span></div><div class="fotos ' + cls + '">' + figs + "</div>" }];
+  }
+  function slideBoasVindas() {
+    return { cor: "var(--teal)", html: '<div class="boas"><div><span class="selo">🐞 Bem-vindo(a)</span><h1 class="titulo">Seja bem-vindo(a), <span>Caçador(a)!</span></h1><p class="grande" style="font-size:3.6vmin;color:var(--texto)">Elogie um colega, conte como foi a semana, veja as fotos do time e responda o desafio. Tudo pelo celular.</p></div>' + qr(origem + "/inicio.html", "Abra a Toca no celular") + "</div>" };
+  }
+
+  var dados = {};
+  function montar() {
+    var s = [].concat(slideRecados(dados.recado), slideNews(dados.news), slideAgenda(dados.time), slideElogios(dados.elogios), slideFotos(dados.album), slideDesafio(dados.desafio), slideSentimento(dados.sent), slideFotos(dados.album));
+    // remove fotos repetidas quando há poucas
+    if ((dados.album && dados.album.fotos || []).length <= 3) s = s.filter(function (x, i, arr) { return x.cls !== "slide-fotos" || arr.findIndex(function (y) { return y.cls === "slide-fotos"; }) === i; });
+    s.push(slideBoasVindas());
+    slides = s;
+    palco.innerHTML = slides.map(function (x, i) { return '<section class="slide ' + (x.cls || "") + '" style="--cor:' + x.cor + '" data-i="' + i + '">' + x.html + "</section>"; }).join("");
+    pontos.innerHTML = slides.map(function () { return "<i></i>"; }).join("");
+  }
+  function mostrar(i) {
+    if (!slides.length) return;
+    atual = (i + slides.length) % slides.length;
+    var secs = palco.children;
+    for (var k = 0; k < secs.length; k++) secs[k].classList.toggle("on", k === atual);
+    var ps = pontos.children;
+    for (var j = 0; j < ps.length; j++) ps[j].classList.toggle("on", j === atual);
+    document.documentElement.style.setProperty("--cor-barra", slides[atual].cor);
+    barra.classList.remove("anda"); void barra.offsetWidth; barra.classList.add("anda");
+    agenda();
+  }
+  var restante = DUR, inicio = 0;
+  function agenda() {
+    clearTimeout(timer);
+    restante = DUR; inicio = Date.now();
+    if (!pausado) timer = setTimeout(proximo, DUR);
+  }
+  var precisaRemontar = false;
+  function proximo() {
+    // No fim da volta, remonta (dados novos, outras fotos e outros elogios).
+    if (atual === slides.length - 1 || precisaRemontar) { precisaRemontar = false; montar(); mostrar(0); return; }
+    mostrar(atual + 1);
+  }
+  function pausar(v) {
+    pausado = v;
+    document.body.classList.toggle("pausado", v);
+    $("bPausa").textContent = v ? "▶" : "⏸";
+    if (v) { clearTimeout(timer); restante = Math.max(500, restante - (Date.now() - inicio)); }
+    else { inicio = Date.now(); timer = setTimeout(proximo, restante); }
+  }
+
+  function carregar() {
+    return Promise.all([pega("/api/recado"), pega("/api/noticias"), pega("/api/time"), pega("/api/elogios"), pega("/api/album"), pega("/api/desafios"), pega("/api/sentimentos")]).then(function (r) {
+      dados = { recado: r[0], news: r[1], time: r[2], elogios: r[3], album: r[4], desafio: r[5], sent: r[6] };
+    });
+  }
+  carregar().then(function () { montar(); mostrar(0); });
+  setInterval(function () { carregar().then(function () { precisaRemontar = true; }); }, ATUALIZA);
+  // Recarrega a página uma vez por dia de madrugada (pega versões novas da TV).
+  setInterval(function () { var h = new Date().getHours(); if (h === 4 && performance.now() > 3600000) location.reload(); }, 30 * 60 * 1000);
+
+  // ---------- Controles ----------
+  function telaCheia() {
+    if (document.fullscreenElement) document.exitFullscreen().catch(function () {});
+    else document.documentElement.requestFullscreen().catch(function () {});
+  }
+  $("bAnt").onclick = function () { mostrar(atual - 1); };
+  $("bProx").onclick = function () { mostrar(atual + 1); };
+  $("bPausa").onclick = function () { pausar(!pausado); };
+  $("bTela").onclick = telaCheia;
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "ArrowRight" || e.key === "PageDown") mostrar(atual + 1);
+    else if (e.key === "ArrowLeft" || e.key === "PageUp") mostrar(atual - 1);
+    else if (e.key === " ") { e.preventDefault(); pausar(!pausado); }
+    else if (e.key === "f" || e.key === "F") telaCheia();
+  });
+  // Esconde o cursor e os botões depois de 3 s parado.
+  var ocioso;
+  function mexeu() { document.body.classList.remove("ocioso"); clearTimeout(ocioso); ocioso = setTimeout(function () { document.body.classList.add("ocioso"); }, 3000); }
+  document.addEventListener("mousemove", mexeu); document.addEventListener("touchstart", mexeu); mexeu();
+  // Mantém a tela acesa (quando o navegador permite).
+  var trava = null;
+  function manterAcesa() { if ("wakeLock" in navigator) navigator.wakeLock.request("screen").then(function (t) { trava = t; }).catch(function () {}); }
+  manterAcesa();
+  document.addEventListener("visibilitychange", function () { if (document.visibilityState === "visible") manterAcesa(); });
+})();
+</script>
+</body>
+</html>

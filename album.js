@@ -430,4 +430,14 @@ albumRouter.delete("/gestora/momentos/:id", sem_cache, async (req, res) => {
   }
 });
 
+// Resumo de um período para o Toca News: fotos novas e em quais momentos.
+export async function resumoAlbum(desde, ate) {
+  const doc = await ler();
+  const novas = doc.fotos.filter((f) => f.criadaEm >= desde && f.criadaEm < ate);
+  const nomes = Object.fromEntries(doc.momentos.map((m) => [m.id, m.nome]));
+  const momentos = [...new Set(novas.map((f) => nomes[f.momentoId]).filter(Boolean))];
+  const comentarios = doc.fotos.reduce((n, f) => n + (f.comentarios || []).filter((c) => c.criadoEm >= desde && c.criadoEm < ate).length, 0);
+  return { fotos: novas.length, momentos, comentarios };
+}
+
 export const _interno = { setSdk: (m) => { _colecao.setSdk(m); cache = { at: 0, doc: null }; } };

@@ -259,6 +259,13 @@ sentimentosRouter.use((_req, res, next) => {
   next();
 });
 
+// Resumo de uma semana para o Toca News (só números e palavras; nada de frases).
+export async function resumoSentimento(semana) {
+  const respostas = await respostasDa(semana);
+  const palavras = contar(respostas);
+  return { total: respostas.length, palavraDaSemana: palavras[0]?.[0] || null, palavras: palavras.slice(0, 5).map((p) => p[0]) };
+}
+
 const resumo = (semana, respostas) => {
   const palavras = contar(respostas);
   return {

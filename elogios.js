@@ -198,6 +198,13 @@ function contarPalavras(elogios, limite = 80) {
   return contarTermos(elogios, { limite, ignorar: (e) => new Set(tokens(e.nome).map((t) => t.toLocaleLowerCase("pt-BR"))) });
 }
 
+// Resumo de um período (Toca News): quantos elogios aprovados, quantas pessoas e os temas.
+export async function resumoElogios(desde, ate) {
+  const lista = (await lerTodos()).filter((e) => !pendente(e) && e.criadoEm >= desde && e.criadoEm < ate);
+  const pessoas = new Set(lista.map((e) => String(e.nome || "").trim().toLocaleLowerCase("pt-BR")).filter(Boolean));
+  return { total: lista.length, pessoas: pessoas.size, temas: contarPalavras(lista, 6).map((p) => p[0]) };
+}
+
 // ---------------- Rotas ----------------
 
 const limpa = (v, max) =>

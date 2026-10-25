@@ -71,6 +71,8 @@ html[data-tema="escuro"][data-pagina="gestora"] .prev .tira{color:#ed857e}
 html[data-tema="escuro"][data-pagina="gestora"] .mo-passo select,html[data-tema="escuro"][data-pagina="gestora"] .mo-form input,html[data-tema="escuro"][data-pagina="gestora"] .mo-form textarea{border:1px solid #3e4342;background:#1c3134}
 html[data-tema="escuro"][data-pagina="gestora"] .mo-item{background:#1c3134}
 html[data-tema="escuro"][data-pagina="gestora"] .ag-form input,html[data-tema="escuro"][data-pagina="gestora"] .ag-form select,html[data-tema="escuro"][data-pagina="gestora"] .dz-form textarea,html[data-tema="escuro"][data-pagina="gestora"] .dz-form input[type=text]{border:1px solid #3e4342;background:#1c3134}
+html[data-tema="escuro"][data-pagina="gestora"] .nw-ed{background:#1c3134}
+html[data-tema="escuro"][data-pagina="gestora"] .nw-form input,html[data-tema="escuro"][data-pagina="gestora"] .nw-form textarea{border:1px solid #3e4342;background:#1c3134}
 html[data-tema="escuro"][data-pagina="gestora"] .ag-item{background:#1c3134}
 html[data-tema="escuro"][data-pagina="gestora"] .dz-op{background:#1c3134}
 html[data-tema="escuro"][data-pagina="gestora"] .dz-op.certa{box-shadow:0 0 0 2px #1b2c22}
@@ -136,6 +138,7 @@ html[data-tema="escuro"][data-pagina="inicio"] .sm-lista li.festa{background:lin
 html[data-tema="escuro"][data-pagina="inicio"] .sm-lista li.festa .ic{background:#27200f}
 html[data-tema="escuro"][data-pagina="inicio"] .sm-lista li.breve .ic{background:#321622}
 html[data-tema="escuro"][data-pagina="inicio"] .sm-lista li.breve .qd{background:#321622;color:#e588b3}
+html[data-tema="escuro"][data-pagina="inicio"] .news{background:#1c3134}
 html[data-tema="escuro"][data-pagina="inicio"] .novidades{background:#1c3134}
 html[data-tema="escuro"][data-pagina="inicio"] .bv-caixa{border:1px solid rgba(59,87,91,.16)}
 html[data-tema="escuro"][data-pagina="inicio"] .bv-entrar{color:#cdf8f2}
