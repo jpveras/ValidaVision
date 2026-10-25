@@ -112,6 +112,23 @@ datalist{display:none}
 .dz-form textarea{min-height:64px;resize:vertical;line-height:1.45}
 .dm{display:grid;grid-template-columns:1fr 1.4fr;gap:8px}
 .ag-lista{display:flex;flex-direction:column;gap:8px}
+.nw-gerar,.tv-link{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:0 0 16px}
+.nw-gerar button,.tv-link button,.nw-form .linha button{white-space:normal;height:auto;min-height:36px;max-width:100%;line-height:1.3;padding-top:8px;padding-bottom:8px}
+.tv-link code{font-size:14px;padding:7px 10px;border-radius:6px;background:var(--panel);border:1px solid var(--line);color:var(--ink);word-break:break-all}
+.nw-ed{border:1px solid var(--line);border-radius:10px;padding:14px;margin:0 0 12px;background:#fff}
+.nw-ed.oculta{opacity:.7;border-style:dashed}
+.nw-ed>summary{cursor:pointer;list-style:none;display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-weight:500;color:var(--ink)}
+.nw-ed>summary::-webkit-details-marker{display:none}
+.nw-ed[open]>summary{margin-bottom:12px}
+.nw-tag{font-size:11px;font-weight:700;border-radius:99px;padding:2px 8px;background:var(--teal-soft);color:var(--teal2)}
+.nw-tag.cinza{background:var(--panel);color:var(--muted)}
+.nw-form{display:grid;gap:8px}
+.nw-form input,.nw-form textarea{width:100%;box-sizing:border-box;border:1px solid #cfd8d6;border-radius:6px;padding:9px 10px;font:inherit;font-size:15px;background:#fff;color:var(--ink)}
+.nw-form textarea{min-height:64px;resize:vertical;line-height:1.45}
+.nw-form textarea.dest{min-height:150px}
+.nw-form .linha{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:4px}
+.nw-form .grow{flex:1}
+@media screen{html[data-tema="escuro"][data-pagina] .nw-ed{background:var(--card);border-color:var(--line)}html[data-tema="escuro"][data-pagina] .nw-form input,html[data-tema="escuro"][data-pagina] .nw-form textarea{background:var(--panel);border-color:var(--line)}html[data-tema="escuro"][data-pagina] .tv-link code{background:var(--panel)}}
 .ag-item{display:flex;align-items:center;gap:12px;border:1px solid var(--line);border-radius:8px;padding:8px 10px;background:#fff}
 .ag-item.editando{border-color:var(--teal);box-shadow:0 0 0 2px var(--teal-soft)}
 .ag-item .ic{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;flex:none;font-size:18px;background:var(--panel)}
@@ -274,7 +291,7 @@ html[data-tema="escuro"] .ev-tip{background:#e4efed;color:#0f1a1c}
 .passos li b{color:var(--ink)}
 .dicas{margin:0;padding-left:18px}
 .dicas li{margin:6px 0}
-.guia kbd{font:inherit;font-size:12px;font-weight:500;padding:1px 6px;border:1px solid #cfd8d6;border-bottom-width:2px;border-radius:3px;background:var(--panel);white-space:nowrap}
+.guia kbd,.tv-guia kbd{font:inherit;font-size:12px;font-weight:500;padding:1px 6px;border:1px solid #cfd8d6;border-bottom-width:2px;border-radius:3px;background:var(--panel);white-space:nowrap}
 /* Análise da semana (IA) */
 .analise .card-head{gap:10px}
 .analise .acoes{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
@@ -323,8 +340,8 @@ html[data-tema="escuro"] .ev-tip{background:#e4efed;color:#0f1a1c}
   .sug li{break-inside:avoid}
 }
 </style>
-<link rel="stylesheet" href="/vv-tema-auto.css?v=36">
-<link rel="stylesheet" href="/vv-tema.css?v=36">
+<link rel="stylesheet" href="/vv-tema-auto.css?v=37">
+<link rel="stylesheet" href="/vv-tema.css?v=37">
 <script src="/vv-tema.js?v=23"></script>
 <link rel="manifest" href="/manifest.webmanifest?v=3">
 <meta name="theme-color" content="#033a45">
@@ -341,7 +358,7 @@ html[data-tema="escuro"] .ev-tip{background:#e4efed;color:#0f1a1c}
   <a class="logo" href="/inicio.html">
     <img id="brandLogo" src="/logo.png" alt="" hidden onload="this.hidden=false;this.nextElementSibling.setAttribute('hidden','')">
     <svg width="28" height="24" viewBox="0 0 28 24" aria-hidden="true"><path d="M1 2h9l4 9 4-9h9L14 23z" fill="#2fc28f"/><path d="M10 2h8l-4 9z" fill="#1a8f6a"/></svg>
-    <b>Toca dos <span>Bug Hunters</span></b><span class="ver">v0.36</span>
+    <b>Toca dos <span>Bug Hunters</span></b><span class="ver">v0.37</span>
   </a>
   <div class="spacer"></div>
   <span class="env">Área da Gestora</span>
@@ -426,6 +443,8 @@ html[data-tema="escuro"] .ev-tip{background:#e4efed;color:#0f1a1c}
       <button type="button" role="tab" data-aba="pessoas"><span aria-hidden="true">🎂</span>Aniversários</button>
       <button type="button" role="tab" data-aba="agenda"><span aria-hidden="true">📅</span>Agenda</button>
       <button type="button" role="tab" data-aba="desafio"><span aria-hidden="true">🧩</span>Desafio</button>
+      <button type="button" role="tab" data-aba="news"><span aria-hidden="true">📰</span>Toca News</button>
+      <button type="button" role="tab" data-aba="tv"><span aria-hidden="true">📺</span>TV da Toca</button>
       <button type="button" role="tab" data-aba="sugestoes"><span aria-hidden="true">📮</span>Sugestões<i class="gt-n" id="nSug" hidden></i></button>
       <button type="button" role="tab" data-aba="lembrete"><span aria-hidden="true">🔔</span>Lembrete</button>
       <button type="button" role="tab" data-aba="pergunta" data-recurso="pergunta"><span aria-hidden="true">❓</span>Pergunta</button>
@@ -449,6 +468,8 @@ html[data-tema="escuro"] .ev-tip{background:#e4efed;color:#0f1a1c}
             <li><b>🎂 Aniversários</b>: cadastre cada pessoa do time com o dia e o mês do aniversário (o ano não é pedido) e, se quiser, a data de entrada no time. A partir de <b>7 dias antes</b>, o Início da Toca já avisa (“Faltam 5 dias para o aniversário da Carla 🎂”, “Amanhã é aniversário…”) e, no dia, mostra “Hoje é aniversário de…” com o botão <kbd>Dar parabéns</kbd>. O mesmo vale para os anos de time.</li>
             <li><b>📅 Agenda</b>: marque confraternizações, entregas, feriados, férias e treinamentos. Use as ideias prontas, escolha a data (e a data final, para férias) e salve. O Início mostra a contagem regressiva — “faltam 3 dias”.</li>
             <li><b>🧩 Desafio</b>: escreva uma pergunta (ou use uma ideia pronta), de 2 a 4 alternativas, marque a certa e uma explicação curta. Cada pessoa responde uma vez, vê na hora se acertou e ganha 1 ponto por acerto no ranking do mês. Publicar um novo encerra o anterior e revela a resposta.</li>
+            <li><b>📰 Toca News</b>: toda <b>segunda às 8h</b> sai sozinho um resumo da semana anterior (elogios, sentimento, desafio, fotos, aniversários e agenda), escrito pela IA, e quem ativou as notificações recebe o aviso. Na aba você lê, corrige o texto, esconde ou apaga a edição, gera de novo e pode <kbd>Avisar o time</kbd> na hora. Ele aparece no Início da Toca e na TV.</li>
+            <li><b>📺 TV da Toca</b>: abra <b>/tv</b> no navegador da TV ou do monitor do time e aperte <kbd>F</kbd> (tela cheia). Passam sozinhos os recados, o Toca News, aniversários e agenda, elogios (sem nomes), fotos, o desafio com QR Code e a palavra da semana.</li>
             <li><b>🔑 Senha</b>: escolha uma senha só sua quando quiser.</li>
             <li><b>Para sair</b>, clique em <kbd>Sair</kbd> — principalmente em computador compartilhado. Para voltar, toque no escudo 🛡️ ao lado do sino, no topo de qualquer página.</li>
           </ol>
@@ -637,6 +658,42 @@ html[data-tema="escuro"] .ev-tip{background:#e4efed;color:#0f1a1c}
       </div>
     </section>
 
+    <section class="gt-aba" data-painel="news" role="tabpanel">
+      <section class="card">
+        <div class="card-head"><span>📰 Toca News</span><span class="counter"><a href="/inicio.html#news" target="_blank" rel="noopener">Ver no Início ↗</a></span></div>
+        <div class="card-body">
+          <p class="ev-nota" style="margin:0 0 12px">Toda <b>segunda às 8h</b> o Toca News da semana anterior é gerado sozinho e quem ativou as notificações recebe o aviso. Ele usa só números e palavras: nenhuma frase do Sentimento, nenhum texto de elogio e nenhum nome de quem elogiou. Se a IA falhar, sai uma versão automática mais simples.</p>
+          <div class="nw-gerar"><button class="btn-primary btn-sm" type="button" id="nwPassada">Gerar da semana passada</button><button class="btn-outline btn-sm" type="button" id="nwAtual">Gerar desta semana (até agora)</button><span class="msgsg" id="nwMsg" role="status"></span></div>
+          <div id="nwLista"><span class="carregando"></span></div>
+        </div>
+      </section>
+    </section>
+
+    <section class="gt-aba" data-painel="tv" role="tabpanel">
+      <section class="card">
+        <div class="card-head"><span>📺 TV da Toca</span><span class="counter"><a href="/tv.html" target="_blank" rel="noopener">Abrir ↗</a></span></div>
+        <div class="card-body tv-guia">
+          <p class="ev-nota" style="margin:0 0 14px">Uma tela para deixar ligada na TV ou num monitor do time. Os slides passam sozinhos a cada 12 segundos, com relógio e o endereço da Toca. Ela se atualiza sozinha (a cada 10 minutos) — é só deixar aberta.</p>
+          <div class="tv-link"><code id="tvUrl"></code><button class="btn-primary btn-sm" type="button" id="tvAbrir">Abrir a TV da Toca ↗</button><button class="btn-outline btn-sm" type="button" id="tvCopiar">Copiar link</button><span class="msgsg" id="tvMsg" role="status"></span></div>
+          <h4 class="dz-h">Como colocar na TV</h4>
+          <ol class="passos">
+            <li>No computador ligado à TV (HDMI) ou no navegador da própria TV, abra o endereço acima.</li>
+            <li>Aperte <kbd>F</kbd> ou mexa o mouse e clique em <kbd>⛶ Tela cheia</kbd>. O cursor e os botões somem sozinhos.</li>
+            <li>Teclas: <kbd>→</kbd> próximo, <kbd>←</kbd> anterior, <kbd>espaço</kbd> pausa (para comentar algo numa reunião).</li>
+            <li>A tela tenta ficar sempre acesa. Se o computador tiver economia de energia, desligue o descanso de tela.</li>
+          </ol>
+          <h4 class="dz-h">O que aparece</h4>
+          <ul class="dicas">
+            <li>📣 Os recados ligados na aba Recado · 📰 o Toca News da semana</li>
+            <li>📅 Aniversários, anos de time e agenda (os mesmos do Início)</li>
+            <li>💚 Elogios recentes — <b>só o texto, sem o nome</b>, como no telão</li>
+            <li>📸 Fotos novas do álbum · 🧩 Desafio aberto com QR Code para responder pelo celular · 🌡️ palavra da semana</li>
+            <li>Slides sem conteúdo não aparecem. Sempre fecha com as boas-vindas e o QR Code da Toca.</li>
+          </ul>
+        </div>
+      </section>
+    </section>
+
     <section class="gt-aba" data-painel="sugestoes" role="tabpanel">
     <section class="card no-print" id="sugestoes">
       <div class="card-head"><span>📮 Caixa de sugestões<span class="sg-badge" id="sgBadge" hidden></span></span><span class="counter"><a href="/sugestoes.html" target="_blank" rel="noopener">Ver como a equipe vê ↗</a></span></div>
@@ -694,8 +751,8 @@ guia.addEventListener('toggle',()=>ls.set('vv-gestora-guia',guia.open?null:'fech
 const msg=(t,e=false)=>{$('msg').textContent=t;$('msg').className='status'+(e?' error':'')};
 
 // ---------- Abas ----------
-const ABAS=['inicio','sentimento','recado','elogios','album','pessoas','agenda','desafio','sugestoes','lembrete','pergunta','senha'];
-const ALIAS={perguntas:'pergunta',lembretes:'lembrete',evCard:'sentimento',analiseCard:'sentimento'};
+const ABAS=['inicio','sentimento','recado','elogios','album','pessoas','agenda','desafio','news','tv','sugestoes','lembrete','pergunta','senha'];
+const ALIAS={perguntas:'pergunta',lembretes:'lembrete',noticias:'news',telao:'tv',evCard:'sentimento',analiseCard:'sentimento'};
 let aba='inicio';
 const R={}; // números do resumo (Início)
 function abaDoHash(){const h=decodeURIComponent(location.hash.slice(1));return ABAS.includes(h)?h:(ALIAS[h]||'inicio')}
@@ -719,6 +776,8 @@ function aoMostrar(nome){
   if(nome==='senha')renderSenhaEstado();
   if((nome==='pessoas'||nome==='agenda')&&!timeDados)carregarTime();
   if(nome==='desafio')carregarDesafios();
+  if(nome==='news')carregarNews();
+  if(nome==='tv')renderTv();
 }
 document.querySelector('.gt-abas').addEventListener('click',e=>{const b=e.target.closest('[data-aba]');if(b)irPara(b.dataset.aba)});
 document.querySelector('.gt-abas').addEventListener('keydown',e=>{
@@ -765,6 +824,8 @@ function renderResumo(){
   const dz=R.desafio;
   if(!dz)c.push(card('desafio','🧩','Desafio da semana',sp,'carregando…'));
   else{const ab=dz.desafios.find(x=>!x.encerradoEm);c.push(card('desafio','🧩',ab?'Respostas no desafio':'Desafio da semana',ab?ab.total:'Nenhum',ab?`${ab.total?Math.round(ab.acertos/ab.total*100):0}% de acerto`:'Publique um desafio para o time',!ab))}
+  const nw=R.news;
+  if(nw){const e=nw.edicoes.find(x=>!x.oculta);c.push(card('news','📰','Toca News',e?esc(curto(e.titulo,28)):'—',e?`${esc(e.rotulo.replace(/^Semana \d+ · /,''))}${e.notificadaEm?' · time avisado':''}`:'Sai sozinho toda segunda às 8h'))}
   $('gtResumo').innerHTML=c.join('');
 }
 function expirou(){chave=null;clearTimeout(elTimer);ls.set('vv-gestora',null);mostrarLogin('Sua sessão expirou. Entre novamente.',true)}
@@ -800,6 +861,7 @@ async function abrirPainel(){
   carregarAlbum();
   carregarTime();
   carregarDesafios();
+  carregarNews();
   if(infoG)renderSenhaEstado();else carregarInfoGestora();
   irPara(abaDoHash(),{hist:false});
   await carregarSemana(atual&&semanas.some(s=>s.semana===atual)?atual:d.atual);
@@ -1480,6 +1542,62 @@ $('dzForm').addEventListener('submit',async e=>{
   if(dzDados?.desafios.some(x=>!x.encerradoEm))return armar(b,publicar,'Confirmar (encerra o atual)');
   publicar();
 });
+
+// ---------- Toca News ----------
+let nwDados=null;
+const nwData=iso=>new Date(iso).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
+async function carregarNews(){
+  try{nwDados=await api('/api/noticias/gestora');R.news=nwDados;renderNews();renderResumo()}
+  catch(e){if(e.status===401)return expirou();$('nwLista').innerHTML=`<p class="vazio">${esc(e.message)}</p>`}
+}
+// Destaques no formulário: uma linha por destaque, começando pelo emoji.
+const destaquesTexto=l=>(l||[]).map(d=>`${d.emoji} ${d.texto}`).join('\n');
+function destaquesDe(txt){return String(txt||'').split('\n').map(x=>x.trim()).filter(Boolean).map(x=>{const m=x.match(/^([^\p{L}\p{N}\s"“(]{1,8})\s+(.+)$/u);return m?{emoji:m[1],texto:m[2]}:{emoji:'•',texto:x}})}
+function renderNews(){
+  const d=nwDados;if(!d)return;
+  $('nwPassada').textContent='Gerar da semana passada ('+d.rotulos.passada.replace(/^Semana \d+ · /,'')+')';
+  if(!d.edicoes.length){$('nwLista').innerHTML='<p class="vazio">Nenhuma edição ainda. A primeira sai sozinha na segunda às 8h — ou gere agora a da semana passada. 📰</p>';return}
+  $('nwLista').innerHTML=d.edicoes.map((e,i)=>`<details class="nw-ed${e.oculta?' oculta':''}" data-id="${esc(e.id)}" ${i===0?'open':''}>
+    <summary>${esc(e.rotulo)} <span class="nw-tag${e.fonte==='ia'?'':' cinza'}">${e.fonte==='ia'?'✨ IA':'modelo automático'}</span>${e.oculta?'<span class="nw-tag cinza">escondida</span>':''}${e.notificadaEm?`<span class="nw-tag cinza">🔔 avisado ${nwData(e.notificadaEm)}</span>`:''}${e.editadaEm?'<span class="nw-tag cinza">editada</span>':''}</summary>
+    <form class="nw-form" novalidate>
+      <label class="label"><span>Título</span></label><input name="titulo" maxlength="80" value="${esc(e.titulo)}">
+      <label class="label"><span>Abertura</span></label><textarea name="abertura" maxlength="400">${esc(e.abertura)}</textarea>
+      <label class="label"><span>Destaques (um por linha, começando pelo emoji)</span></label><textarea class="dest" name="destaques">${esc(destaquesTexto(e.destaques))}</textarea>
+      <label class="label"><span>Fechamento</span></label><input name="fechamento" maxlength="200" value="${esc(e.fechamento)}">
+      <div class="linha"><button class="btn-primary btn-sm" type="submit">Salvar texto</button><button class="btn-outline btn-sm nw-vis" type="button">${e.oculta?'Mostrar para o time':'Esconder'}</button><button class="btn-outline btn-sm nw-avisar" type="button" ${e.oculta?'disabled':''}>🔔 Avisar o time</button><span class="grow"></span><button class="btn-danger btn-sm nw-del" type="button">Apagar</button></div>
+      <span class="msgsg" role="status"></span>
+      <p class="ev-nota" style="margin:0">Gerada em ${nwData(e.geradaEm)} · ${e.numeros?`${e.numeros.elogios} elogios, ${e.numeros.sentimentos} respostas no Sentimento, ${e.numeros.fotos} fotos, ${e.numeros.desafios} desafio(s)`:''}</p>
+    </form></details>`).join('');
+}
+async function gerarNews(semana,b){
+  const m=$('nwMsg');m.className='msgsg';m.textContent='Escrevendo o Toca News… (pode levar até 1 minuto)';b.disabled=true;
+  try{await api('/api/noticias/gestora/gerar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({semana})});m.className='msgsg ok';m.textContent='Edição pronta ✓ Confira o texto abaixo.';await carregarNews()}
+  catch(err){if(err.status===401)return expirou();m.className='msgsg err';m.textContent=err.message}
+  finally{b.disabled=false}
+}
+$('nwPassada').onclick=e=>{const b=e.currentTarget,ja=nwDados?.edicoes.some(x=>x.semana===nwDados.semanaPassada);ja?armar(b,()=>gerarNews('passada',b),'Confirmar: substituir a edição'):gerarNews('passada',b)};
+$('nwAtual').onclick=e=>{const b=e.currentTarget,ja=nwDados?.edicoes.some(x=>x.semana===nwDados.semanaAtual);ja?armar(b,()=>gerarNews('atual',b),'Confirmar: substituir a edição'):gerarNews('atual',b)};
+$('nwLista').addEventListener('submit',async e=>{
+  e.preventDefault();const f=e.target,ed=f.closest('.nw-ed'),m=f.querySelector('.msgsg');
+  m.className='msgsg';m.textContent='Salvando…';
+  try{await api('/api/noticias/gestora/'+encodeURIComponent(ed.dataset.id),{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({titulo:f.titulo.value,abertura:f.abertura.value,destaques:destaquesDe(f.destaques.value),fechamento:f.fechamento.value})});
+    await carregarNews();const nm=document.querySelector(`.nw-ed[data-id="${CSS.escape(ed.dataset.id)}"] .msgsg`);if(nm){nm.className='msgsg ok';nm.textContent='Salvo ✓'}}
+  catch(err){if(err.status===401)return expirou();m.className='msgsg err';m.textContent=err.message}
+});
+$('nwLista').addEventListener('click',e=>{
+  const ed=e.target.closest('.nw-ed');if(!ed)return;const id=encodeURIComponent(ed.dataset.id),m=ed.querySelector('.msgsg');
+  const falha=err=>{if(err.status===401)return expirou();m.className='msgsg err';m.textContent=err.message};
+  const vis=e.target.closest('.nw-vis'),av=e.target.closest('.nw-avisar'),del=e.target.closest('.nw-del');
+  const e0=nwDados.edicoes.find(x=>x.id===ed.dataset.id);
+  if(vis)(async()=>{try{await api('/api/noticias/gestora/'+id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({oculta:!e0.oculta})});await carregarNews()}catch(err){falha(err)}})();
+  if(av)armar(av,async()=>{m.className='msgsg';m.textContent='Enviando…';try{const r=await api(`/api/noticias/gestora/${id}/notificar`,{method:'POST'});await carregarNews();const nm=document.querySelector(`.nw-ed[data-id="${CSS.escape(ed.dataset.id)}"] .msgsg`);if(nm){nm.className='msgsg ok';nm.textContent=`Aviso enviado para ${r.enviados} de ${r.total} ${r.total===1?'aparelho':'aparelhos'} ✓`}}catch(err){falha(err)}},'Confirmar: avisar todos');
+  if(del)armar(del,async()=>{try{await api('/api/noticias/gestora/'+id,{method:'DELETE'});await carregarNews()}catch(err){falha(err)}},'Confirmar: apagar');
+});
+
+// ---------- TV da Toca ----------
+function renderTv(){$('tvUrl').textContent=location.origin+'/tv'}
+$('tvAbrir').onclick=()=>window.open('/tv.html','_blank','noopener');
+$('tvCopiar').onclick=async()=>{const m=$('tvMsg');try{await navigator.clipboard.writeText(location.origin+'/tv');m.className='msgsg ok';m.textContent='Link copiado ✓'}catch{m.className='msgsg err';m.textContent='Não deu para copiar; selecione o endereço ao lado.'}};
 
 addEventListener('vv-tema',()=>{if(dados&&!$('painel').hidden&&aba==='sentimento')vvNuvem($('cloudBox'),$('cloud'),$('fallback'),dados.palavras)});
 let rz;addEventListener('resize',()=>{clearTimeout(rz);rz=setTimeout(()=>{if(dados&&!$('painel').hidden&&aba==='sentimento')vvNuvem($('cloudBox'),$('cloud'),$('fallback'),dados.palavras)},250)});

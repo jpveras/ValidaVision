@@ -253,4 +253,17 @@ desafiosRouter.delete("/gestora/:id/resposta/:rid", semCache, async (req, res) =
   }
 });
 
+// Resumo de um período para o Toca News: desafios publicados no período e o pódio do mês.
+export async function resumoDesafios(desde, ate) {
+  const doc = await ler();
+  const desafios = doc.desafios
+    .filter((d) => d.criadoEm >= desde && d.criadoEm < ate)
+    .map((d) => {
+      const st = estat(doc, d);
+      return { pergunta: d.pergunta, respostas: st.total, acertos: st.acertos, encerrado: !!d.encerradoEm };
+    });
+  const mes = mesSP(new Date(Date.parse(ate) - 1));
+  return { desafios, podio: ranking(doc, mes).slice(0, 3), rotuloMes: rotuloMes(mes) };
+}
+
 export const _interno = { limpar: () => (cache = { at: 0, doc: null }) };

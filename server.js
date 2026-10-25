@@ -16,6 +16,7 @@ import { recadoRouter } from "./recado.js";
 import { gestoraRouter } from "./gestora.js";
 import { timeRouter } from "./time.js";
 import { desafiosRouter } from "./desafios.js";
+import { noticiasRouter } from "./noticias.js";
 import { situacaoArmazenamento } from "./colecao.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -149,6 +150,13 @@ app.get("/api/armazenamento", async (_req, res) => {
 app.use("/api/desafios", desafiosRouter);
 app.get(["/desafio", "/quiz"], (_req, res) => res.redirect(302, "/desafio.html"));
 app.get(["/album", "/fotos"], (_req, res) => res.redirect(302, "/album.html"));
+
+// Toca News (resumo semanal; gerado na segunda pelo Vercel Cron, ver vercel.json)
+app.use("/api/noticias", noticiasRouter);
+app.get(["/news", "/noticias"], (_req, res) => res.redirect(302, "/inicio.html#news"));
+
+// TV da Toca: modo quiosque para a TV/monitor do time (slides automáticos)
+app.get(["/tv", "/telao-toca"], (_req, res) => res.redirect(302, "/tv.html"));
 
 
 // ======================================================

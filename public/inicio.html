@@ -54,6 +54,25 @@ button.bloco{border-radius:0}
 .sm-lista .parabens:hover{background:var(--teal2)}
 @media(max-width:560px){.sm-lista li{padding:10px 14px;gap:10px;flex-wrap:wrap}.sm-lista .tx{flex-basis:calc(100% - 52px)}.sm-lista .qd,.sm-lista .parabens{margin-left:42px}.semana h2{padding:12px 14px}}
 @media screen{html[data-tema="escuro"][data-pagina] .semana{background:var(--card);border-color:var(--line)}html[data-tema="escuro"][data-pagina] .sm-lista .ic{background:#20393c}html[data-tema="escuro"][data-pagina] .sm-lista li.festa{background:linear-gradient(90deg,#2e2412,transparent)}html[data-tema="escuro"][data-pagina] .sm-lista li.festa .ic{background:#4a3a14}html[data-tema="escuro"][data-pagina] .sm-lista li.breve .ic,html[data-tema="escuro"][data-pagina] .sm-lista li.breve .qd{background:#3d1a2c;color:#f6a8cb}html[data-tema="escuro"][data-pagina] .sm-lista .parabens{color:#fff}}
+/* Toca News (resumo da semana, v0.37) */
+.news{margin:30px 0 0;border:1px solid var(--line);border-radius:14px;background:#fff;overflow:hidden;scroll-margin-top:80px}
+.news-topo{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--line);background:linear-gradient(90deg,var(--teal-soft),transparent)}
+.news-topo h2{margin:0;font-size:15px;font-weight:700;color:var(--ink)}
+.news-topo small{margin-left:auto;font-size:12px;color:var(--muted);white-space:nowrap}
+.news-corpo{padding:14px 18px 16px}
+.news-corpo h3{margin:0 0 6px;font-size:19px;line-height:1.3;color:var(--ink)}
+.news-corpo p{margin:0 0 10px;font-size:14px;line-height:1.5;color:var(--text)}
+.news-dest{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.news-dest li{display:flex;gap:10px;font-size:14px;line-height:1.45;color:var(--text)}
+.news-dest li span:first-child{flex:none;width:22px;text-align:center}
+.news-dest li.extra{display:none}
+.news.aberta .news-dest li.extra{display:flex}
+.news-fim{display:none;margin:12px 0 0!important;font-weight:500;color:var(--ink)!important}
+.news.aberta .news-fim{display:block}
+.news-mais{margin-top:12px;background:none;border:0;padding:0;font:inherit;font-size:14px;font-weight:700;color:var(--teal2);cursor:pointer;height:auto}
+.news-mais:hover{text-decoration:underline}
+@media(max-width:560px){.news-topo,.news-corpo{padding-left:14px;padding-right:14px}.news-corpo h3{font-size:17px}}
+@media screen{html[data-tema="escuro"][data-pagina] .news{background:var(--card);border-color:var(--line)}html[data-tema="escuro"][data-pagina] .news-mais{background:none;color:var(--teal)}}
 /* Últimas atualizações */
 .novidades{margin:30px 0 0;border:1px solid var(--line);border-radius:14px;background:#fff;overflow:hidden}
 .novidades h2{margin:0;padding:14px 18px;font-size:15px;font-weight:700;color:var(--ink);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px}
@@ -115,8 +134,8 @@ html.vv-bv{overflow:hidden}
 @media(max-width:560px){.bv h1{font-size:26px}.bv h1 span{font-size:31px}.bv-caixa{padding:28px 20px 22px}.bv-ico{width:78px;height:78px}}
 @media(prefers-reduced-motion:reduce){.bv,.bv-caixa,.bv-ico,.menu.entrar .bloco,.bv-barra i{animation:none!important}}
 </style>
-<link rel="stylesheet" href="/vv-tema-auto.css?v=36">
-<link rel="stylesheet" href="/vv-tema.css?v=36">
+<link rel="stylesheet" href="/vv-tema-auto.css?v=37">
+<link rel="stylesheet" href="/vv-tema.css?v=37">
 <script src="/vv-tema.js?v=23"></script>
 <link rel="manifest" href="/manifest.webmanifest?v=3">
 <meta name="theme-color" content="#033a45">
@@ -151,7 +170,7 @@ html.vv-bv{overflow:hidden}
   <a class="logo" href="/inicio.html">
     <img id="brandLogo" src="/logo.png" alt="" hidden onload="this.hidden=false;this.nextElementSibling.setAttribute('hidden','')">
     <svg width="28" height="24" viewBox="0 0 28 24" aria-hidden="true"><path d="M1 2h9l4 9 4-9h9L14 23z" fill="#2fc28f"/><path d="M10 2h8l-4 9z" fill="#1a8f6a"/></svg>
-    <b>Toca dos <span>Bug Hunters</span></b><span class="ver">v0.36</span>
+    <b>Toca dos <span>Bug Hunters</span></b><span class="ver">v0.37</span>
   </a>
   <div class="spacer"></div>
 </header>
@@ -235,6 +254,11 @@ html.vv-bv{overflow:hidden}
     </button>
   </nav>
 
+  <section class="news" id="news" aria-labelledby="newsTit" hidden>
+    <div class="news-topo"><h2 id="newsTit">📰 Toca News</h2><small id="newsSem"></small></div>
+    <div class="news-corpo" id="newsCorpo"></div>
+  </section>
+
   <section class="semana" id="semana" aria-labelledby="smTit" hidden>
     <h2 id="smTit">📅 Esta semana na Toca</h2>
     <ul class="sm-lista" id="smLista"></ul>
@@ -312,6 +336,22 @@ html.vv-bv{overflow:hidden}
     if(!li.length)return;
     document.getElementById('smLista').innerHTML=li.slice(0,8).join('');
     document.getElementById('semana').hidden=false;
+  });
+
+  // Toca News: a edição mais recente (até 8 dias), com "Ler tudo".
+  pega('/api/noticias').then(function(n){
+    var e=n&&n.edicoes&&n.edicoes[0];
+    if(!e||Date.now()-Date.parse(e.geradaEm)>8*86400e3)return;
+    var d=e.destaques||[],sec=document.getElementById('news');
+    document.getElementById('newsSem').textContent=String(e.rotulo||'').replace(/^Semana \d+ · /,'');
+    document.getElementById('newsCorpo').innerHTML='<h3>'+esc(e.titulo)+'</h3>'+(e.abertura?'<p>'+esc(e.abertura)+'</p>':'')+
+      '<ul class="news-dest">'+d.map(function(x,i){return '<li'+(i>=3?' class="extra"':'')+'><span aria-hidden="true">'+esc(x.emoji)+'</span><span>'+esc(x.texto)+'</span></li>'}).join('')+'</ul>'+
+      (e.fechamento?'<p class="news-fim">'+esc(e.fechamento)+'</p>':'')+
+      (d.length>3||e.fechamento?'<button type="button" class="news-mais" aria-expanded="false">Ler tudo ›</button>':'');
+    var b=sec.querySelector('.news-mais');
+    if(b)b.onclick=function(){var ab=sec.classList.toggle('aberta');b.textContent=ab?'Mostrar menos ‹':'Ler tudo ›';b.setAttribute('aria-expanded',ab)};
+    sec.hidden=false;
+    if(location.hash==='#news'){sec.classList.add('aberta');if(b){b.textContent='Mostrar menos ‹';b.setAttribute('aria-expanded','true')}setTimeout(function(){sec.scrollIntoView({behavior:'smooth',block:'start'})},300)}
   });
 
   // Até 5 itens; mais fontes para a lista nunca ficar curta.

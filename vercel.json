@@ -1,6 +1,7 @@
 {
   "regions": ["gru1"],
   "crons": [
-    { "path": "/api/lembretes/enviar", "schedule": "0 12 * * 5" }
+    { "path": "/api/lembretes/enviar", "schedule": "0 12 * * 5" },
+    { "path": "/api/noticias/cron", "schedule": "0 11 * * 1" }
   ]
 }

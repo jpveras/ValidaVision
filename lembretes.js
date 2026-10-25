@@ -104,25 +104,39 @@ async function mensagem() {
   };
 }
 
-async function enviarParaTodos() {
+// Envia uma notificação para todos os inscritos (também usada pelo Toca News).
+// marcarEnvio: registra o horário como "último lembrete de sexta".
+export async function enviarMensagem(msg, { marcarEnvio = false } = {}) {
   await chaves();
   const { itens } = await inscricoes();
-  const msg = JSON.stringify(await mensagem());
+  const corpo = JSON.stringify(msg);
   const mortas = new Set();
   let ok = 0;
   await Promise.all(
     itens.map(async (s) => {
       try {
-        await webpush.sendNotification({ endpoint: s.endpoint, keys: s.keys }, msg, { TTL: 6 * 3600 });
+        await webpush.sendNotification({ endpoint: s.endpoint, keys: s.keys }, corpo, { TTL: 6 * 3600 });
         ok++;
       } catch (e) {
         if (e?.statusCode === 404 || e?.statusCode === 410) mortas.add(s.endpoint);
-        else console.error("Lembrete: falha ao enviar", e?.statusCode, e?.body || e?.message);
+        else console.error("Notificação: falha ao enviar", e?.statusCode, e?.body || e?.message);
       }
     })
   );
-  await alterarInscricoes((d) => ({ ...d, itens: d.itens.filter((s) => !mortas.has(s.endpoint)), ultimoEnvio: new Date().toISOString() }));
+  if (mortas.size || marcarEnvio)
+    await alterarInscricoes((d) => ({ ...d, itens: d.itens.filter((s) => !mortas.has(s.endpoint)), ...(marcarEnvio ? { ultimoEnvio: new Date().toISOString() } : {}) }));
   return { enviados: ok, total: itens.length, removidas: mortas.size };
+}
+
+async function enviarParaTodos() {
+  return enviarMensagem(await mensagem(), { marcarEnvio: true });
+}
+
+// Chamadas do Vercel Cron: exige CRON_SECRET (quando existe) ou o agente do cron da Vercel.
+export function cronAutorizado(req) {
+  const segredo = String(process.env.CRON_SECRET || "").trim();
+  if (segredo) return req.get("authorization") === `Bearer ${segredo}`;
+  return /vercel-cron/i.test(String(req.get("user-agent") || ""));
 }
 
 // ---------------- Rotas ----------------
@@ -177,9 +191,7 @@ lembretesRouter.post("/cancelar", async (req, res) => {
 // Chamado pelo Vercel Cron (vercel.json) na sexta de manhã.
 lembretesRouter.get("/enviar", async (req, res) => {
   try {
-    const segredo = String(process.env.CRON_SECRET || "").trim();
-    if (segredo && req.get("authorization") !== `Bearer ${segredo}`) return res.status(401).json({ error: "Não autorizado." });
-    if (!segredo && !/vercel-cron/i.test(String(req.get("user-agent") || ""))) return res.status(401).json({ error: "Não autorizado." });
+    if (!cronAutorizado(req)) return res.status(401).json({ error: "Não autorizado." });
     if (diaSemanaSP() !== "Fri") return res.json({ ok: true, pulado: "não é sexta" });
     const { ultimoEnvio } = await inscricoes();
     if (ultimoEnvio && Date.now() - Date.parse(ultimoEnvio) < 20 * 3600 * 1000) return res.json({ ok: true, pulado: "já enviado hoje" });
@@ -213,4 +225,5 @@ lembretesRouter.post("/gestora/testar", async (req, res) => {
   }
 });
 
+export { diaSemanaSP };
 export const _interno = { setSdk: (m) => { _colecao.setSdk(m); vapid = null; }, diaSemanaSP };

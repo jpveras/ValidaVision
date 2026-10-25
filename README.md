@@ -42,6 +42,21 @@ Os elogios ficam visíveis para quem abrir a página (é a ideia da dinâmica). 
 A chave fica só no `.env` e nunca vai para o browser. Não compartilhe o `.env`.
 Antes de enviar telas reais da empresa, valide as políticas internas de dados e PII.
 
+## Novidades da v0.37
+
+- **📺 TV da Toca** (`/tv`): modo quiosque para a TV ou monitor do time. Slides automáticos (12 s) com
+  recados, Toca News, aniversários/tempo de casa/agenda, elogios (só o texto, sem nomes), fotos novas do álbum,
+  Desafio aberto com QR Code, palavra da semana e boas-vindas com QR da Toca. Relógio, barra de progresso,
+  tela cheia (`F`), `←`/`→`, espaço pausa; cursor some sozinho; tenta manter a tela acesa; atualiza os dados
+  a cada 10 min. Slides sem conteúdo não aparecem. Instruções na Área da Gestora → aba **TV da Toca**.
+- **📰 Toca News** (`noticias.js`): toda segunda às 8h (cron `/api/noticias/cron`, `0 11 * * 1` UTC) gera o
+  resumo da semana anterior (elogios, Sentimento, desafio, fotos, aniversários e agenda) com a IA — se ela
+  falhar, sai um texto automático — e avisa por notificação. Só números e palavras: nenhuma frase do Sentimento,
+  texto de elogio ou nome de quem elogiou. Aparece no Início (cartão com "Ler tudo") e na TV.
+  Área da Gestora → aba **Toca News**: gerar (semana passada ou atual), editar, esconder, apagar, avisar o time.
+  Guardado em `noticias/_dados.json` (últimas 12 edições).
+- `lembretes.js` exporta `enviarMensagem()` e `cronAutorizado()` (reaproveitados pelo Toca News).
+
 ## Novidades da v0.36
 
 - **🎂 Aniversários 7 dias antes:** o quadro "Esta semana na Toca" do Início avisa a partir de 7 dias antes ("Faltam 5 dias para o aniversário de Diego", "Amanhã é aniversário de…"), também para os anos de time; tudo ordenado junto com a agenda pelo que está mais perto. No dia continua o destaque com **Dar parabéns**.
