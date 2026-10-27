@@ -106,9 +106,11 @@ async function mensagem() {
 
 // Envia uma notificação para todos os inscritos (também usada pelo Toca News).
 // marcarEnvio: registra o horário como "último lembrete de sexta".
-export async function enviarMensagem(msg, { marcarEnvio = false } = {}) {
+export async function enviarMensagem(msg, { marcarEnvio = false, filtro = null } = {}) {
   await chaves();
-  const { itens } = await inscricoes();
+  let { itens } = await inscricoes();
+  if (filtro) itens = itens.filter(filtro);
+  if (!itens.length) return { enviados: 0, total: 0, removidas: 0 };
   const corpo = JSON.stringify(msg);
   const mortas = new Set();
   let ok = 0;
@@ -130,6 +132,35 @@ export async function enviarMensagem(msg, { marcarEnvio = false } = {}) {
 
 async function enviarParaTodos() {
   return enviarMensagem(await mensagem(), { marcarEnvio: true });
+}
+
+// ---------------- Aviso de elogio (v0.38) ----------------
+// Quem quiser, informa o próprio nome no sino 🔔; quando chega um elogio para esse nome, só esse
+// aparelho recebe "Você recebeu um elogio!". O nome fica guardado junto com a inscrição (opcional).
+export const chaveNome = (n) =>
+  String(n || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9 ]+/g, " ").replace(/\s+/g, " ").trim();
+// "ana" combina com "ana souza" (e vice-versa); "ana souza" não combina com "ana lima".
+export function mesmoNome(a, b) {
+  const x = chaveNome(a).split(" ").filter(Boolean), y = chaveNome(b).split(" ").filter(Boolean);
+  if (!x.length || !y.length) return false;
+  const [c, l] = x.length <= y.length ? [x, y] : [y, x];
+  return c.every((t, i) => t === l[i]);
+}
+export async function avisarElogiados(elogios) {
+  let total = 0;
+  for (const e of elogios || []) {
+    if (!e?.nome) continue;
+    const r = await enviarMensagem(
+      { title: "💚 Você recebeu um elogio!", body: `“${String(e.texto || "").slice(0, 100)}”`, url: "/elogios.html", tag: "vv-elogio-" + e.id },
+      { filtro: (s) => s.nome && mesmoNome(s.nome, e.nome) }
+    );
+    total += r.enviados;
+  }
+  return total;
+}
+// Não deixa o envio do aviso atrasar a resposta por muito tempo.
+export function avisarElogiadosRapido(elogios, ms = 4000) {
+  return Promise.race([avisarElogiados(elogios).catch((e) => console.error("Aviso de elogio falhou:", e?.message || e)), new Promise((r) => setTimeout(r, ms))]);
 }
 
 // Chamadas do Vercel Cron: exige CRON_SECRET (quando existe) ou o agente do cron da Vercel.
@@ -178,6 +209,37 @@ lembretesRouter.post("/inscrever", async (req, res) => {
   }
 });
 
+// Liga/desliga o aviso de elogio deste aparelho (nome vazio = desliga).
+lembretesRouter.post("/nome", async (req, res) => {
+  try {
+    const ip = String(req.get("x-forwarded-for") || req.ip || "").split(",")[0].trim();
+    const agora = Date.now();
+    const j = (tentativas.get(ip) || []).filter((t) => agora - t < 60_000);
+    if (j.length >= 10) return res.status(429).json({ error: "Muitas tentativas. Aguarde um minuto." });
+    j.push(agora);
+    tentativas.set(ip, j);
+    const endpoint = String(req.body?.endpoint || "");
+    const nome = String(req.body?.nome || "").replace(/[\u0000-\u001f\u007f]/g, " ").replace(/\s+/g, " ").trim().slice(0, 40);
+    if (!endpoint) return res.status(400).json({ error: "Ative as notificações primeiro." });
+    if (nome && chaveNome(nome).length < 2) return res.status(400).json({ error: "Escreva o seu nome." });
+    let achou = false;
+    await alterarInscricoes((d) => ({
+      ...d,
+      itens: d.itens.map((x) => {
+        if (x.endpoint !== endpoint) return x;
+        achou = true;
+        const { nome: _n, ...resto } = x;
+        return nome ? { ...resto, nome } : resto;
+      }),
+    }));
+    if (!achou) return res.status(404).json({ error: "Este aparelho não está com as notificações ativas. Ative de novo pelo sino 🔔." });
+    res.json({ ok: true, nome: nome || null });
+  } catch (e) {
+    console.error("Lembrete: erro ao salvar nome", e);
+    res.status(500).json({ error: "Não consegui salvar agora." });
+  }
+});
+
 lembretesRouter.post("/cancelar", async (req, res) => {
   try {
     const endpoint = String(req.body?.endpoint || "");
@@ -207,7 +269,7 @@ lembretesRouter.get("/gestora", async (req, res) => {
   if (!(await exigeGestora(req, res))) return;
   try {
     const d = await inscricoes();
-    res.json({ inscritos: d.itens.length, ultimoEnvio: d.ultimoEnvio || null });
+    res.json({ inscritos: d.itens.length, avisoElogio: d.itens.filter((x) => x.nome).length, ultimoEnvio: d.ultimoEnvio || null });
   } catch (e) {
     res.status(500).json({ error: "Não consegui carregar os lembretes." });
   }

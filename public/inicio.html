@@ -54,6 +54,21 @@ button.bloco{border-radius:0}
 .sm-lista .parabens:hover{background:var(--teal2)}
 @media(max-width:560px){.sm-lista li{padding:10px 14px;gap:10px;flex-wrap:wrap}.sm-lista .tx{flex-basis:calc(100% - 52px)}.sm-lista .qd,.sm-lista .parabens{margin-left:42px}.semana h2{padding:12px 14px}}
 @media screen{html[data-tema="escuro"][data-pagina] .semana{background:var(--card);border-color:var(--line)}html[data-tema="escuro"][data-pagina] .sm-lista .ic{background:#20393c}html[data-tema="escuro"][data-pagina] .sm-lista li.festa{background:linear-gradient(90deg,#2e2412,transparent)}html[data-tema="escuro"][data-pagina] .sm-lista li.festa .ic{background:#4a3a14}html[data-tema="escuro"][data-pagina] .sm-lista li.breve .ic,html[data-tema="escuro"][data-pagina] .sm-lista li.breve .qd{background:#3d1a2c;color:#f6a8cb}html[data-tema="escuro"][data-pagina] .sm-lista .parabens{color:#fff}}
+/* Nome, "novo" nos blocos e aviso de elogio (v0.38) */
+.ola-trocar{background:none;border:0;padding:0;margin-left:6px;font:inherit;font-size:13px;color:var(--muted);text-decoration:underline;cursor:pointer;height:auto;text-transform:none;letter-spacing:normal}
+.perfil{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:-8px 0 22px;padding:12px 14px;border:1px dashed var(--teal);border-radius:12px;background:var(--teal-soft)}
+.perfil p{margin:0;flex:1 1 220px;font-size:14px;line-height:1.4;color:var(--ink)}
+.perfil p small{display:block;color:var(--muted);font-size:12px}
+.perfil input{flex:1 1 160px;min-width:0;height:38px;box-sizing:border-box;border:1px solid #cfd8d6;border-radius:8px;padding:0 12px;font:inherit;font-size:15px;background:#fff;color:var(--ink)}
+.perfil .acoes{display:flex;gap:8px;align-items:center}
+.perfil .pular{background:none;border:0;padding:0 4px;font:inherit;font-size:13px;color:var(--muted);cursor:pointer;text-decoration:underline;height:auto;text-transform:none;letter-spacing:normal}
+.perfil .erro{flex-basis:100%;margin:0;font-size:13px;color:#b42318}
+.bloco-novo{position:absolute;top:10px;right:10px;z-index:1;background:#fff;color:var(--cor);font-size:11px;font-weight:900;letter-spacing:.4px;text-transform:uppercase;line-height:1;padding:5px 8px;border-radius:99px;box-shadow:0 2px 8px rgba(0,0,0,.18);white-space:nowrap;animation:novoPulso 2.4s ease-in-out infinite}
+@keyframes novoPulso{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+@media (prefers-reduced-motion:reduce){.bloco-novo{animation:none}}
+.news-novo{font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.4px;color:#fff;background:var(--teal);border-radius:99px;padding:3px 8px}
+@media(max-width:560px){.bloco-novo{top:7px;right:7px;font-size:10px;padding:4px 7px}.perfil{margin-top:-4px}}
+@media screen{html[data-tema="escuro"][data-pagina] .perfil input{background:var(--panel);border-color:var(--line)}html[data-tema="escuro"][data-pagina] .bloco-novo{background:#0f1a1c}html[data-tema="escuro"][data-pagina] .perfil .erro{color:#f07a72}}
 /* Toca News (resumo da semana, v0.37) */
 .news{margin:30px 0 0;border:1px solid var(--line);border-radius:14px;background:#fff;overflow:hidden;scroll-margin-top:80px}
 .news-topo{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--line);background:linear-gradient(90deg,var(--teal-soft),transparent)}
@@ -134,8 +149,8 @@ html.vv-bv{overflow:hidden}
 @media(max-width:560px){.bv h1{font-size:26px}.bv h1 span{font-size:31px}.bv-caixa{padding:28px 20px 22px}.bv-ico{width:78px;height:78px}}
 @media(prefers-reduced-motion:reduce){.bv,.bv-caixa,.bv-ico,.menu.entrar .bloco,.bv-barra i{animation:none!important}}
 </style>
-<link rel="stylesheet" href="/vv-tema-auto.css?v=37">
-<link rel="stylesheet" href="/vv-tema.css?v=37">
+<link rel="stylesheet" href="/vv-tema-auto.css?v=38">
+<link rel="stylesheet" href="/vv-tema.css?v=38">
 <script src="/vv-tema.js?v=23"></script>
 <link rel="manifest" href="/manifest.webmanifest?v=3">
 <meta name="theme-color" content="#033a45">
@@ -160,7 +175,7 @@ html.vv-bv{overflow:hidden}
   if(mostrar)html.classList.add('vv-bv');
 })();
 </script>
-<script src="/vv-app.js?v=3" defer></script>
+<script src="/vv-app.js?v=4" defer></script>
 <script src="/vv-gestora.js?v=1" defer></script>
 <script src="/vv-recado.js?v=3" defer></script>
 </head>
@@ -170,7 +185,7 @@ html.vv-bv{overflow:hidden}
   <a class="logo" href="/inicio.html">
     <img id="brandLogo" src="/logo.png" alt="" hidden onload="this.hidden=false;this.nextElementSibling.setAttribute('hidden','')">
     <svg width="28" height="24" viewBox="0 0 28 24" aria-hidden="true"><path d="M1 2h9l4 9 4-9h9L14 23z" fill="#2fc28f"/><path d="M10 2h8l-4 9z" fill="#1a8f6a"/></svg>
-    <b>Toca dos <span>Bug Hunters</span></b><span class="ver">v0.37</span>
+    <b>Toca dos <span>Bug Hunters</span></b><span class="ver">v0.38</span>
   </a>
   <div class="spacer"></div>
 </header>
@@ -216,8 +231,9 @@ html.vv-bv{overflow:hidden}
 
 <main class="content"><div class="panel"><div class="wrap">
 
-  <h1 class="ola">Olá, <span>caçador(a)!</span> 🐞</h1>
-  <p class="ola-sub">Por onde vamos começar hoje?</p>
+  <h1 class="ola" id="ola">Olá, <span>caçador(a)!</span> 🐞</h1>
+  <p class="ola-sub">Por onde vamos começar hoje? <button type="button" class="ola-trocar" id="olaTrocar" hidden>Não é você?</button></p>
+  <form class="perfil" id="perfil" hidden novalidate></form>
 
   <nav class="menu" id="menu" aria-label="Menus da Toca">
     <a class="bloco elogie" href="/elogios.html">
@@ -305,6 +321,57 @@ html.vv-bv{overflow:hidden}
     timer=setTimeout(fechar,TEMPO+300);
   }else entrarMenus();
 
+  // ---------- Nome da pessoa e aviso de elogio (v0.38; o nome fica só neste aparelho) ----------
+  var LS={get:function(k){try{return localStorage.getItem(k)}catch(e){return null}},set:function(k,v){try{v==null?localStorage.removeItem(k):localStorage.setItem(k,v)}catch(e){}}};
+  var escH=function(v){return String(v==null?'':v).replace(/[&<>"']/g,function(m){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]})};
+  var meuNome=function(){return String(LS.get('vv-nome')||LS.get('vv-album-nome')||'').replace(/\s+/g,' ').trim().slice(0,40)};
+  var perfil=document.getElementById('perfil');
+  function mostrarNome(){
+    var n=meuNome(),p=n.split(' ')[0];
+    document.getElementById('ola').innerHTML=p?'Olá, <span>'+escH(p)+'!</span> 🐞':'Olá, <span>caçador(a)!</span> 🐞';
+    var t=document.querySelector('#bvTit span');if(t&&p)t.textContent=p+'!';
+    document.getElementById('olaTrocar').hidden=!p;
+  }
+  function cartaoNome(){
+    perfil.innerHTML='<p>👋 Como podemos te chamar?<small>Fica só neste aparelho e já preenche o seu nome no desafio e nos comentários.</small></p><input id="pfNome" maxlength="40" autocomplete="name" placeholder="Seu nome" value="'+escH(meuNome())+'"><span class="acoes"><button class="btn-primary btn-sm" type="submit">Salvar</button><button class="pular" type="button" data-pular="nome">Agora não</button></span>';
+    perfil.dataset.passo='nome';perfil.hidden=false;
+  }
+  function cartaoAviso(){
+    if(!window.vvApp||!window.vvApp.estadoAviso||LS.get('vv-perfil-pular-aviso'))return;
+    window.vvApp.estadoAviso().then(function(st){
+      if(!st.pode||st.ligado){perfil.hidden=true;return}
+      var p=meuNome().split(' ')[0];
+      perfil.innerHTML='<p>💚 Quer saber na hora quando alguém te elogiar, '+escH(p)+'?<small>Você recebe um aviso no celular ou no computador. Dá para desligar no sino 🔔.</small></p><span class="acoes"><button class="btn-primary btn-sm" type="submit">Ligar aviso</button><button class="pular" type="button" data-pular="aviso">Agora não</button></span>';
+      perfil.dataset.passo='aviso';perfil.hidden=false;
+    });
+  }
+  perfil.addEventListener('submit',function(e){
+    e.preventDefault();var er=perfil.querySelector('.erro');if(er)er.remove();
+    var falha=function(m){var x=document.createElement('p');x.className='erro';x.textContent=m;perfil.appendChild(x)};
+    if(perfil.dataset.passo==='nome'){
+      var n=String(document.getElementById('pfNome').value||'').replace(/\s+/g,' ').trim().slice(0,40);
+      if(n.length<2)return falha('Escreva o seu nome.');
+      if(window.vvPerfil)window.vvPerfil.definir(n);else{LS.set('vv-nome',n);LS.set('vv-album-nome',n)}
+      mostrarNome();perfil.hidden=true;cartaoAviso();
+    }else{
+      var b=perfil.querySelector('[type=submit]');b.disabled=true;b.textContent='Ligando…';
+      window.vvApp.ligarAviso(meuNome()).then(function(){perfil.innerHTML='<p>Pronto! Quando alguém te elogiar, você fica sabendo na hora. 💚</p>';setTimeout(function(){perfil.hidden=true},4000)})
+        .catch(function(err){b.disabled=false;b.textContent='Ligar aviso';falha(err.message||'Não consegui ligar agora.')});
+    }
+  });
+  perfil.addEventListener('click',function(e){var p=e.target.closest('[data-pular]');if(!p)return;LS.set(p.dataset.pular==='nome'?'vv-perfil-pular':'vv-perfil-pular-aviso','1');perfil.hidden=true});
+  document.getElementById('olaTrocar').onclick=function(){LS.set('vv-perfil-pular',null);cartaoNome();var i=document.getElementById('pfNome');i.value='';i.focus()};
+  mostrarNome();
+  addEventListener('load',function(){setTimeout(function(){if(!meuNome()){if(!LS.get('vv-perfil-pular'))cartaoNome()}else cartaoAviso()},0)});
+
+  // ---------- "Novo" nos blocos desde a última visita (v0.38) ----------
+  var VISTO=(function(){try{return JSON.parse(LS.get('vv-visto')||'null')}catch(e){return null}})();
+  if(!VISTO)LS.set('vv-visto',JSON.stringify({_inicio:new Date().toISOString()})); // primeira vez: nada aparece como novo
+  var visto=function(a){return VISTO?(VISTO[a]||VISTO._inicio||null):null};
+  var depois=function(iso,a){var v=visto(a);return !!(v&&iso&&String(iso)>v)};
+  function selo(cls,txt){var b=document.querySelector('.bloco.'+cls);if(!b||b.querySelector('.bloco-novo'))return;var s=document.createElement('span');s.className='bloco-novo';s.textContent=txt;b.appendChild(s);b.setAttribute('aria-label',b.querySelector('b').textContent+' — '+txt)}
+  function marcarVisto(a){var m;try{m=JSON.parse(LS.get('vv-visto')||'null')}catch(e){}m=m||{_inicio:new Date().toISOString()};m[a]=new Date().toISOString();LS.set('vv-visto',JSON.stringify(m))}
+
   // ---------- Últimas atualizações (resumo do que aconteceu na Toca) ----------
   var esc=function(v){return String(v==null?'':v).replace(/[&<>"']/g,function(m){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]})};
   function quando(iso){if(!iso)return'';var s=(Date.now()-new Date(iso))/1000;if(s<60)return'agora';if(s<3600)return'há '+Math.floor(s/60)+' min';if(s<86400)return'há '+Math.floor(s/3600)+' h';var d=Math.floor(s/86400);if(d===1)return'ontem';if(d<7)return'há '+d+' dias';return new Date(iso).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})}
@@ -343,7 +410,7 @@ html.vv-bv{overflow:hidden}
     var e=n&&n.edicoes&&n.edicoes[0];
     if(!e||Date.now()-Date.parse(e.geradaEm)>8*86400e3)return;
     var d=e.destaques||[],sec=document.getElementById('news');
-    document.getElementById('newsSem').textContent=String(e.rotulo||'').replace(/^Semana \d+ · /,'');
+    document.getElementById('newsSem').innerHTML=(depois(e.geradaEm,'news')?'<span class="news-novo">novo</span> ':'')+escH(String(e.rotulo||'').replace(/^Semana \d+ · /,''));marcarVisto('news');
     document.getElementById('newsCorpo').innerHTML='<h3>'+esc(e.titulo)+'</h3>'+(e.abertura?'<p>'+esc(e.abertura)+'</p>':'')+
       '<ul class="news-dest">'+d.map(function(x,i){return '<li'+(i>=3?' class="extra"':'')+'><span aria-hidden="true">'+esc(x.emoji)+'</span><span>'+esc(x.texto)+'</span></li>'}).join('')+'</ul>'+
       (e.fechamento?'<p class="news-fim">'+esc(e.fechamento)+'</p>':'')+
@@ -355,8 +422,22 @@ html.vv-bv{overflow:hidden}
   });
 
   // Até 5 itens; mais fontes para a lista nunca ficar curta.
-  Promise.all([pega('/api/album'),pega('/api/elogios'),pega('/api/sentimentos'),pega('/api/sugestoes'),pega('/api/desafios'),pega('/api/recado')]).then(function(r){
+  var leitor=LS.get('vv-leitor');
+  var pegaDz=fetch('/api/desafios',{cache:'no-store',headers:leitor&&/^[a-f0-9]{32}$/.test(leitor)?{'x-leitor':leitor}:{}}).then(function(r){return r.ok?r.json():null}).catch(function(){return null});
+  Promise.all([pega('/api/album'),pega('/api/elogios'),pega('/api/sentimentos'),pega('/api/sugestoes'),pegaDz,pega('/api/recado')]).then(function(r){
     var al=r[0],el=r[1],se=r[2],sg=r[3],dz=r[4],rc=r[5],itens=[];
+    // Selos "novo" / "responda" nos blocos
+    try{
+      var plural=function(n,um,v){return n+' '+(n===1?um:v)};
+      if(el&&el.elogios){var ne=el.elogios.filter(function(x){return depois(x.criadoEm,'elogios')}).length;if(ne)selo('elogie',plural(ne,'novo','novos'))}
+      var dia=new Date().getDay();
+      if(se&&se.semana&&LS.get('vv-sentimento-semana')!==se.semana&&(dia>=4||dia===0))selo('sentimento','responda');
+      if(al&&al.fotos){var nf=al.fotos.filter(function(x){return depois(x.criadaEm,'album')}).length;
+        var nc=0;al.fotos.forEach(function(f){(f.comentarios||[]).forEach(function(c){if(depois(c.criadoEm,'album'))nc++})});
+        if(nf)selo('album',plural(nf,'foto nova','fotos novas'));else if(nc)selo('album',plural(nc,'comentário','comentários'))}
+      if(sg&&sg.mural){var ns=sg.mural.filter(function(x){return depois(x.respondidaEm,'sugestoes')}).length;if(ns)selo('sugestoes',ns===1?'resposta nova':ns+' respostas')}
+      if(dz&&dz.atual&&!dz.atual.minha)selo('desafio',depois(dz.atual.criadoEm,'desafio')?'novo':'responda');
+    }catch(e){}
     if(rc&&rc.recados&&rc.recados.length){var ult=rc.recados.slice().sort(function(a,b){return String(b.atualizadoEm).localeCompare(String(a.atualizadoEm))})[0];itens.push({em:ult.atualizadoEm,ic:'📣',t:rc.recados.length>1?'<b>'+rc.recados.length+' recados</b> da chefa para o time':'Recado da chefa: <b>'+esc(curto(ult.titulo||'Recado da Chefa!',40))+'</b>',s:esc(curto(ult.mensagem,70)),href:'javascript:void(0)',acao:'recado'})}
     if(dz&&dz.anteriores&&dz.anteriores.length){var an=dz.anteriores[0];itens.push({em:an.encerradoEm,ic:'✅',t:'Resposta do desafio anterior revelada',s:an.total?(Math.round(an.acertos/an.total*100))+'% acertaram · veja a explicação':'Veja a resposta certa',href:'/desafio.html'})}
     if(dz&&dz.ranking&&dz.ranking.length){var ld=dz.ranking[0];itens.push({em:null,ic:'🏆',t:'<b>'+esc(ld.nome)+'</b> lidera o ranking do mês',s:ld.pontos+' '+(ld.pontos===1?'ponto':'pontos')+' no Desafio da semana',href:'/desafio.html',fixo:dz.rotuloMes?dz.rotuloMes.split(' ')[0]:''})}

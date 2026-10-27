@@ -101,7 +101,7 @@ html[data-tema="escuro"][data-pagina="gestora"] .toolbar select{border:1px solid
 html[data-tema="escuro"][data-pagina="gestora"] .tile{background:#1c3134}
 html[data-tema="escuro"][data-pagina="gestora"] .resp{background:#1c3134}
 html[data-tema="escuro"][data-pagina="gestora"] .guia{background:#1c3134}
-html[data-tema="escuro"][data-pagina="gestora"] .guia kbd{border:1px solid #3e4342}
+html[data-tema="escuro"][data-pagina="gestora"] .guia kbd,html[data-tema="escuro"][data-pagina="gestora"] .tv-guia kbd{border:1px solid #3e4342}
 html[data-tema="escuro"][data-pagina="gestora"] .clima.positivo{background:#1b2a23;color:#a8f3d3}
 html[data-tema="escuro"][data-pagina="gestora"] .clima.neutro{background:#212524;color:#bdcbd0}
 html[data-tema="escuro"][data-pagina="gestora"] .clima.atencao{background:#332a13;color:#efc590}
@@ -138,6 +138,9 @@ html[data-tema="escuro"][data-pagina="inicio"] .sm-lista li.festa{background:lin
 html[data-tema="escuro"][data-pagina="inicio"] .sm-lista li.festa .ic{background:#27200f}
 html[data-tema="escuro"][data-pagina="inicio"] .sm-lista li.breve .ic{background:#321622}
 html[data-tema="escuro"][data-pagina="inicio"] .sm-lista li.breve .qd{background:#321622;color:#e588b3}
+html[data-tema="escuro"][data-pagina="inicio"] .perfil input{border:1px solid #3e4342;background:#1c3134}
+html[data-tema="escuro"][data-pagina="inicio"] .perfil .erro{color:#ed857e}
+html[data-tema="escuro"][data-pagina="inicio"] .bloco-novo{background:#1c3134}
 html[data-tema="escuro"][data-pagina="inicio"] .news{background:#1c3134}
 html[data-tema="escuro"][data-pagina="inicio"] .novidades{background:#1c3134}
 html[data-tema="escuro"][data-pagina="inicio"] .bv-caixa{border:1px solid rgba(59,87,91,.16)}

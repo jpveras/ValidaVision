@@ -42,6 +42,21 @@ Os elogios ficam visíveis para quem abrir a página (é a ideia da dinâmica). 
 A chave fica só no `.env` e nunca vai para o browser. Não compartilhe o `.env`.
 Antes de enviar telas reais da empresa, valide as políticas internas de dados e PII.
 
+## Novidades da v0.38
+
+- **"Novo" nos blocos do Início**: selos como "3 novos" (elogios), "1 foto nova"/"comentários" (álbum),
+  "resposta nova" (sugestões), "novo"/"responda" (desafio sem resposta deste aparelho) e "responda" no
+  Sentimento (de quinta a domingo, se ainda não respondeu). Toca News ganha a etiqueta "novo". Guardado só no
+  aparelho (`vv-visto`; abrir a página da área marca como visto; na 1ª visita nada aparece como novo).
+- **Nome lembrado** (`vv-nome`, só no aparelho): "Olá, Carla!" no Início e nas boas-vindas, cartão "Como podemos
+  te chamar?" (com "Agora não" e "Não é você?"), e o nome já vem preenchido no desafio e nos comentários do álbum.
+  `window.vvPerfil` e `window.vvVisto` em `vv-app.js`.
+- **Aviso de elogio**: no sino 🔔 (ou no cartão do Início) a pessoa liga o aviso com o próprio nome; quando chega um
+  elogio para esse nome, só o aparelho dela recebe "💚 Você recebeu um elogio!". `POST /api/lembretes/nome`
+  (nome vazio desliga); nome guardado junto da inscrição. Comparação sem acento/maiúscula; "Ana" combina com
+  "Ana Souza", "Ana Souza" não combina com "Ana Lima". Com aprovação antes do telão, o aviso sai ao aprovar.
+  A aba Lembrete da gestora mostra quantas pessoas ligaram.
+
 ## Novidades da v0.37
 
 - **📺 TV da Toca** (`/tv`): modo quiosque para a TV ou monitor do time. Slides automáticos (12 s) com
