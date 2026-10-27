@@ -112,6 +112,17 @@ html.vv-tema-anim, html.vv-tema-anim * { transition: background-color .25s, colo
 .vv-app-linha input { flex: 1; min-width: 0; height: 34px; box-sizing: border-box; border: 1px solid var(--line, #cfd8d6); border-radius: 6px; padding: 0 10px; font: inherit; font-size: 14px; background: var(--card, #fff); color: var(--ink, #0b3b47); }
 .vv-app-linha button { margin-top: 0; flex: none; }
 .vv-app-item.vv-app-elo { border-bottom: 0; }
+.vv-app-item a.btn-sm { align-self: flex-start; margin-top: 4px; text-decoration: none; }
+.vv-upd { position: fixed; left: 12px; right: 12px; bottom: 16px; z-index: 60; max-width: 520px; margin: 0 auto; display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  background: #033a45; color: #e4efed; border-radius: 14px; padding: 14px 16px; box-shadow: 0 12px 34px rgba(0,0,0,.35); animation: vvUpd .35s ease-out; }
+@keyframes vvUpd { from { transform: translateY(30px); opacity: 0; } }
+.vv-upd-ico { font-size: 28px; flex: none; }
+.vv-upd-tx { flex: 1 1 200px; min-width: 0; font-size: 13px; line-height: 1.4; }
+.vv-upd-tx b { display: block; font-size: 15px; color: #fff; }
+.vv-upd-tx span b { display: inline; font-size: inherit; }
+.vv-upd-acoes { display: flex; gap: 10px; align-items: center; margin-left: auto; }
+.vv-upd-acoes a, .vv-app-item a.btn-sm { text-decoration: none; display: inline-flex; align-items: center; justify-content: center; }
+.vv-upd-depois { background: none; border: 0; color: #b9d3d0; font: inherit; font-size: 13px; text-decoration: underline; cursor: pointer; padding: 0; height: auto; text-transform: none; letter-spacing: normal; }
 .vv-app-msg { margin: 8px 0 0; font-size: 13px; color: var(--teal2, #0b7f70); min-height: 1em; }
 .vv-app-msg.erro { color: #b42318; }
 @media screen { html[data-tema="escuro"] .vv-app-msg.erro { color: #f07a72; } }
