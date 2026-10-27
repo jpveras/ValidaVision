@@ -288,4 +288,23 @@ lembretesRouter.post("/gestora/testar", async (req, res) => {
 });
 
 export { diaSemanaSP };
+// Aviso livre da gestora para todos que ativaram as notificações (ex.: "Atualize o app").
+const ultimoAviso = { t: 0 };
+lembretesRouter.post("/gestora/aviso", async (req, res) => {
+  if (!(await exigeGestora(req, res))) return;
+  try {
+    const linha = (v, max) => String(v ?? "").replace(/[\u0000-\u001f\u007f]/g, " ").replace(/\s+/g, " ").trim().slice(0, max);
+    const title = linha(req.body?.titulo, 60), body = linha(req.body?.texto, 180);
+    let url = String(req.body?.link || "").trim() || "/inicio.html";
+    if (!/^\/[^/]/.test(url) && url !== "/") return res.status(400).json({ error: "O link precisa ser uma página da Toca (começando com /)." });
+    if (title.length < 3 || body.length < 3) return res.status(400).json({ error: "Escreva o título e o texto do aviso." });
+    if (Date.now() - ultimoAviso.t < 5 * 60 * 1000) return res.status(429).json({ error: "Aguarde alguns minutos entre um aviso e outro." });
+    ultimoAviso.t = Date.now();
+    res.json({ ok: true, ...(await enviarMensagem({ title, body, url: url.slice(0, 200), tag: "vv-aviso-" + Date.now() })) });
+  } catch (e) {
+    console.error("Aviso da gestora: erro", e);
+    res.status(500).json({ error: "Falha ao enviar o aviso." });
+  }
+});
+
 export const _interno = { setSdk: (m) => { _colecao.setSdk(m); vapid = null; }, diaSemanaSP };
