@@ -25,6 +25,14 @@
     marcar: function (area) { var m = mapa() || { _inicio: new Date().toISOString() }; m[area] = new Date().toISOString(); set(K, JSON.stringify(m)); },
     iniciar: function () { if (!mapa()) set(K, JSON.stringify({ _inicio: new Date().toISOString() })); },
   };
+  // App Android (TWA): o Android abre a Toca com o referrer "android-app://br.com.jpveras.bughunters"
+  // e, a partir da 1.1.1, com "&av=<versão>" no endereço. Guardamos para avisar quando houver versão nova.
+  try {
+    var q = new URLSearchParams(location.search);
+    var twa = /^android-app:\/\/br\.com\.jpveras\.bughunters/.test(document.referrer || "");
+    if (twa || q.get("av")) { set("vv-twa", "1"); set("vv-twa-av", String(parseInt(q.get("av") || "1", 10) || 1)); }
+  } catch (e) { /* ok */ }
+
   // Abrir a página de uma área conta como "visto".
   var AREA = { "/elogios.html": "elogios", "/album.html": "album", "/desafio.html": "desafio", "/sugestoes.html": "sugestoes", "/sentimento.html": "sentimento" };
   var area = AREA[location.pathname];
@@ -124,6 +132,8 @@
     var rec = pop.querySelector(".vv-app-rec");
     if (rec) rec.hidden = !(window.vvRecado && window.vvRecado.tem());
     var inst = pop.querySelector(".vv-app-inst"), lem = pop.querySelector(".vv-app-lem");
+    var upd = pop.querySelector(".vv-app-upd");
+    if (upd) { upd.hidden = !appNovo; if (appNovo) upd.innerHTML = '<b>📲 Atualização do app: ' + esc(appNovo.nome) + '</b><span>' + esc(appNovo.novidade) + ' Baixe e toque em Instalar.</span><a class="btn-primary btn-sm" href="' + esc(appNovo.apk) + '" target="_blank" rel="noopener">Atualizar o app</a>'; }
     if (instalado) inst.innerHTML = '<b>📲 App instalado</b><span>Abra o Toca dos Bug Hunters pelo ícone na tela inicial.</span>';
     else if (promptInstalar) inst.innerHTML = '<b>📲 Instalar o app</b><span>Ícone na tela inicial, abre direto, sem barra do navegador.</span><button type="button" class="btn-primary btn-sm" data-acao="instalar">Instalar</button>';
     else if (ios) inst.innerHTML = '<b>📲 Instalar no iPhone</b><span>No Safari, toque em <b>Compartilhar</b> (□↑) e depois em <b>Adicionar à Tela de Início</b>.</span>';
@@ -177,7 +187,7 @@
     pop.hidden = true;
     pop.setAttribute("role", "dialog");
     pop.setAttribute("aria-label", "App e lembrete de sexta");
-    pop.innerHTML = '<div class="vv-app-item vv-app-rec" hidden><b>📣 Recado da Chefa</b><span>Rever os recados que a chefa deixou para o time.</span><button type="button" class="btn-outline btn-sm" data-acao="recado">Ver recado</button></div><div class="vv-app-item vv-app-inst"></div><div class="vv-app-item vv-app-lem"></div><div class="vv-app-item vv-app-elo" hidden></div><p class="vv-app-msg" role="status"></p>';
+    pop.innerHTML = '<div class="vv-app-item vv-app-upd" hidden></div><div class="vv-app-item vv-app-rec" hidden><b>📣 Recado da Chefa</b><span>Rever os recados que a chefa deixou para o time.</span><button type="button" class="btn-outline btn-sm" data-acao="recado">Ver recado</button></div><div class="vv-app-item vv-app-inst"></div><div class="vv-app-item vv-app-lem"></div><div class="vv-app-item vv-app-elo" hidden></div><p class="vv-app-msg" role="status"></p>';
     document.body.appendChild(pop);
 
     btn.addEventListener("click", function (e) { e.stopPropagation(); abrir(); });
@@ -201,9 +211,39 @@
     atualiza();
   }
 
+  // ---------- Aviso "Atualize o app" (só no app Android antigo) ----------
+  var appNovo = null;
+  function verificaApp() {
+    var standalone = window.matchMedia("(display-mode: standalone)").matches;
+    if (!standalone || lsGet("vv-twa") !== "1") return;
+    var minha = parseInt(lsGet("vv-twa-av") || "1", 10) || 1;
+    fetch("/api/app").then(function (r) { return r.json(); }).then(function (d) {
+      if (!d || !d.versao || d.versao <= minha) return;
+      appNovo = d;
+      atualiza();
+      var hoje = new Date().toISOString().slice(0, 10);
+      if (lsGet("vv-app-aviso-dia") === hoje || /gestora/.test(location.pathname)) return;
+      var abre = function () { setTimeout(mostrarAvisoApp, 900); };
+      if (document.documentElement.classList.contains("vv-bv")) window.addEventListener("vv-bv-fim", abre, { once: true }); else abre();
+    }).catch(function () {});
+  }
+  function mostrarAvisoApp() {
+    if (!appNovo || document.querySelector(".vv-upd")) return;
+    var el = document.createElement("div");
+    el.className = "vv-upd";
+    el.setAttribute("role", "dialog");
+    el.setAttribute("aria-label", "Atualização do app");
+    el.innerHTML = '<span class="vv-upd-ico" aria-hidden="true">📲</span><div class="vv-upd-tx"><b>Nova versão do app (' + esc(appNovo.nome) + ')</b><span>' + esc(appNovo.novidade) + ' Baixe e toque em <b>Instalar</b> — seus dados continuam.</span></div>' +
+      '<div class="vv-upd-acoes"><a class="btn-primary btn-sm" href="' + esc(appNovo.apk) + '" target="_blank" rel="noopener">Atualizar</a><button type="button" class="vv-upd-depois">Depois</button></div>';
+    document.body.appendChild(el);
+    var fecha = function () { try { localStorage.setItem("vv-app-aviso-dia", new Date().toISOString().slice(0, 10)); } catch (e) { /* ok */ } el.remove(); };
+    el.querySelector(".vv-upd-depois").onclick = fecha;
+    el.querySelector("a").addEventListener("click", function () { setTimeout(fecha, 300); });
+  }
+
   window.addEventListener("vv-recado", function () { atualiza(); });
   function esc(v) { return String(v == null ? "" : v).replace(/[&<>"']/g, function (m) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" }[m]; }); }
   window.vvApp = { abrir: function () { if (btn) { abrir(true); window.scrollTo(0, 0); } }, ligarAviso: ligarAviso, estadoAviso: estadoAviso };
-  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", function () { setTimeout(monta, 0); });
-  else setTimeout(monta, 0);
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", function () { setTimeout(function () { monta(); verificaApp(); }, 0); });
+  else setTimeout(function () { monta(); verificaApp(); }, 0);
 })();

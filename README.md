@@ -42,6 +42,15 @@ Os elogios ficam visíveis para quem abrir a página (é a ideia da dinâmica). 
 A chave fica só no `.env` e nunca vai para o browser. Não compartilhe o `.env`.
 Antes de enviar telas reais da empresa, valide as políticas internas de dados e PII.
 
+## App Android 1.1.1 e aviso de atualização
+
+- Ícone novo (logo do Time Bug Hunters). O app abre `/inicio.html?app=1&av=3`; o número `av` é o appVersionCode.
+- Quem abre a Toca por um app mais antigo (Android identificado pelo referrer `android-app://br.com.jpveras.bughunters`)
+  vê, uma vez por dia, o aviso **"Nova versão do app"** com o botão **Atualizar**, e o item fica também no sino 🔔.
+- Versão atual em `APP_ANDROID` no `server.js` (`/api/app`); link fixo para o APK mais novo: **/baixar-app**.
+- Para lançar outra versão: aumente `appVersionCode`/`appVersionName` e o `av=` do `startUrl` em
+  `android/twa-manifest.json`, e atualize `APP_ANDROID` (versao, nome, novidade, apk).
+
 ## Novidades da v0.38
 
 - **"Novo" nos blocos do Início**: selos como "3 novos" (elogios), "1 foto nova"/"comentários" (álbum),

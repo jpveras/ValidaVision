@@ -102,6 +102,18 @@ app.get(["/gestora", "/painel", "/chefa"], (_req, res) => res.redirect(302, "/ge
 // App Android (TWA): o Android confere este arquivo para abrir a Toca em tela cheia, sem barra de endereço.
 app.get("/.well-known/assetlinks.json", (_req, res) => res.type("application/json").sendFile(path.join(__dirname, "public", ".well-known", "assetlinks.json")));
 
+// Versão mais nova do app Android. Ao gerar um APK novo (android/twa-manifest.json), atualize aqui:
+// "versao" = appVersionCode. O startUrl do app leva "&av=<versao>", e quem abre por um app mais
+// antigo vê o aviso "Atualize o app" (vv-app.js) com o botão para baixar.
+const APP_ANDROID = {
+  versao: 3,
+  nome: "1.1.1",
+  novidade: "Ícone novo com a logo do Time Bug Hunters.",
+  apk: "https://github.com/jpveras/ValidaVision/releases/download/app-v1.1.1/toca-bug-hunters.apk",
+};
+app.get("/api/app", (_req, res) => res.set("Cache-Control", "public, max-age=300").json({ ...APP_ANDROID, baixar: "/baixar-app" }));
+app.get(["/baixar-app", "/app.apk", "/apk"], (_req, res) => res.redirect(302, APP_ANDROID.apk));
+
 app.use(express.static(path.join(__dirname, "public")));
 
 // Elogie um Colega (rotas próprias, não interferem na análise de tela)
