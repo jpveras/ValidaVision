@@ -706,6 +706,18 @@ html[data-tema="escuro"] .ev-tip{background:#e4efed;color:#0f1a1c}
       <div class="card-head"><span>🔔 Lembrete de sexta</span></div>
       <div class="card-body" id="lbCorpo" style="font-size:14px"><span class="carregando"></span></div>
     </section>
+    <section class="card no-print">
+      <div class="card-head"><span>📢 Aviso para o time</span></div>
+      <div class="card-body">
+        <p class="ev-nota" style="margin:0 0 10px">Manda uma notificação agora para todo mundo que ativou as notificações (celular ou computador). Use com moderação — ex.: “Saiu versão nova do app”, “Confra começa em 30 min”.</p>
+        <form class="ag-form" id="avForm" novalidate>
+          <div class="tudo"><label class="label" for="avTit"><span>Título</span></label><input id="avTit" maxlength="60" placeholder="Ex.: 📲 App atualizado!"></div>
+          <div class="tudo"><label class="label" for="avTx"><span>Texto</span></label><input id="avTx" maxlength="180" placeholder="Ex.: Toque para baixar a versão nova com o ícone do Time Bug Hunters."></div>
+          <div class="tudo"><label class="label" for="avLink"><span>Abre qual página (opcional)</span></label><input id="avLink" maxlength="200" placeholder="/inicio.html  ·  /baixar-app  ·  /desafio.html"></div>
+          <div class="linha"><button class="btn-primary btn-sm" type="submit" id="avEnviar">Enviar aviso para todos</button><span class="msgsg" id="avMsg" role="status"></span></div>
+        </form>
+      </div>
+    </section>
     </section>
 
     <section class="gt-aba" data-painel="pergunta" data-recurso="pergunta" role="tabpanel">
@@ -995,6 +1007,13 @@ async function carregarLembretes(){
     <button class="btn-outline btn-sm" type="button" id="lbTestar" ${d.inscritos?'':'disabled'}>Enviar lembrete agora</button> <span class="msgsg" id="lbMsg"></span>`;
   }catch(e){$('lbCorpo').textContent=e.message}
 }
+$('avForm').addEventListener('submit',e=>{
+  e.preventDefault();const b=$('avEnviar'),m=$('avMsg');
+  armar(b,async()=>{m.className='msgsg';m.textContent='Enviando…';b.disabled=true;
+    try{const d=await api('/api/lembretes/gestora/aviso',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({titulo:$('avTit').value,texto:$('avTx').value,link:$('avLink').value})});m.className='msgsg ok';m.textContent=`Aviso enviado para ${d.enviados} de ${d.total} ${d.total===1?'aparelho':'aparelhos'} ✓`;$('avForm').reset()}
+    catch(err){if(err.status===401)return expirou();m.className='msgsg err';m.textContent=err.message}
+    finally{b.disabled=false}},'Confirmar: enviar para todos');
+});
 $('lbCorpo').addEventListener('click',async e=>{
   const b=e.target.closest('#lbTestar');if(!b)return;
   if(!b.classList.contains('armed')){b.classList.add('armed');b.textContent='Confirmar envio para todos';setTimeout(()=>{b.classList.remove('armed');b.textContent='Enviar lembrete agora'},3500);return}
