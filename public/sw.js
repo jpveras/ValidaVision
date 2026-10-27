@@ -20,8 +20,8 @@ self.addEventListener("push", (e) => {
   e.waitUntil(
     self.registration.showNotification(titulo, {
       body: d.body || "Como foi a sua semana?",
-      icon: "/icon-192.png?v=3",
-      badge: "/icon-192.png?v=3",
+      icon: "/icon-192.png?v=4",
+      badge: "/icon-192.png?v=4",
       tag: d.tag || "vv-lembrete",
       data: { url: d.url || "/sentimento.html" },
     })
