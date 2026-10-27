@@ -340,15 +340,15 @@ html[data-tema="escuro"] .ev-tip{background:#e4efed;color:#0f1a1c}
   .sug li{break-inside:avoid}
 }
 </style>
-<link rel="stylesheet" href="/vv-tema-auto.css?v=37">
-<link rel="stylesheet" href="/vv-tema.css?v=37">
+<link rel="stylesheet" href="/vv-tema-auto.css?v=38">
+<link rel="stylesheet" href="/vv-tema.css?v=38">
 <script src="/vv-tema.js?v=23"></script>
 <link rel="manifest" href="/manifest.webmanifest?v=3">
 <meta name="theme-color" content="#033a45">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=3">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Bug Hunters">
-<script src="/vv-app.js?v=3" defer></script>
+<script src="/vv-app.js?v=4" defer></script>
 <script src="/vv-gestora.js?v=1" defer></script>
 <script src="/vv-recado.js?v=3" defer></script>
 </head>
@@ -358,7 +358,7 @@ html[data-tema="escuro"] .ev-tip{background:#e4efed;color:#0f1a1c}
   <a class="logo" href="/inicio.html">
     <img id="brandLogo" src="/logo.png" alt="" hidden onload="this.hidden=false;this.nextElementSibling.setAttribute('hidden','')">
     <svg width="28" height="24" viewBox="0 0 28 24" aria-hidden="true"><path d="M1 2h9l4 9 4-9h9L14 23z" fill="#2fc28f"/><path d="M10 2h8l-4 9z" fill="#1a8f6a"/></svg>
-    <b>Toca dos <span>Bug Hunters</span></b><span class="ver">v0.37</span>
+    <b>Toca dos <span>Bug Hunters</span></b><span class="ver">v0.38</span>
   </a>
   <div class="spacer"></div>
   <span class="env">Área da Gestora</span>
@@ -464,7 +464,7 @@ html[data-tema="escuro"] .ev-tip{background:#e4efed;color:#0f1a1c}
             <li><b>💚 Elogios</b>: acompanhe os elogios chegando (com nome), aprove ou remova. Ligue <b>Aprovar antes de mostrar no telão</b> se quiser conferir tudo antes.</li>
             <li><b>📷 Álbum</b>: primeiro escolha ou crie o <b>momento</b> (ex.: “Confraternização de outubro”, com data), depois escolha as fotos, dê legendas e publique. No álbum, a equipe vê as fotos separadas por momento. Para editar a legenda, apagar uma foto ou remover comentários, abra a foto no álbum — com você conectada, os botões de gestora aparecem lá.</li>
             <li><b>📮 Sugestões</b>: mude o status, responda e marque <b>“Mostrar para a equipe”</b> para a resposta aparecer no mural “Ouvimos você”.</li>
-            <li><b>🔔 Lembrete</b>: veja quantas pessoas ativaram o aviso de sexta (9h) e, se precisar, envie um lembrete na hora.</li>
+            <li><b>🔔 Lembrete</b>: veja quantas pessoas ativaram o aviso de sexta (9h) e o <b>aviso de elogio</b> (cada pessoa recebe “Você recebeu um elogio!” quando é elogiada) e, se precisar, envie um lembrete na hora.</li>
             <li><b>🎂 Aniversários</b>: cadastre cada pessoa do time com o dia e o mês do aniversário (o ano não é pedido) e, se quiser, a data de entrada no time. A partir de <b>7 dias antes</b>, o Início da Toca já avisa (“Faltam 5 dias para o aniversário da Carla 🎂”, “Amanhã é aniversário…”) e, no dia, mostra “Hoje é aniversário de…” com o botão <kbd>Dar parabéns</kbd>. O mesmo vale para os anos de time.</li>
             <li><b>📅 Agenda</b>: marque confraternizações, entregas, feriados, férias e treinamentos. Use as ideias prontas, escolha a data (e a data final, para férias) e salve. O Início mostra a contagem regressiva — “faltam 3 dias”.</li>
             <li><b>🧩 Desafio</b>: escreva uma pergunta (ou use uma ideia pronta), de 2 a 4 alternativas, marque a certa e uma explicação curta. Cada pessoa responde uma vez, vê na hora se acertou e ganha 1 ponto por acerto no ranking do mês. Publicar um novo encerra o anterior e revela a resposta.</li>
@@ -990,6 +990,7 @@ $('pqCorpo').addEventListener('click',async e=>{
 async function carregarLembretes(){
   try{const d=await api('/api/lembretes/gestora');R.lembrete=d;renderResumo();
     $('lbCorpo').innerHTML=`<p style="margin:0 0 10px"><b>${d.inscritos}</b> ${d.inscritos===1?'pessoa ativou':'pessoas ativaram'} o lembrete. Toda <b>sexta às 9h</b> elas recebem um aviso para responder o Sentimento (e a Pergunta da semana, se houver uma aberta).${d.ultimoEnvio?` Último envio: ${new Date(d.ultimoEnvio).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}.`:''}</p>
+    <p class="ev-nota" style="margin:0 0 10px">💚 <b>${d.avisoElogio||0}</b> ${(d.avisoElogio||0)===1?'pessoa ligou':'pessoas ligaram'} o <b>aviso de elogio</b> (no sino 🔔): quando chega um elogio com o nome dela, só o aparelho dela recebe “Você recebeu um elogio!”. Com a aprovação antes do telão ligada, o aviso sai quando você aprova.</p>
     <p class="ev-nota" style="margin:0 0 10px">Para ativar, cada pessoa toca no sino 🔔 no topo do site. No iPhone é preciso instalar o app antes (Compartilhar → Adicionar à Tela de Início).</p>
     <button class="btn-outline btn-sm" type="button" id="lbTestar" ${d.inscritos?'':'disabled'}>Enviar lembrete agora</button> <span class="msgsg" id="lbMsg"></span>`;
   }catch(e){$('lbCorpo').textContent=e.message}

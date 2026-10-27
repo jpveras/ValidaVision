@@ -107,6 +107,11 @@ html.vv-tema-anim, html.vv-tema-anim * { transition: background-color .25s, colo
 .vv-app-item b { color: var(--ink, #0b3b47); font-weight: 600; }
 .vv-app-item span { color: var(--muted, #6b7a80); font-size: 13px; }
 .vv-app-item button { align-self: flex-start; margin-top: 4px; }
+.vv-app-item span b { font-weight: 600; }
+.vv-app-linha { display: flex; gap: 6px; margin-top: 6px; }
+.vv-app-linha input { flex: 1; min-width: 0; height: 34px; box-sizing: border-box; border: 1px solid var(--line, #cfd8d6); border-radius: 6px; padding: 0 10px; font: inherit; font-size: 14px; background: var(--card, #fff); color: var(--ink, #0b3b47); }
+.vv-app-linha button { margin-top: 0; flex: none; }
+.vv-app-item.vv-app-elo { border-bottom: 0; }
 .vv-app-msg { margin: 8px 0 0; font-size: 13px; color: var(--teal2, #0b7f70); min-height: 1em; }
 .vv-app-msg.erro { color: #b42318; }
 @media screen { html[data-tema="escuro"] .vv-app-msg.erro { color: #f07a72; } }

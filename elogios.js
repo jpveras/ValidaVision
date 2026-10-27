@@ -23,6 +23,7 @@ import dotenv from "dotenv";
 import { readFileSync } from "node:fs";
 import { lerDoc, atualizarDoc, gravarDocDireto, listarDocs, apagarDocs, _colecao } from "./colecao.js";
 import { confereGestora, gestoraConfigurada } from "./sentimentos.js";
+import { avisarElogiadosRapido } from "./lembretes.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PREFIX = "elogios/";
@@ -309,6 +310,8 @@ elogiosRouter.post("/", async (req, res) => {
     const item = { id: crypto.randomUUID().slice(0, 8), nome, texto, criadoEm: new Date().toISOString() };
     if (aprovarAntes) item.status = "pendente";
     await aposGravar(await store().add(item));
+    // Aviso "Você recebeu um elogio!" para quem ligou o aviso com esse nome (só se já está publicado).
+    if (!aprovarAntes) await avisarElogiadosRapido([item]);
     res.status(201).json({ ok: true, id: item.id, pendente: !!aprovarAntes });
   } catch (e) {
     console.error("Erro ao salvar elogio:", e);
@@ -342,12 +345,14 @@ elogiosRouter.put("/config", async (req, res) => {
     const aprovarAntes = !!req.body?.aprovarAntes;
     const config = await salvarConfig({ aprovarAntes });
     let aprovadosAgora = 0;
+    const novos = new Map();
     // Ao desligar a aprovação, quem estava esperando é publicado (senão ficaria escondido).
     if (!aprovarAntes) {
       const itens = await store().update((l) =>
-        l.map((e) => (pendente(e) ? (aprovadosAgora++, { ...e, status: "aprovado" }) : e))
+        l.map((e) => (pendente(e) ? (aprovadosAgora++, novos.set(e.id, e), { ...e, status: "aprovado" }) : e))
       );
       await aposGravar(itens);
+      await avisarElogiadosRapido([...novos.values()]);
     }
     res.json({ ok: true, config, aprovadosAgora });
   } catch (e) {
@@ -360,7 +365,9 @@ elogiosRouter.post("/aprovar-todos", async (req, res) => {
   if (!(await exigeAdmin(req, res))) return;
   try {
     let n = 0;
-    await aposGravar(await store().update((l) => l.map((e) => (pendente(e) ? (n++, { ...e, status: "aprovado" }) : e))));
+    const novos = new Map();
+    await aposGravar(await store().update((l) => l.map((e) => (pendente(e) ? (n++, novos.set(e.id, e), { ...e, status: "aprovado" }) : e))));
+    await avisarElogiadosRapido([...novos.values()]);
     res.json({ ok: true, aprovados: n });
   } catch (e) {
     console.error("Erro ao aprovar todos:", e);
@@ -372,9 +379,10 @@ elogiosRouter.post("/:id/aprovar", async (req, res) => {
   if (!(await exigeAdmin(req, res))) return;
   try {
     const id = String(req.params.id);
-    let achou = false;
-    await aposGravar(await store().update((l) => l.map((e) => (e.id === id ? ((achou = true), { ...e, status: "aprovado" }) : e))));
+    let achou = false, era = null;
+    await aposGravar(await store().update((l) => l.map((e) => (e.id === id ? ((achou = true), (era = pendente(e) ? e : null), { ...e, status: "aprovado" }) : e))));
     if (!achou) return res.status(404).json({ error: "Esse elogio não existe mais." });
+    if (era) await avisarElogiadosRapido([era]);
     res.json({ ok: true });
   } catch (e) {
     console.error("Erro ao aprovar elogio:", e);
