@@ -42,7 +42,7 @@ Os elogios ficam visíveis para quem abrir a página (é a ideia da dinâmica). 
 A chave fica só no `.env` e nunca vai para o browser. Não compartilhe o `.env`.
 Antes de enviar telas reais da empresa, valide as políticas internas de dados e PII.
 
-## App Android 1.1.1 e aviso de atualização
+## App Android 1.1.2 (abertura escura) e aviso de atualização
 
 - Ícone novo (logo do Time Bug Hunters). O app abre `/inicio.html?app=1&av=3`; o número `av` é o appVersionCode.
 - Quem abre a Toca por um app mais antigo (Android identificado pelo referrer `android-app://br.com.jpveras.bughunters`)
