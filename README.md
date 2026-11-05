@@ -42,6 +42,15 @@ Os elogios ficam visíveis para quem abrir a página (é a ideia da dinâmica). 
 A chave fica só no `.env` e nunca vai para o browser. Não compartilhe o `.env`.
 Antes de enviar telas reais da empresa, valide as políticas internas de dados e PII.
 
+## Correções de 05/11/2026 (revisão antes da apresentação)
+
+- **Nuvem de palavras travava a página** ("Maximum call stack size exceeded") quando todas as palavras tinham a
+  mesma quantidade (ex.: só uma resposta no Sentimento, ou todos os elogios com palavras diferentes) e alguma não
+  cabia: o tamanho não diminuía e a biblioteca tentava para sempre. Agora o tamanho diminui junto, há tamanho
+  mínimo, e a lista original não é mais alterada pela biblioteca. Vale para Sentimento, Pergunta, Área da Gestora
+  e o telão do Elogie.
+- Moderação no celular: a barra de cima passava da largura da tela.
+
 ## App Android 1.1.2 (abertura escura) e aviso de atualização
 
 - Ícone novo (logo do Time Bug Hunters). O app abre `/inicio.html?app=1&av=3`; o número `av` é o appVersionCode.

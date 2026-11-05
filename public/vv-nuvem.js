@@ -15,7 +15,10 @@
     // Tela estreita (celular): letras um pouco menores para todas as palavras caberem sem cortar.
     const estreita = W < 520;
     const maxPx = Math.max(30, Math.min(W, H) / (palavras.length < 6 ? 3 : estreita ? 5.6 : 4.4)), minPx = Math.max(estreita ? 12 : 14, maxPx / 5);
-    const tam = (c) => (max === min ? maxPx * 0.75 : minPx + ((c - min) / (max - min)) * (maxPx - minPx));
+    // O tamanho acompanha a quantidade mesmo abaixo do mínimo: com shrinkToFit a biblioteca reduz a quantidade
+    // (×3/4) até a palavra caber. Se o tamanho não diminuísse (ex.: todas as palavras com a mesma quantidade),
+    // ela tentaria para sempre e travaria a página ("Maximum call stack size exceeded").
+    const tam = (c) => (max === min ? maxPx * 0.75 * (c / max) : c >= min ? minPx + ((c - min) / (max - min)) * (maxPx - minPx) : minPx * (c / min));
     const CORES = paleta();
     const cor = (w, c) => CORES[(w.length + c) % CORES.length];
     if (window.WordCloud && WordCloud.isSupported) {
@@ -23,7 +26,7 @@
       canvas.width = W * dpr; canvas.height = H * dpr; canvas.hidden = false; fallback.hidden = true;
       canvas.style.width = W + 'px'; canvas.style.height = H + 'px'; canvas.style.margin = M + 'px auto';
       const desenhar = () => WordCloud(canvas, {
-        list: palavras, weightFactor: (c) => tam(c) * dpr, fontFamily: 'Roboto, "Segoe UI", Arial, sans-serif', fontWeight: '700',
+        list: palavras.map((p) => [p[0], p[1]]), minSize: 6 * dpr, weightFactor: (c) => tam(c) * dpr, fontFamily: 'Roboto, "Segoe UI", Arial, sans-serif', fontWeight: '700',
         color: cor, rotateRatio: estreita ? 0 : 0.15, rotationSteps: 2, gridSize: Math.round(8 * dpr), backgroundColor: 'rgba(0,0,0,0)',
         shrinkToFit: true, drawOutOfBound: false, shuffle: false,
       });
