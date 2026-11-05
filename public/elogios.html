@@ -433,11 +433,11 @@ function renderCloud(force){
   if(sig===lastCloudSig&&!force)return;lastCloudSig=sig;
   const lista=state.palavras,max=lista[0][1],min=lista[lista.length-1][1];
   const maxPx=Math.max(34,Math.min(W,H)/(lista.length<6?3.2:4.6)),minPx=Math.max(13,maxPx/5.5);
-  const tam=c=>max===min?maxPx*.8:minPx+(c-min)/(max-min)*(maxPx-minPx);
+  const tam=c=>max===min?maxPx*.8*(c/max):c>=min?minPx+(c-min)/(max-min)*(maxPx-minPx):minPx*(c/min); // diminui junto com o shrinkToFit (senão trava)
   if(window.WordCloud&&WordCloud.isSupported){
     const cv=$('cloud'),dpr=Math.min(2,window.devicePixelRatio||1);
     cv.width=W*dpr;cv.height=H*dpr;cv.hidden=false;$('fallback').hidden=true;
-    WordCloud(cv,{list:lista,weightFactor:c=>tam(c)*dpr,fontFamily:'Roboto, "Segoe UI", Arial, sans-serif',fontWeight:'700',
+    WordCloud(cv,{list:lista.map(p=>[p[0],p[1]]),minSize:6*dpr,weightFactor:c=>tam(c)*dpr,fontFamily:'Roboto, "Segoe UI", Arial, sans-serif',fontWeight:'700',
       color:(w,c)=>CORES[(w.length+c)%CORES.length],rotateRatio:.2,rotationSteps:2,gridSize:Math.round(8*dpr),
       backgroundColor:'rgba(0,0,0,0)',shrinkToFit:true,drawOutOfBound:false,shuffle:false});
   }else{
